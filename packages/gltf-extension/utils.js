@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const camelCase = require('camelcase');
 
 const SCHEMA_ROOT = path.resolve(__dirname, './glTF-spec/extensions/2.0/Vendor/ALCM_interactivity/schema');
 
@@ -51,16 +52,16 @@ function enhanceSchema(extra = defaultEnhancement, schema) {
  * 
  * @param {*} ref 
  */
-function fixReference(ref) {
-    return createTypeName(ref.$ref.replace('#/definitions/', ''));
+function fixReference(ref, parentTypeName = '') {
+    return createTypeName(camelCase(ref.$ref.replace('#/definitions/', '')), camelCase(parentTypeName));
 }
 
 /**
  * generates type filename
  * @param typeName
  */
-function createTypeName(typeName) {
-    return `ALCM_interactivity_${typeName}.schema.json`
+function createTypeName(typeName, parentTypeName = '') {
+    return `${parentTypeName?parentTypeName+'.':''}${typeName}.schema.json`
 }
 
 module.exports = {

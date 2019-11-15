@@ -1,16 +1,10 @@
-export enum MaterialEnum {
-    FOO,
-    BAR,
-    BAZ
-}
-
-export interface Peter {
-    meter: boolean;
-}
-
-export interface MaterialProperties {
-    bar: MaterialEnum[];
-    skrrt: string[];
-    bob: { [id: string]: number };
-    ss: Peter;
+export interface Material {
+    myProp: NestedProp;
 }   
+
+/**
+ * IF i add this stuff
+ */
+export interface NestedProp {
+
+}

@@ -1,4 +1,5 @@
 const path = require('path');
+const camelCase = require('camelcase');
 
 // schema generator
 const SchemaGenerator = require('ts-json-schema-generator/dist/factory/generator');
@@ -27,6 +28,13 @@ Object.keys(schema.definitions).forEach(typeName => {
     // first the type itself
     if(type.allOf) {
         type.allOf = type.allOf.map(fixReference);
+
+        // mark for usage
+        type.allOf.forEach(refType => {
+            if(schema.definitions[refType]) {
+                schema.definitions[refType].__used = true;
+            }
+        });
     }
 
     // then all properties
@@ -38,8 +46,12 @@ Object.keys(schema.definitions).forEach(typeName => {
                 const def = prop.items.$ref.replace('#/definitions/', '');
                 if(schema.definitions[def]) {
                     const refProps = schema.definitions[def];
+                    refProps.__used = true;
                     if(refProps.type === 'object') {
-                        prop.items.$ref = fixReference(prop.items);
+                        prop.items.$ref = fixReference(prop.items, typeName);
+                        if(!refProps.__parent) {
+                            refProps.__parent = typeName;
+                        }
                     } else {
                         prop.items = refProps;
                         refProps.__hide = true;
@@ -49,7 +61,16 @@ Object.keys(schema.definitions).forEach(typeName => {
 
             // reference to other object
             if(prop.$ref) {
-                prop.$ref = fixReference(prop);
+                const refKey = prop.$ref.replace('#/definitions/', '');
+                prop.$ref = fixReference(prop, typeName);
+                
+                if(schema.definitions[refKey]) {
+                    schema.definitions[refKey].__used = true;
+
+                    if(!schema.definitions[refKey].__parent) {
+                        schema.definitions[refKey].__parent = typeName;
+                    }
+                }
             }
         });
     }
@@ -71,9 +92,9 @@ const toplevelSchema = enhanceSchema({
 outputSchemaFile('gltf.ALCM_interactivity.schema.json', toplevelSchema);
 
 // opther types
-const { MaterialProperties, ...otherTypes } = types;
+const { Material, ...otherTypes } = types;
 
-// material
+// material TODO my be removed because of manual extension
 const materialSchema = enhanceSchema({
     description: 'Extra properties that transport changeable material properties',
     allOf: [
@@ -81,15 +102,17 @@ const materialSchema = enhanceSchema({
             $ref: 'material.schema.json'
         }
     ]
-}, { properties: MaterialProperties.properties });
+}, { properties: Material.properties });
 outputSchemaFile('material.schema.json', materialSchema);
 
 // all others
 Object.keys(otherTypes).forEach(typeName => {
-    const {__hide, ...type} = otherTypes[typeName];
-    if(!__hide) {
-        const extraTypeSchema = enhanceSchema({}, type);
+    const { __hide, __used, __parent,  ...type} = otherTypes[typeName];
+    if(!__hide && __used) {
+        const extraTypeSchema = enhanceSchema({
+            title: typeName
+        }, type);
 
-        outputSchemaFile(createTypeName(typeName), extraTypeSchema);
+        outputSchemaFile(createTypeName(camelCase(typeName), __parent ? camelCase(__parent): '' ), extraTypeSchema);
     }
 });
