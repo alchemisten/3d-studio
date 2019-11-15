@@ -1,0 +1,4 @@
+
+[submodule "packages/gltf-extension/glTF-spec"]
+	path = packages/gltf-extension/glTF-spec
+	url = https://github.com/alchemistenag/glTF
