@@ -37,10 +37,20 @@ Object.keys(schema.definitions).forEach(typeName => {
         });
     }
 
+    // first the type itself
+    if(type.additionalProperties && type.additionalProperties.$ref) {
+        type.additionalProperties.$ref = fixReference(type.additionalProperties);
+        const refKey = type.additionalProperties.$ref;
+        if(schema.definitions[refKey]) {
+            schema.definitions[refKey].__used = true;
+        }
+    }
+
     // then all properties
     if(type.properties) {
         Object.keys(type.properties).forEach(propName => {
             const prop = type.properties[propName];
+            
             // is array
             if(prop.items && prop.items.$ref) {
                 const def = prop.items.$ref.replace('#/definitions/', '');
@@ -78,7 +88,7 @@ Object.keys(schema.definitions).forEach(typeName => {
 
 console.log('Creating output...');
 
-const { definitions: { ALCMInteractivity, ...types }, ...other } = schema;
+const { definitions: { Interactivity, ...types }, ...other } = schema;
 
 // toplevel schema
 const toplevelSchema = enhanceSchema({
@@ -88,7 +98,7 @@ const toplevelSchema = enhanceSchema({
             $ref: 'glTFProperty.schema.json' 
         } 
     ]
-}, { properties: ALCMInteractivity.properties });
+}, { properties: Interactivity.properties });
 outputSchemaFile('gltf.ALCM_interactivity.schema.json', toplevelSchema);
 
 // opther types

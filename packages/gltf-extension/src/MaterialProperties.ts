@@ -1,10 +1,7 @@
 export interface Material {
-    myProp: NestedProp;
+    changeables: MaterialOption[];
 }   
 
-/**
- * IF i add this stuff
- */
-export interface NestedProp {
-
+export interface MaterialOption {
+    
 }
