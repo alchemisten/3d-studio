@@ -6,13 +6,15 @@ const SchemaGenerator = require('ts-json-schema-generator/dist/factory/generator
 const DefaultConfig = require('ts-json-schema-generator/dist/src/Config');
 
 // other
-const { enhanceSchema, 
-        outputSchemaFile, 
+const { enhanceSchema,
+        outputSchemaFile,
         createTypeName,
-        fixReference 
+        fixReference,
+        ensureSchemaRootExists
 } = require('./utils');
 
 console.log('Generating schema...');
+ensureSchemaRootExists();
 
 const schema = SchemaGenerator.createGenerator({
     ...DefaultConfig.DEFAULT_CONFIG,

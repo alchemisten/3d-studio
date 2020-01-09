@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/.bin/ts-json-schema-generator --path ./src/**.ts -u -o ./schema/schema.json"
+    "generate": "node generate-schema.js"
   },
   "keywords": [],
   "author": "",

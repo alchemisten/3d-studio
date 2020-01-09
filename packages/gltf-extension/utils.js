@@ -64,9 +64,22 @@ function createTypeName(typeName, parentTypeName = '') {
     return `${parentTypeName?parentTypeName+'.':''}${typeName}.schema.json`
 }
 
+function createDirIfNotExistent(dir) {
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+}
+
+function ensureSchemaRootExists() {
+    createDirIfNotExistent(SCHEMA_ROOT)
+}
+
+
+
 module.exports = {
     outputSchemaFile,
     enhanceSchema,
     fixReference,
-    createTypeName
+    createTypeName,
+    ensureSchemaRootExists
 };
