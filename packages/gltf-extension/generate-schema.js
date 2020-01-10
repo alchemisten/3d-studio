@@ -1,6 +1,8 @@
 const path = require('path');
 const camelCase = require('camelcase');
 
+const ALCM_interactivity_extension_name = "ALCM_interactivity";
+
 // schema generator
 const SchemaGenerator = require('ts-json-schema-generator/dist/factory/generator');
 const DefaultConfig = require('ts-json-schema-generator/dist/src/Config');
@@ -89,42 +91,52 @@ Object.keys(schema.definitions).forEach(typeName => {
 });
 
 console.log('Creating output...');
-
-const { definitions: { Interactivity, ...types }, ...other } = schema;
-
-// toplevel schema
-const toplevelSchema = enhanceSchema({
-    description: 'glTF extension for describing interactive elements in 3d scenes',
-    allOf: [ 
-        { 
-            $ref: 'glTFProperty.schema.json' 
-        } 
-    ]
-}, { properties: Interactivity.properties });
-outputSchemaFile('gltf.ALCM_interactivity.schema.json', toplevelSchema);
-
-// opther types
-const { Material, ...otherTypes } = types;
-
-// material TODO my be removed because of manual extension
-const materialSchema = enhanceSchema({
-    description: 'Extra properties that transport changeable material properties',
-    allOf: [
-        {
-            $ref: 'material.schema.json'
-        }
-    ]
-}, { properties: Material.properties });
-outputSchemaFile('material.schema.json', materialSchema);
+const types = schema.definitions;
+[
+    {clazz:"Interactivity", name:"glTF"},
+    {clazz:"MaterialExtension", name:"material"},
+    {clazz:"MeshesExtension", name:"meshes"},
+    {clazz:"NodeExtension", name:"node"}
+].forEach(schema =>
+    createTopLevelSchemaExtensions(schema.clazz, schema.name, types)
+);
 
 // all others
-Object.keys(otherTypes).forEach(typeName => {
-    const { __hide, __used, __parent,  ...type} = otherTypes[typeName];
-    if(!__hide && __used) {
-        const extraTypeSchema = enhanceSchema({
-            title: typeName
-        }, type);
+Object.keys(types).forEach(typeName => {
+    if(!(types[typeName] == null)){
+        const { __hide, __used, __parent,  ...type} = types[typeName];
+        if(!__hide && __used) {
+            const extraTypeSchema = enhanceSchema({
+                title: typeName,
+                allOf: [
+                    {
+                        $ref: 'glTFChildOfRootProperty.schema.json'
+                    }
+                ]
+            }, type);
 
-        outputSchemaFile(createTypeName(camelCase(typeName), __parent ? camelCase(__parent): '' ), extraTypeSchema);
+            outputSchemaFile(createTypeName(camelCase(typeName), __parent ? camelCase(__parent): '' ), extraTypeSchema);
+        }
+    } else {
+        console.log("Couldn't retrieve type for " + typeName)
     }
+
 });
+
+function createTopLevelSchemaExtensions(extensionClass, extensionName, types) {
+    const extClass = types[extensionClass];
+
+    const materialSchema = enhanceSchema({
+        title: ALCM_interactivity_extension_name+" "+ extensionName +" extension",
+        description: 'Extra properties that transport changeable material properties',
+        allOf: [
+            {
+                $ref: 'glTFProperty.schema.json'
+            }
+        ]
+    }, { properties: extClass.properties });
+    outputSchemaFile(extensionName+"."+ALCM_interactivity_extension_name+".schema.json", materialSchema);
+
+    console.log("Created top level schema for " + extensionClass)
+    types[extensionClass] = undefined
+}
