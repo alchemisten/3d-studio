@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate-alcm": "node generate-schema.js",
+    "generate-alcm-ast": "node generate-schema-ast.js",
     "generate-gltf": "node generate-gltf-ts.js"
   },
   "keywords": [],
@@ -14,7 +14,8 @@
     "camelcase": "^5.3.1",
     "fs": "0.0.1-security",
     "path": "^0.12.7",
-    "ts-json-schema-generator": "^0.56.0"
+    "ts-json-schema-generator": "^0.56.0",
+    "typescript-json-schema": "^0.42.0"
   },
   "devDependencies": {
     "json-schema-to-typescript": "^3.1.4"

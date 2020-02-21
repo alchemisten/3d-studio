@@ -1,6 +1,4 @@
 export interface Node {
-    /**
-     * @schemaInclude:glTFid
-     */
+    /** @schemaInclude:glTFid */
     defaultMaterialOptionGroup: number;
 }
