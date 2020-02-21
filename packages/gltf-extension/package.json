@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "generate-alcm-ast": "node generate-schema-ast.js",
-    "generate-gltf": "node generate-gltf-ts.js"
+    "generate-gltf": "node generate-gltf-ts.js",
+    "test": "node generate-gltf-ts.js && node test/validate-gltf.js"
   },
   "keywords": [],
   "author": "",

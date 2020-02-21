@@ -81,5 +81,6 @@ module.exports = {
     enhanceSchema,
     fixReference,
     createTypeName,
+    createDirIfNotExistent,
     ensureSchemaRootExists
 };
