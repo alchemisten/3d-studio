@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "lib": [ "es6", "dom" ],
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "typeRoots": [],
+        "declaration": true,
+        "outDir": "./lib",
+        "strict": true,
+        "types": []
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules",
+        "typings",
+        "**/__tests__/*"
+    ]
+}

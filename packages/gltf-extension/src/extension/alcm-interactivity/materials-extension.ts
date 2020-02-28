@@ -1,4 +1,4 @@
-export interface MaterialExtension {
+export interface MaterialsExtension {
     optionGroup: MaterialOptionGroup;
 }
 

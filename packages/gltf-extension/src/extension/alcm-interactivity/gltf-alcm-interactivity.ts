@@ -1,4 +1,4 @@
-import {MaterialOptionGroup} from "./MaterialExtension";
+import {MaterialOptionGroup} from "./materials-extension";
 
 export interface Interactivity {
     i18n: LanguageMap;

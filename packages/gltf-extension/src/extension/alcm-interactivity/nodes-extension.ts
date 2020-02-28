@@ -1,6 +1,6 @@
-import {MaterialOptionEntry} from "./MaterialExtension";
+import {MaterialOptionEntry} from "./materials-extension";
 
-export interface NodeExtension {
+export interface NodesExtension {
 
     /** @schemaInclude:glTFid */
     anchor: number;

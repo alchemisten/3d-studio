@@ -5,7 +5,7 @@ const { createDirIfNotExistent } = require('./utils');
 
 const GLTF_2_SCHEMA_SPEC = path.resolve(__dirname, './glTF-spec/specification/2.0/schema/glTF.schema.json');
 
-const outputPath = process.argv[2] || './out/';
+const outputPath = process.argv[2] || '../out/';
 const outputFileName = process.argv[3] || 'gltf.d.ts';
 const schemaPath = process.argv[4] || GLTF_2_SCHEMA_SPEC;
 

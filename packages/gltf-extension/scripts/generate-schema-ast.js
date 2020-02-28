@@ -16,12 +16,13 @@ const { enhanceSchema,
 } = require('./utils');
 
 console.log('Generating schema...');
+
 ensureSchemaRootExists();
 
 const schema = SchemaGenerator.createGenerator({
     ...DefaultConfig.DEFAULT_CONFIG,
     strictTuples: false,
-    path: path.resolve(__dirname, './src/extension/alcm/**.ts'),
+    path: path.resolve(__dirname, '../src/extension/alcm-interactivity/**.ts'),
     unstable: true
 }).createSchema();
 
@@ -93,9 +94,9 @@ Object.keys(schema.definitions).forEach(typeName => {
 let types = schema.definitions;
 const topLevelTypes = [
     {clazz:"Interactivity", name:"glTF"},
-    {clazz:"MaterialExtension", name:"material"},
+    {clazz:"MaterialsExtension", name:"material"},
     {clazz:"MeshesExtension", name:"meshes"},
-    {clazz:"NodeExtension", name:"node"}
+    {clazz:"NodesExtension", name:"node"}
 ];
 
 topLevelTypes.forEach(schema =>

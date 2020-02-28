@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const camelCase = require('camelcase');
 
-const SCHEMA_ROOT = path.resolve(__dirname, './glTF-spec/extensions/2.0/Vendor/ALCM_interactivity/schema');
+const SCHEMA_ROOT = path.resolve(__dirname, '../glTF-spec/extensions/2.0/Vendor/ALCM_interactivity/schema');
 
 const defaultEnhancement = {
     $schema: 'http://json-schema.org/draft-04/schema',

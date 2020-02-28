@@ -1,4 +1,4 @@
-import {MaterialOptionEntry} from "./MaterialExtension";
+import {MaterialOptionEntry} from "./materials-extension";
 
 export interface MeshesExtension {
     /** @schemaInclude:glTFid */
