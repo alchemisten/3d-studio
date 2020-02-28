@@ -3,7 +3,6 @@ const path = require('path');
 
 
 // LINKS https://github.com/YousefED/typescript-json-schema/blob/master/test/programs/extra-properties/schema.json
-//
 
 // schema generator
 const {PartialArgs, CompilerOptions, getProgramFromFiles, generateSchema, buildGenerator} = require('typescript-json-schema');
@@ -25,7 +24,7 @@ const program = getProgramFromFiles(files, compilerOptions, basePath);
 
 // We can either get the schema for one file and one type...
 const schemaMo = generateSchema(program, "MaterialOption", settings);
-const schemaM = generateSchema(program, "Material", settings);
+const schemaM = generateSchema(program, "MaterialExtension", settings);
 console.log(schemaMo);
 console.log(schemaM);
 

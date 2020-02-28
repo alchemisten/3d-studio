@@ -1,4 +1,4 @@
-export interface Material {
+export interface MaterialExtension {
     optionGroup: MaterialOptionGroup;
 }
 
@@ -11,4 +11,13 @@ export interface MaterialOption {
     id: String;
     name: String;
     overrides: {[key: string]: object};
+}
+
+export interface MaterialOptionEntry {
+    /** @schemaInclude:glTFid */
+    material: number
+    /** @schemaInclude:glTFid */
+    materialOptionGroup?: number
+
+    ignoreOptions?: boolean
 }

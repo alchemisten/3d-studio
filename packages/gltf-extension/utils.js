@@ -64,6 +64,10 @@ function createTypeName(typeName, parentTypeName = '') {
     return `${parentTypeName?parentTypeName+'.':''}${typeName}.schema.json`
 }
 
+/**
+ * Checks whether the dir exists else create it.
+ * @param dir
+ */
 function createDirIfNotExistent(dir) {
     if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
