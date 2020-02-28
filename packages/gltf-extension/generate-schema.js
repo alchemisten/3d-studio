@@ -36,7 +36,7 @@ const compilerOptions = {
 };
 
 // optionally pass a base path
-const basePath = "./src";
+const basePath = "./src/extension/alcm";
 const files = fs.readdirSync(basePath).filter(fn => fn.endsWith('.ts')).map(f=>path.resolve(basePath, f));
 const program = getProgramFromFiles(files, compilerOptions, basePath);
 
@@ -44,4 +44,4 @@ const program = getProgramFromFiles(files, compilerOptions, basePath);
 const schema = generateSchema(program, "*", settings);
 console.log(schema);
 
-exec("./src/**/*.ts", "*", compilerOptions);
+exec(`${basePath}/**/*.ts", "*"`, compilerOptions);

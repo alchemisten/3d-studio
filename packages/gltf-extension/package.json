@@ -7,6 +7,7 @@
     "generate-alcm-ast": "node generate-schema-ast.js",
     "generate-alcm": "node generate-schema.js",
     "generate-gltf": "node generate-gltf-ts.js",
+    "validate-gltf": "node validate-gltf.js",
     "test": "node generate-gltf-ts.js && node test/validate-gltf.js"
   },
   "keywords": [],
@@ -15,7 +16,7 @@
   "dependencies": {
     "camelcase": "^5.3.1",
     "fs": "0.0.1-security",
-    "gltf-validator": "^2.0.0-dev.3.0",
+    "gltf-validator": "^2.0.0-dev.3.2",
     "path": "^0.12.7",
     "ts-json-schema-generator": "^0.56.0",
     "typescript-json-schema": "^0.42.0"

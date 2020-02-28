@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const validator = require('gltf-validator');
 
-const inputFilePath = process.argv[2] || "./out/Box/";
-const filename = process.argv[3] || "Box.gltf";
+const inputFilePath = process.argv[2] || "./test/samples/Triangle";
+const filename = process.argv[3] || "Triangle.gltf";
 
 const fullpath = path.resolve(inputFilePath, filename);
 
@@ -44,7 +44,7 @@ const validationOptions = {
 
 const asset = fs.readFileSync(fullpath);
 validator.validateBytes(new Uint8Array(asset), validationOptions).then((result) => {
-    console.log("Validation successful:\n", JSON.stringify(result, null, '  '));
+    console.log(JSON.stringify(result, null, '  '));
 }, (result) => {
     // Promise rejection means that arguments were invalid or validator was unable
     // to detect file format (glTF or GLB).
