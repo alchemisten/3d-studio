@@ -1,35 +1,34 @@
 {
   "name": "@alchemisten/gltf-extension-validator",
   "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "preversion": "npm run lint",
-    "test": "mocha -r ts-node/register src/**/*.spec.ts"
-  },
+  "description": "Typescript example",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "devDependencies": {
-    "@types/jest": "^22.2.3",
-    "chai": "^4.2.0",
-    "codecov": "^3.1.0",
-    "mocha": "^7.1.0",
-    "prettier": "^1.13.2",
-    "ts-node": "^8.6.2",
-    "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.13.0",
-    "typescript": "^3.7.5"
+  "scripts": {
+    "compile": "tsc --declaration",
+    "lint": "tslint --project tsconfig.json",
+    "prepublish": "npm run compile",
+    "test": "mocha"
   },
-  "files": [
-    "lib/**/*"
-  ],
+  "directories": {
+    "lib": "./lib",
+    "src": "./src",
+    "test": "./src"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.6",
+    "assert": "^1.4.1",
+    "mocha": "^7.0.0",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.3"
+  },
   "dependencies": {
     "gltf-validator": "^2.0.0-dev.3.2",
     "@alchemisten/gltf-extension": "^1.0.0"
   },
-  "author": "",
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "license": "ISC"
 }
