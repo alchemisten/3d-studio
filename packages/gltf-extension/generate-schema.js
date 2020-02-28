@@ -5,7 +5,7 @@ const path = require('path');
 // LINKS https://github.com/YousefED/typescript-json-schema/blob/master/test/programs/extra-properties/schema.json
 
 // schema generator
-const {PartialArgs, CompilerOptions, getProgramFromFiles, generateSchema, buildGenerator} = require('typescript-json-schema');
+const {PartialArgs, CompilerOptions, exec, getDefaultArgs, getProgramFromFiles, generateSchema, buildGenerator} = require('typescript-json-schema');
 
 // optionally pass argument to schema generator
 const settings = {
@@ -14,7 +14,25 @@ const settings = {
 
 // optionally pass ts compiler options
 const compilerOptions = {
-    strictNullChecks: true
+    ref: true,
+    aliasRef: false,
+    topRef: false,
+    titles: false,
+    defaultProps: false,
+    noExtraProps: false,
+    propOrder: false,
+    typeOfKeyword: false,
+    required: false,
+    strictNullChecks: false,
+    ignoreErrors: false,
+    out: "./out/glTF.ALCM_interactivity.schema.json",
+    validationKeywords: [],
+    include: [],
+    excludePrivate: false,
+    uniqueNames: false,
+    rejectDateType: false,
+    id: "",
+    defaultNumberType: "number"
 };
 
 // optionally pass a base path
@@ -23,15 +41,7 @@ const files = fs.readdirSync(basePath).filter(fn => fn.endsWith('.ts')).map(f=>p
 const program = getProgramFromFiles(files, compilerOptions, basePath);
 
 // We can either get the schema for one file and one type...
-const schemaMo = generateSchema(program, "MaterialOption", settings);
-const schemaM = generateSchema(program, "MaterialExtension", settings);
-console.log(schemaMo);
-console.log(schemaM);
+const schema = generateSchema(program, "*", settings);
+console.log(schema);
 
-// ... or a generator that lets us incrementally get more schemas
-//const generator = buildGenerator(program, settings);
-// all symbols
-//const symbols = generator.getUserSymbols();
-
-// Get symbols for different types from generator.
-//const matSchema = generator.getSchemaForSymbol("Material");
+exec("./src/**/*.ts", "*", compilerOptions);
