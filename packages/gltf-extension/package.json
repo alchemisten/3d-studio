@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compile": "tsc --declaration",
     "generate-alcm-ast": "node scripts/generate-schema-ast.js",
     "generate-alcm": "node scripts/generate-schema.js",
     "generate-gltf": "node scripts/generate-gltf-ts.js",

@@ -2,6 +2,8 @@ import 'mocha';
 
 import { readFileSync } from 'fs';
 import { validateBytes } from 'gltf-validator';
+import {equal} from "assert";
+import * as ALCM from '@alchemisten/gltf-extension/lib/extension/alcm-interactivity/gltf-alcm-interactivity';
 
 const SAMPLE_TRIANGLE_BASIC = 'samples/Triangle/Triangle.gltf';
 
@@ -11,11 +13,10 @@ describe('GLTF Validator', () => {
     it(`normal validation`, async () => {
         const asset = readFileSync(SAMPLE_TRIANGLE_BASIC);
 
-        validateBytes(new Uint8Array(asset))
+        const res = await validateBytes(new Uint8Array(asset));
             //.then((report) => console.info('Validation succeeded: ', report))
             //.catch((error) => console.error('Validation failed: ', error));
 
-        //expect(reader.getContainer()).not.equal(undefined, 'Expected container to be present');
+        equal(res.mimeType, "model/gltf+json", "Weird mimeTye.");
     });
-
 });
