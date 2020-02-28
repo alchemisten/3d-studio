@@ -90,14 +90,15 @@ Object.keys(schema.definitions).forEach(typeName => {
     }
 });
 
-console.log('Creating output...');
 const types = schema.definitions;
-[
+const topLevelTypes = [
     {clazz:"Interactivity", name:"glTF"},
     {clazz:"MaterialExtension", name:"material"},
     {clazz:"MeshesExtension", name:"meshes"},
     {clazz:"NodeExtension", name:"node"}
-].forEach(schema =>
+];
+
+topLevelTypes.forEach(schema =>
     createTopLevelSchemaExtensions(schema.clazz, schema.name, types)
 );
 
@@ -115,12 +116,15 @@ Object.keys(types).forEach(typeName => {
                 ]
             }, type);
 
-            outputSchemaFile(createTypeName(camelCase(typeName), __parent ? camelCase(__parent): '' ), extraTypeSchema);
+            const schemaName = createTypeName(camelCase(typeName), __parent ? camelCase(__parent): '' );
+            outputSchemaFile(schemaName, extraTypeSchema);
+            console.log("Created schema for " + schemaName)
         }
     } else {
-        console.log("Couldn't retrieve type for " + typeName)
+        if(!topLevelTypes.find(it => it["clazz"] === typeName)){
+            console.log("Couldn't retrieve type for " + typeName)
+        }
     }
-
 });
 
 function createTopLevelSchemaExtensions(extensionClass, extensionName, types) {
@@ -137,6 +141,6 @@ function createTopLevelSchemaExtensions(extensionClass, extensionName, types) {
     }, { properties: extClass.properties });
     outputSchemaFile(extensionName+"."+ALCM_interactivity_extension_name+".schema.json", materialSchema);
 
-    console.log("Created top level schema for " + extensionClass)
+    console.log("Created top level schema for " + extensionClass);
     types[extensionClass] = undefined
 }
