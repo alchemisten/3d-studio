@@ -1,0 +1,166 @@
+{
+  "scene" : 0,
+  "scenes" : [
+    {
+      "nodes" : [ 0 ]
+    },
+    {
+      "nodes" : [ 1 ]
+    }
+  ],
+
+  "nodes" : [
+    {
+      "mesh" : 0,
+      "extensions": {
+          "ALCM": {
+              "defaultMaterialOptionGroup": 0,
+              "materials": [
+                  { "material": 0 },
+                  { "material": 0, "optionGroup": 0 },
+                  { "material": 0, "ignoreOptions": true }
+              ],
+              "anchors": [
+
+              ]
+          }
+      }
+    },
+    {
+        "name": "CoverNode2",
+        "mesh": 0,
+        "extensions": {
+            "ALCM": {
+                "ignoreMaterialOptions": true
+            }
+        }
+    }
+  ],
+
+  "meshes" : [
+    {
+      "primitives" : [ {
+        "attributes" : {
+          "POSITION" : 1
+        },
+        "indices" : 0,
+        "material": 0
+      } ],
+     "extensions": {
+          "ALCM": {
+              "defaultMaterialOptionGroup": 0,
+              "materials": [
+                  { "material": 0 },
+                  { "material": 0, "optionGroup": 0 },
+                  { "material": 0, "ignoreOptions": true }
+              ]
+          }
+      }
+    }
+  ],
+
+  "buffers" : [
+    {
+      "uri" : "simpleTriangle.bin",
+      "byteLength" : 44
+    }
+  ],
+  "bufferViews" : [
+    {
+      "buffer" : 0,
+      "byteOffset" : 0,
+      "byteLength" : 6,
+      "target" : 34963
+    },
+    {
+      "buffer" : 0,
+      "byteOffset" : 8,
+      "byteLength" : 36,
+      "target" : 34962
+    }
+  ],
+  "accessors" : [
+    {
+      "bufferView" : 0,
+      "byteOffset" : 0,
+      "componentType" : 5123,
+      "count" : 3,
+      "type" : "SCALAR",
+      "max" : [ 2 ],
+      "min" : [ 0 ]
+    },
+    {
+      "bufferView" : 1,
+      "byteOffset" : 0,
+      "componentType" : 5126,
+      "count" : 3,
+      "type" : "VEC3",
+      "max" : [ 1.0, 1.0, 0.0 ],
+      "min" : [ 0.0, 0.0, 0.0 ]
+    }
+  ],
+
+  "asset" : {
+    "version" : "2.0"
+  },
+  "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.800000011920929,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "metallicFactor": 0.0
+            },
+            "name": "Red",
+            "extensions": {
+                "ALCM": {
+                    "optionGroup": 0
+                }
+            }
+        }
+  ],
+  "extensionsUsed": [
+      "ALCM_interactivity"
+  ],
+  "extensions": {
+      "ALCM_interactivity": {
+          "anchors": [
+              {
+                  "name": "box-anchor-point-source",
+                  "matrix": [
+                      0,0,0,0,
+                      0,0,0,0,
+                      0,0,0,0,
+                      0,0,0,1
+                  ]
+              },
+              {
+                  "name": "box-anchor-point-sink",
+                  "matrix": [
+                      0,0,0,0,
+                      0,0,0,0,
+                      0,0,0,0,
+                      0,0,0,1
+                  ]
+              }
+          ],
+          "materialOptionGroups": [
+              {
+                  "id": "mat-opts-1",
+                  "options":[
+                      {
+                          "id": "opt-1",
+                          "name": "Foo",
+                          "overrides": {
+                              "normalTexture": 0
+                          }
+                      }
+                  ]
+              }
+          ]
+      }
+  }
+}
