@@ -9,4 +9,7 @@ export interface NodesExtension {
     defaultMaterialOptionGroup?: number;
 
     materials: MaterialOptionEntry[];
+
+    /** @schemaInclude:glTFid */
+    highlight?: number 
 }

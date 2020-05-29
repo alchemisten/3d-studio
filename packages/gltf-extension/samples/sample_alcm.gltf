@@ -13,7 +13,7 @@
     {
       "mesh" : 0,
       "extensions": {
-          "ALCM": {
+          "ALCM_interactivity": {
               "defaultMaterialOptionGroup": 0,
               "materials": [
                   { "material": 0 },
@@ -30,7 +30,7 @@
         "name": "CoverNode2",
         "mesh": 0,
         "extensions": {
-            "ALCM": {
+            "ALCM_interactivity": {
                 "ignoreMaterialOptions": true
             }
         }
@@ -47,7 +47,7 @@
         "material": 0
       } ],
      "extensions": {
-          "ALCM": {
+          "ALCM_interactivity": {
               "defaultMaterialOptionGroup": 0,
               "materials": [
                   { "material": 0 },
@@ -61,7 +61,7 @@
 
   "buffers" : [
     {
-      "uri" : "simpleTriangle.bin",
+      "uri" : "data:application/octet-stream;base64,AAABAAIAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAA=",
       "byteLength" : 44
     }
   ],
@@ -116,7 +116,7 @@
             },
             "name": "Red",
             "extensions": {
-                "ALCM": {
+                "ALCM_interactivity": {
                     "optionGroup": 0
                 }
             }
