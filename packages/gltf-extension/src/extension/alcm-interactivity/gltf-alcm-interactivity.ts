@@ -1,8 +1,8 @@
-import { MaterialOptionGroup } from "./materials-extension";
+import { MaterialOptionGroup } from './materials-extension';
 
 /**
  * Root extensions for the ALCM_interactivity vendor extension.
- * 
+ *
  * @member i18n - Contains a list of supported languages and a dictionary to look up specific static text values for a given text and language key.
  * @member materialOptionGroups - Contains an array of MaterialOptionGroups in a gltf flat manner to be reusable by any node/mesh without duplications.
  * @member anchorExtension - Contains an array of the individual anchors for all scenes and their objects and the possible combinations among them.
@@ -17,21 +17,20 @@ export interface Interactivity {
     viewerFeatures: ViewerFeatures
     projectInformation: ProjectInformation
     highlights: Highlight[]
-    background?: {
-        color?: ColorString
-        texture?: string
-        cubeTexture?: string
+    background?: { // TODO make array
+        type: 'color' | 'texture' | 'cubeTexture'
+        value: ColorString | string // TODO add documentation and definition for "URLLike"
     }
-    environment?: {
-        texture?: string
+    environment?: { // TODO make array
+        texture: string
     }
 }
 
 /**
  * Describing additional project information.
- * 
+ *
  * @member id - Should uniquely identify this artifact in composition with the @member projectId.
- * @member projectId - Should be given to a project, indirectly reduces the possibility of name collisions.
+ * @member projectKey - Should be given to a project, indirectly reduces the possibility of name collisions.
  * @member name - A simple name for this project/artifcat can differ from the projectId.
  * @member version - Expresses the current version of the artifact, should be incremented when changes have been applied to trigger update mechanisms for custom viewer implementations like cache invalidation.
  * @member changeDate - Should be set accordingly to @member version, describes the last change date of the file or any dependent external asset.
@@ -44,21 +43,20 @@ export interface Interactivity {
  */
 export interface ProjectInformation {
     id: string
-    projectId: string
+    projectKey: string
     name: string
-    version: number
-    changeDate: Date
+    version?: number
+    changeDate?: Date
     baseUrl: string
-    folder: string
-    orientation: ViewOrientation
-    heading: TemplateString
-    intro: TemplateString
-    tags: [string]
+    orientation?: ViewOrientation
+    heading?: TemplateString
+    intro?: TemplateString
+    tags: [ string ]
 }
 
 /**
  * Preservation of all information for internationalization.
- * 
+ *
  * @member supportedLocales - An array with each supported or enabled locale.
  * @member languageMap - The i18n dictionary containing the translations for specific locales and keys (@see LanguageMap.)
  */
@@ -68,38 +66,67 @@ export interface Internationalization {
 }
 
 // TODO (FlorianDe): Discuss
+/**             x
+ *   | 0 = (0.0, 0.0) | 1 = (0.0, 0.5) | 2 = (0.0, 1.0) |
+ *   | 3 = (0.5, 0.0) | 4 = (0.5, 0.5) | 5 = (0.5, 1.0) |
+ *   | 6 = (1.0, 0.0) | 7 = (1.0, 0.5) | 8 = (1.0, 1.0) |
+ * y
+ */
 export enum Positioning {
-    Top = 0.0,
-    Left = 0.0,
-    Center = 0.5,
-    Bottom = 1.0,
-    Right = 1.0
+    TopLeft = 'tl',
+    Top = 't',
+    TopRight = 'tr',
+    Left = 'l',
+    Center = 'c',
+    Right = 'r',
+    BottomLeft = 'bl',
+    Bottom = 'b',
+    BottomRight = 'br'
 }
+
+// TODO
+export interface Vec2Like {
+    x: number;
+    y: number;
+}
+
+export const PositionRoots: {
+    [k in Positioning]: Vec2Like;
+} = {
+    [ Positioning.TopLeft ]: { x: 0, y: 0 },
+    [ Positioning.Top ]: { x: 0.5, y: 0 },
+    [ Positioning.TopRight ]: { x: 1.0, y: 0 },
+    [ Positioning.Left ]: { x: 0, y: 0.5 },
+    [ Positioning.Center ]: { x: 0.5, y: 0.5 },
+    [ Positioning.Right ]: { x: 1.0, y: 0.5 },
+    [ Positioning.BottomLeft ]: { x: 0, y: 1.0 },
+    [ Positioning.Bottom ]: { x: 0.5, y: 1.0 },
+    [ Positioning.BottomRight ]: { x: 1.0, y: 1.0 }
+};
 
 /**
  * Possible values to tell the viewer implementation how the project should ideally be displayed.
- * 
+ *
  * Portrait - The project should be displayed in portrait mode.
  * Landscape - The project should be displayed in landscape mode.
  * All - The project can either be displayed in portrait or landscape mode.
  */
 export enum ViewOrientation {
-    Portrait = "PORTRAIT",
-    Landscape = "LANDSCAPE",
-    All = "ALL"
+    Portrait = 'PORTRAIT',
+    Landscape = 'LANDSCAPE',
+    All = 'ALL'
 }
 
 /**
  * Influences the behavior of how a certain property of an object should be transformed in correlation with the set transformation type.
- * 
+ *
  * Local - Should be used if the property is to be transformed into correlation to the hierarchy.
  * Global - Should be used if the property shall have no hierarchical dependency.
  * Fixed - Can be used to restrict any transformation for a property. E.g. to place a highlight always at a specific position on the screen.
  */
 export enum LocationTransformType {
-    Local = "LOCAL",
-    Global = "GLOBAL",
-    Fixed = "FIXED"
+    Local = 'LOCAL',
+    Global = 'GLOBAL'
 }
 
 export type ColorString = string
@@ -107,22 +134,22 @@ export type TemplateString = string
 
 /**
  * Type description for a dictionary.
- * 
+ *
  * It is a nested map structure where the first key represents a locale value and the second key is a translation key to retrieve the translation.
  */
-export type LanguageMap = { [lang: string]: { [key: string]: string } };
+export type LanguageMap = { [ lang: string ]: { [ key: string ]: string } };
 
 /**
  * Type description for a n:m number map.
- * 
+ *
  * N:M mapping for compatible anchors with their corresponding gltfIds
  */
-export type AnchorMap = { [anchorId: number]: number[] };
+export type AnchorMap = { [ anchorId: number ]: number[] };
 
 /**
  * Type description for an anchor object.
- * 
- * @member id - A unique identifier to exactly specify 
+ *
+ * @member id - A unique identifier to exactly specify
  * @member name - The name for an anchor which could be used to specify or display it. The name can be a templateable string to allow dynamic content and/or internationalization.
  * @member categories - An array of categories this anchor belongs to. This field can also be empty if an anchor has no suitable group/category
  * @member matrix - Matrix to describe an anchor point, translation, direction, up vector.
@@ -139,7 +166,7 @@ export interface Anchor {
 
 /**
  * Includes all components regarding the anchor extension.
- * 
+ *
  * @member anchors - An array with anchors for all scenes.
  * @member anchorCompatibilities - The compatability n:m map for suitable anchors (@see AnchorMap.)
  */
@@ -178,66 +205,83 @@ export interface FogOptions {
     near: number
     far: number
 }
+
 export type StrokeOptions = {
     color: ColorString
     thickness: number
-    transparency?: number
+    alpha?: number
 }
 
 export type NodeStyleMap = {
-    [nodeId: number]: {
+    [ nodeId: number ]: {
         strokeOptions: StrokeOptions
         duration?: number
     }
 }
 
+export enum HighlightPositioning {
+    World = 'WORLD',
+    Screen = 'SCREEN'
+}
+
+// TODO define what each value does
+export type AnimationTimeUnit = 'r' | 's' | 'ms' | 'f'
+
+export interface AnimationLocation {
+    time: number;
+    unit: AnimationTimeUnit;
+}
+
+export type ContentStyleMap = {
+    [ containerSelector: string ]: any;
+}
+
 export interface Highlight {
     name: string
     attachedToNode: boolean
-    target: number[]
-    pos: number[]
-    cam: number | number[] //gltfId or cam x,y,z
-    transformationType: LocationTransformType
-    connector: {
+    target: number | number[]
+    position: number | number[]
+    camera: number | number[] //gltfId or cam x,y,z
+    positioning: HighlightPositioning
+    visualLink: {
         path: number[][]
         interpolation: string //linear e.g.?
-        strokeOptions : StrokeOptions
+        strokeOptions: StrokeOptions
     }
     style: {
-        scale: number
+        billboard: boolean
         fov: number
-        anchor: string
     }
-    isAnimationTrigger: boolean // TODO (FlorianDe): necessary?
-    triggerAnimation: {
-        fromBeginning?: boolean
-        animationId: number //should be under animations/x
+    triggerAnimation?: {
+        animationId: number | number[] //should be under animations/x
+        teleport?: boolean
+        loopBehavior?:  'loop' | 'clamp'
+        type: 'relative' | 'absolute' | 'play' | 'pause'
+        speed?: number
+        target: AnimationLocation
+        start?: AnimationLocation
         delay?: number
-        endTime?: string // TODO (FlorianDe): define format
-        relativeDuration?: string // TODO (FlorianDe): define format
         visibleThroughAnimation: boolean
     }
-    isCameraPanTrigger: boolean //necessary?
-    camerPanOptions: {
+    visibility?: {
+        from: AnimationTimeUnit,
+        to: AnimationTimeUnit,
+        // TODO discuss -> Blending?
+    }
+    cameraTransitionOptions?: {
         duration: number //in ms
         easing: string //animejs easing name/function like cubicBezier(.5, .05, .1, .3)
         delay?: number //in ms
-        visibleThroughPan: boolean
+        visibleThroughTransition: boolean
     }
     highlightNodesOnHover: NodeStyleMap
     highlightNodesOnClick: NodeStyleMap
     content?: {
         headline: TemplateString
         body: TemplateString
-        position: {
-            x: number | Positioning
-            y: number | Positioning
-        }
-        offset: {
-            x: number | Positioning
-            y: number | Positioning
-        }
-        style?: string
+        position: Positioning | Vec2Like
+        offset?: Vec2Like
+        style?: ContentStyleMap
     }
 }
 
