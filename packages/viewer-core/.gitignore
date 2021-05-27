@@ -1,0 +1,37 @@
+# Dependencies
+bower_components/
+jspm_packages/
+node_modules/
+
+# IDE files
+.idea/
+*.iml
+.vscode/*
+.history
+.ionide
+.vscode-test
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+
+# System files
+.DS_Store
+thumbs.db
+
+# Generated files
+build/
+dist/
+typings/
+.env*
+.eslintcache
+.next
+.node_repl_history
+.npm
+.pnp.*
+.yarn-integrity
+*.tgz
+*.tsbuildinfo
+lerna-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
