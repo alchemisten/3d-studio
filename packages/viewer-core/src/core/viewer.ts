@@ -16,7 +16,7 @@ import {AssetService} from './services/asset.service';
 
 
 @provide(Viewer)
-export class Viewer implements IViewer<ViewerStateModel> {
+export class Viewer implements IViewer {
     private config: ViewerConfigModel;
     private node: HTMLElement;
     private state: BehaviorSubject<ViewerStateModel>;
