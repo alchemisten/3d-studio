@@ -5,8 +5,8 @@ import {
     Material,
     Object3D,
     PerspectiveCamera,
-    Scene,
-    Texture,
+    Scene, ShadowMapType,
+    Texture, TextureEncoding,
     Vector3,
     WebGLCubeRenderTarget,
     WebGLRenderer
