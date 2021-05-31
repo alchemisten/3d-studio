@@ -28,25 +28,34 @@ export interface SizeModel {
     height: number;
 }
 
+
+export type I18nStringModel = Record<string, Record<string, string>>;
+
+
+export type HighlightModelId = string;
 export interface HighlightModel {
     cameraTarget: Vector3;
     description: string;
-    id: string;
+    i18n: I18nStringModel;
+    id: HighlightModelId;
     name: string;
     object: Object3D;
     position: Vector3;
 }
 
-
+export type LightScenarioId = string;
 export interface LightScenarioModel {
-    name: string;
+    i18n: I18nStringModel;
+    id: LightScenarioId;
     lights: Light[];
 }
 
 
+export type UIControlId = string;
 export interface UIControlModel {
     controls?: UIControlModel[];
-    label: string;
+    i18n: I18nStringModel;
+    id: UIControlId;
     type: any;
     value: any;
 }
@@ -57,10 +66,10 @@ export interface IControllable<ControllableState> {
     getState(): Observable<ControllableState>;
 }
 
-
+export type FeatureId = string;
 export interface IFeature<FeatureState> extends IControllable<FeatureState> {
-    id: string;
-    name: string;
+    i18n: I18nStringModel;
+    id: FeatureId;
     getEnabled(): Observable<boolean>;
     toggle(): void;
 }
