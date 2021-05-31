@@ -1,6 +1,6 @@
 import {provide} from 'inversify-binding-decorators';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {IViewer, UIControlModel, ViewerConfigModel, ViewerStateModel} from '../types';
+import {IViewer, SizeModel, UIControlModel, ViewerConfigModel, ViewerStateModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {PerspectiveCamera} from 'three';
 import {RenderService} from './services/render.service';
@@ -22,13 +22,18 @@ export class Viewer implements IViewer<ViewerStateModel> {
 
 
     init(node: HTMLElement, config: ViewerConfigModel): void {
+        const screenSize = node.getBoundingClientRect() as SizeModel;
         this.node = node;
         this.config = config;
-        this.node.innerHTML = `<ul>${this.config.objects.map(object => '<li>' + object.name + ': ' + object.path + '</li>').join()}</ul>`;
         this.sceneService.setCamera(
             new PerspectiveCamera()
         );
-        this.renderService.init(node);
+        // TODO: Check alternative use cases for rendering without node attachment
+        this.renderService.setRenderConfig({
+            pixelRatio: window.devicePixelRatio,
+            renderSize: screenSize
+        });
+        this.node.appendChild(this.renderService.renderer.domElement);
     }
 
     getControls(): UIControlModel[] {

@@ -63,6 +63,23 @@ export interface UIControlModel {
 }
 
 
+export type ClearColor = {
+    alpha?: number;
+    color: string;
+};
+
+
+export interface RenderConfigModel {
+    autoClear: boolean;
+    clearColor: ClearColor;
+    outputEncoding: TextureEncoding;
+    pixelRatio: number;
+    renderSize: SizeModel;
+    shadowMapEnabled: boolean;
+    shadowMapType: ShadowMapType;
+}
+
+
 export interface IControllable<ControllableState> {
     getControls(): UIControlModel[];
     getState(): Observable<ControllableState>;
@@ -232,10 +249,11 @@ export interface IRenderService {
     hookAfterRender$: Subject<boolean>;
     hookBeforeRender$: Subject<boolean>;
     readonly renderer: WebGLRenderer;
-    init(node: HTMLElement): void;
+    getRenderConfig(): Observable<RenderConfigModel>;
     renderSingleFrame(): void;
     setContinuousRenderingEnabled(enabled: boolean): void;
     setPostProcessingEnabled(enabled: boolean): void;
+    setRenderConfig(config: Partial<RenderConfigModel>): void;
 }
 
 
