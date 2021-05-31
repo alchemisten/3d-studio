@@ -35,8 +35,16 @@ export class Viewer implements IViewer<ViewerStateModel> {
         this.node = node;
         this.config = config;
         this.sceneService.setCamera(
-            new PerspectiveCamera()
+            new PerspectiveCamera(
+                37,
+                screenSize.width / screenSize.height,
+                0.1,
+                20000
+            ),
+            new Vector3(10, 10, 5),
+            new Vector3(0, 0, 0)
         );
+
         // TODO: Check alternative use cases for rendering without node attachment
         this.renderService.setRenderConfig({
             pixelRatio: window.devicePixelRatio,

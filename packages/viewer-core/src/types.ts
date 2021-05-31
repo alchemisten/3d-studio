@@ -263,7 +263,7 @@ export interface ISceneService {
     getCamera(): Observable<PerspectiveCamera | null>;
     getObjects(): Observable<Object3D[]>;
     removeObjectFromScene(objectName: string): void;
-    setCamera(camera: PerspectiveCamera): void;
+    setCamera(camera: PerspectiveCamera, position?: Vector3, target?: Vector3): void;
 }
 
 
