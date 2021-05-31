@@ -16,7 +16,7 @@
       "ES7"
     ],
     "paths": {
-      "utils/*": ["src/utils/*"],
+      "util/*": ["src/util/*"],
       "studio/*": ["src/studio/*"],
       "features/*": ["src/features/*"]
     },
