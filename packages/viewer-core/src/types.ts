@@ -171,7 +171,7 @@ export interface IAssetService {
     hookObjectLoaded$: Subject<Object3D>;
     loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
     loadObject(path: string): Promise<Object3D>;
-    loadTexture(): Promise<Texture>;
+    loadTexture(path: string): Promise<Texture>;
 }
 
 

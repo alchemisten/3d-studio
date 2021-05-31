@@ -11,6 +11,7 @@ import {
 } from 'three';
 import {RenderService} from './services/render.service';
 import {LightService} from './services/light.service';
+import {AssetService} from './services/asset.service';
 
 
 
@@ -21,6 +22,7 @@ export class Viewer implements IViewer<ViewerStateModel> {
     private state: BehaviorSubject<ViewerStateModel>;
 
     constructor(
+        private assetService: AssetService,
         private lightService: LightService,
         private renderService: RenderService,
         private sceneService: SceneService,
@@ -51,6 +53,13 @@ export class Viewer implements IViewer<ViewerStateModel> {
             renderSize: screenSize
         });
         this.node.appendChild(this.renderService.renderer.domElement);
+
+        this.config.objects.forEach(object => {
+            this.assetService.loadObject(object.path).then((loaded) => {
+                this.sceneService.addObjectToScene(loaded);
+                this.renderService.renderSingleFrame();
+            });
+        });
 
         const directionalLight = new DirectionalLight(0xffffff, 1.9);
         directionalLight.position.set(3, 10, -5);
