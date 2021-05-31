@@ -269,6 +269,6 @@ export interface ISceneService {
 
 export interface ILightService {
     addLights(lights: Record<string, Light>): void;
-    getLights(): Observable<Light[]>;
+    getLights(): Observable<Record<string, Light>>;
     removeLights(names?: string[]): void;
 }
