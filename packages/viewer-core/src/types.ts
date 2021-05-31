@@ -48,6 +48,8 @@ export interface LightScenarioModel {
     i18n: I18nStringModel;
     id: LightScenarioId;
     lights: Light[];
+    backgroundEnvironment: string; // Background image or skybox
+    reflectionEnvironment: WebGLCubeRenderTarget;
 }
 
 
