@@ -4,10 +4,14 @@ import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {Subject} from 'rxjs';
 import {PCFSoftShadowMap, PerspectiveCamera, sRGBEncoding, WebGLRenderer} from 'three';
 import {SceneService} from './scene.service';
+import {provideSingleton} from 'util/inversify';
 
 
 
-@provide(RenderService)
+
+
+
+@provideSingleton(RenderService)
 export class RenderService implements IRenderService {
     readonly composer: EffectComposer;
     hookAfterRender$: Subject<boolean>;

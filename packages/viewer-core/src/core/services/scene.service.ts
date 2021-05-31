@@ -1,10 +1,11 @@
 import {Object3D, PerspectiveCamera, Scene} from 'three';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {ISceneService} from '../../types';
-import {provide} from 'inversify-binding-decorators';
+import {provideSingleton} from 'util/inversify';
 
 
-@provide(SceneService)
+
+@provideSingleton(SceneService)
 export class SceneService implements ISceneService {
     readonly scene: Scene;
     private camera: PerspectiveCamera;
