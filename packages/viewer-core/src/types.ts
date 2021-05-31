@@ -74,8 +74,8 @@ export interface IFeature<FeatureState> extends IControllable<FeatureState> {
     toggle(): void;
 }
 
-
-export interface ILightScenarioFeature<FeatureState> extends IFeature<FeatureState> {
+export interface LightScenarioFeatureState {}
+export interface ILightScenarioFeature extends IFeature<LightScenarioFeatureState> {
     // lightService: ILightService;
     getActiveScenario(): Observable<LightScenarioModel>;
     getLightScenarios(): LightScenarioModel[];
@@ -83,7 +83,8 @@ export interface ILightScenarioFeature<FeatureState> extends IFeature<FeatureSta
 }
 
 
-export interface IHighlightFeature<FeatureState> extends IFeature<FeatureState> {
+export interface HighlightFeatureState {}
+export interface IHighlightFeature extends IFeature<HighlightFeatureState> {
     // sceneService: ISceneService;
     focusHighlight(highlightId: string): void;
     getFocusedHighlight(): Observable<HighlightModel | null>;
@@ -91,19 +92,22 @@ export interface IHighlightFeature<FeatureState> extends IFeature<FeatureState> 
 }
 
 
-export interface ICameraRotationFeature<FeatureState> extends IFeature<FeatureState> {
+export interface CameraRotationFeatureState {}
+export interface ICameraRotationFeature extends IFeature<CameraRotationFeatureState> {
     // controls: OrbitControls;
     setRotationEnabled(enabled: boolean): void;
 }
 
 
-export interface IWireframeFeature<FeatureState> extends IFeature<FeatureState> {
+export interface WireframeFeatureState {}
+export interface IWireframeFeature extends IFeature<WireframeFeatureState> {
     // materialService: IMaterialService;
     setWireframeEnabled(enabled: boolean): void;
 }
 
 
-export interface IMaterialChangeFeature<FeatureState> extends IFeature<FeatureState> {
+export interface MaterialChangerFeatureState {}
+export interface IMaterialChangeFeature extends IFeature<MaterialChangerFeatureState> {
     // materialService: IMaterialService;
     addNewMaterial(material: Material): void;
     assignMaterialToSlot(slotName: string, material: Material): void;
@@ -113,7 +117,8 @@ export interface IMaterialChangeFeature<FeatureState> extends IFeature<FeatureSt
 }
 
 
-export interface IViewer<ViewerState> extends IControllable<ViewerState> {
+export interface ViewerState {}
+export interface IViewer extends IControllable<ViewerState> {
     // animationService: IAnimationService;
     // assetService: IAssetService;
     // featureService: IFeatureService;
