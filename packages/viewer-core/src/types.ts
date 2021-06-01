@@ -13,6 +13,7 @@ import {
 } from 'three';
 import {Observable, Subject} from 'rxjs';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 export interface ViewerStateModel {}
 export interface ViewerConfigModel {
@@ -126,7 +127,7 @@ export interface IHighlightFeature extends IFeature<HighlightFeatureState> {
 
 export interface CameraRotationFeatureState {}
 export interface ICameraRotationFeature extends IFeature<CameraRotationFeatureState> {
-    // controls: OrbitControls;
+    // controlService: IControlService;
     setRotationEnabled(enabled: boolean): void;
 }
 
@@ -283,4 +284,9 @@ export interface ILightService {
     addLights(lights: Record<string, Light>): void;
     getLights(): Observable<Record<string, Light>>;
     removeLights(names?: string[]): void;
+}
+
+
+export interface IControlService {
+    getControls(): Observable<OrbitControls>;
 }

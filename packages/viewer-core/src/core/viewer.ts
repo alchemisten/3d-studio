@@ -13,6 +13,7 @@ import {
 import {RenderService} from './services/render.service';
 import {LightService} from './services/light.service';
 import {AssetService} from './services/asset.service';
+import {ControlService} from './services/control.service';
 
 
 
@@ -24,6 +25,7 @@ export class Viewer implements IViewer {
 
     constructor(
         private assetService: AssetService,
+        private controlService: ControlService,
         private lightService: LightService,
         private renderService: RenderService,
         private sceneService: SceneService,
