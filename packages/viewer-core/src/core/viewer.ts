@@ -46,6 +46,8 @@ export class Viewer implements IViewer {
         });
         this.node.appendChild(this.renderService.renderer.domElement);
 
+        window.addEventListener('resize', this.onWindowResize.bind(this));
+
         this.config.objects.forEach(object => {
             this.assetService.loadObject(object.path).then((loaded) => {
                 this.sceneService.addObjectToScene(loaded);
@@ -69,11 +71,25 @@ export class Viewer implements IViewer {
         this.renderService.renderSingleFrame();
     }
 
+
     getControls(): UIControlModel[] {
         return [];
     }
 
+
     getState(): Observable<ViewerStateModel> {
         return this.state.asObservable();
+    }
+
+
+    private onWindowResize() {
+        const screenSize = this.node.getBoundingClientRect() as SizeModel;
+        this.renderService.setRenderConfig({
+            renderSize: screenSize
+        });
+        this.renderService.setCameraConfig({
+            aspect: screenSize.width / screenSize.height
+        });
+        this.renderService.renderSingleFrame();
     }
 }
