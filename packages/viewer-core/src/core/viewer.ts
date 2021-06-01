@@ -7,8 +7,6 @@ import {
     AmbientLight,
     DirectionalLight,
     Object3D,
-    PerspectiveCamera,
-    Vector3
 } from 'three';
 import {RenderService} from './services/render.service';
 import {LightService} from './services/light.service';

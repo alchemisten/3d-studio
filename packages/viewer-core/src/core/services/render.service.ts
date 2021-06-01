@@ -88,7 +88,7 @@ export class RenderService implements IRenderService {
 
     setCameraConfig(config: Partial<CameraConfigModel>): void {
         // TODO: Find better way to apply config then switch with ts-ignore
-        Object.entries(config).forEach(([key, value]) => {
+        Object.keys(config).forEach((key) => {
             switch (key) {
                 case 'position':
                     // @ts-ignore
@@ -116,7 +116,7 @@ export class RenderService implements IRenderService {
 
     setRenderConfig(config: Partial<RenderConfigModel>): void {
         // TODO: Find better way to apply config then switch with ts-ignore
-        Object.entries(config).forEach(([key, value]) => {
+        Object.keys(config).forEach((key) => {
             switch (key) {
                 case 'clearColor':
                     // @ts-ignore

@@ -1,8 +1,8 @@
 import {PerspectiveCamera} from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
-import {combineLatest, fromEvent, Observable, Subject, Subscription} from 'rxjs';
-import {map, take, withLatestFrom} from 'rxjs/operators';
-import {IControlService, RenderConfigModel} from '../../types';
+import {fromEvent, Observable, Subject, Subscription} from 'rxjs';
+import {take, withLatestFrom} from 'rxjs/operators';
+import {IControlService} from '../../types';
 import {provideSingleton} from 'util/inversify';
 import {RenderService} from './render.service';
 

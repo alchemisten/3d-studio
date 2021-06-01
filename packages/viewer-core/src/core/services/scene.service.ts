@@ -1,4 +1,4 @@
-import {Group, Object3D, PerspectiveCamera, Scene, Vector3} from 'three';
+import {Group, Object3D, Scene} from 'three';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ISceneService} from '../../types';
 import {provideSingleton} from 'util/inversify';
