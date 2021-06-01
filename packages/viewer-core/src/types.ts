@@ -80,6 +80,18 @@ export interface RenderConfigModel {
 }
 
 
+export interface CameraConfigModel {
+    aspect: number;
+    far: number;
+    fov: number;
+    near: number;
+    position: Vector3;
+    target: Vector3;
+
+    [key: string]: any;
+}
+
+
 export interface IControllable<ControllableState> {
     getControls(): UIControlModel[];
     getState(): Observable<ControllableState>;
@@ -98,14 +110,14 @@ export interface ILightScenarioFeature extends IFeature<LightScenarioFeatureStat
     // lightService: ILightService;
     getActiveScenario(): Observable<LightScenarioModel>;
     getLightScenarios(): LightScenarioModel[];
-    setActiveScenario(name: string): void;
+    setActiveScenario(id: LightScenarioId): void;
 }
 
 
 export interface HighlightFeatureState {}
 export interface IHighlightFeature extends IFeature<HighlightFeatureState> {
     // sceneService: ISceneService;
-    focusHighlight(highlightId: string): void;
+    focusHighlight(id: HighlightModelId): void;
     getFocusedHighlight(): Observable<HighlightModel | null>;
     getHighlights(): HighlightModel[];
 }
@@ -160,9 +172,9 @@ export interface IAnimationService {
     getActiveAnimations(): Observable<AnimationAction[]>;
     getMixers(): Observable<Record<string, AnimationMixer>>;
     getMixerForObject(objectId: string): AnimationMixer | null;
-    playObjectAnimation(objectId: string, animName: string): void;
-    setAnimationTime(time: number, animIds?: AnimationIdModel[]): void;
+    playObjectAnimation(animId: AnimationIdModel): void;
     setAnimationEnabled(enabled: boolean, animIds?: AnimationIdModel[]): void;
+    setAnimationTime(time: number, animIds?: AnimationIdModel[]): void;
 }
 
 
@@ -249,8 +261,10 @@ export interface IRenderService {
     hookAfterRender$: Subject<boolean>;
     hookBeforeRender$: Subject<boolean>;
     readonly renderer: WebGLRenderer;
+    getCamera(): Observable<PerspectiveCamera>;
     getRenderConfig(): Observable<RenderConfigModel>;
     renderSingleFrame(): void;
+    setCameraConfig(config: Partial<CameraConfigModel>): void;
     setContinuousRenderingEnabled(enabled: boolean): void;
     setPostProcessingEnabled(enabled: boolean): void;
     setRenderConfig(config: Partial<RenderConfigModel>): void;
@@ -260,10 +274,8 @@ export interface IRenderService {
 export interface ISceneService {
     readonly scene: Scene;
     addObjectToScene(object: Object3D): void;
-    getCamera(): Observable<PerspectiveCamera | null>;
     getObjects(): Observable<Object3D[]>;
     removeObjectFromScene(objectName: string): void;
-    setCamera(camera: PerspectiveCamera, position?: Vector3, target?: Vector3): void;
 }
 
 

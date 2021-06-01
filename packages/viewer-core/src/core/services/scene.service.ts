@@ -8,13 +8,10 @@ import {provideSingleton} from 'util/inversify';
 @provideSingleton(SceneService)
 export class SceneService implements ISceneService {
     readonly scene: Scene;
-    private camera: PerspectiveCamera;
-    private camera$: BehaviorSubject<PerspectiveCamera | null>;
     private readonly group: Object3D;
     private objects$: BehaviorSubject<Object3D[]>;
 
     constructor() {
-        this.camera$ = new BehaviorSubject<PerspectiveCamera | null>(null);
         this.scene = new Scene();
         this.group = new Group();
         this.group.name = 'objects';
@@ -30,13 +27,11 @@ export class SceneService implements ISceneService {
         console.log('Object added', this.group);
     }
 
-    getCamera(): Observable<PerspectiveCamera | null> {
-        return this.camera$.asObservable();
-    }
 
     getObjects(): Observable<Object3D[]> {
         return this.objects$.asObservable();
     }
+
 
     removeObjectFromScene(objectName: string): void {
         this.group.traverse(object => {
@@ -45,17 +40,5 @@ export class SceneService implements ISceneService {
             }
         });
         this.objects$.next(this.group.children);
-    }
-
-    setCamera(camera: PerspectiveCamera, position?: Vector3, target?: Vector3): void {
-        this.camera = camera;
-        if (position) {
-            this.camera.position.set(position.x, position.y, position.z);
-        }
-        if (target) {
-            this.camera.lookAt(target);
-        }
-        this.camera.updateProjectionMatrix();
-        this.camera$.next(this.camera);
     }
 }

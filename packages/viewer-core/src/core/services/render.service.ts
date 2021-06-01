@@ -1,7 +1,7 @@
-import {PCFSoftShadowMap, PerspectiveCamera, sRGBEncoding, WebGLRenderer} from 'three';
+import {PCFSoftShadowMap, PerspectiveCamera, sRGBEncoding, Vector3, WebGLRenderer} from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {Observable, Subject} from 'rxjs';
-import {IRenderService, RenderConfigModel} from '../../types';
+import {CameraConfigModel, IRenderService, RenderConfigModel} from '../../types';
 import {SceneService} from './scene.service';
 import {provideSingleton} from 'util/inversify';
 
@@ -24,6 +24,15 @@ const defaultRenderConfig = <RenderConfigModel>{
     shadowMapType: PCFSoftShadowMap
 };
 
+const defaultCameraConfig = <CameraConfigModel>{
+    aspect: 1024 / 768,
+    far: 20000,
+    fov: 37,
+    near: 0.1,
+    position: new Vector3(10, 10, 5),
+    target: new Vector3(0, 0, 0)
+};
+
 
 
 @provideSingleton(RenderService)
@@ -32,7 +41,8 @@ export class RenderService implements IRenderService {
     hookAfterRender$: Subject<boolean>;
     hookBeforeRender$: Subject<boolean>;
     readonly renderer: WebGLRenderer;
-    private camera: PerspectiveCamera | null;
+    private camera: PerspectiveCamera;
+    private readonly camera$: Subject<PerspectiveCamera>;
     private continuousRenderEnabled: boolean;
     private postProcessingEnabled: boolean;
     private renderConfig: RenderConfigModel;
@@ -45,15 +55,20 @@ export class RenderService implements IRenderService {
         this.hookBeforeRender$ = new Subject<boolean>();
         this.renderer = new WebGLRenderer();
         this.composer = new EffectComposer(this.renderer);
-        this.sceneService.getCamera().subscribe(camera => {
-            this.camera = camera;
-        });
+        this.camera = new PerspectiveCamera();
+        this.camera$ = new Subject<PerspectiveCamera>();
+        this.setCameraConfig(defaultCameraConfig);
         this.continuousRenderEnabled = false;
         this.renderConfig = defaultRenderConfig;
         this.renderConfig$ = new Subject<RenderConfigModel>();
         this.setRenderConfig(this.renderConfig);
     }
 
+
+
+    getCamera(): Observable<PerspectiveCamera> {
+        return this.camera$.asObservable();
+    }
 
 
     getRenderConfig(): Observable<RenderConfigModel> {
@@ -63,6 +78,29 @@ export class RenderService implements IRenderService {
 
     renderSingleFrame(): void {
         this.animate();
+    }
+
+
+    setCameraConfig(config: Partial<CameraConfigModel>): void {
+        // TODO: Find better way to apply config then switch with ts-ignore
+        Object.entries(config).forEach(([key, value]) => {
+            switch (key) {
+                case 'position':
+                    // @ts-ignore
+                    this.camera.position.set(config.position.x, config.position.y, config.position.z);
+                    break;
+                case 'target':
+                    // @ts-ignore
+                    this.camera.lookAt(config.target);
+                    break;
+                default:
+                    // @ts-ignore
+                    this.camera[key] = config[key];
+                    break;
+            }
+        });
+        this.camera.updateProjectionMatrix();
+        this.camera$.next(this.camera);
     }
 
 
@@ -77,6 +115,7 @@ export class RenderService implements IRenderService {
 
 
     setRenderConfig(config: Partial<RenderConfigModel>): void {
+        // TODO: Complete implementation
         if (config.renderSize) {
             this.renderer.setSize(config.renderSize.width, config.renderSize.height);
             this.composer.setSize(config.renderSize.width, config.renderSize.height);
