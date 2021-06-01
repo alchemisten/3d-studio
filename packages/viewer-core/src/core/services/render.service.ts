@@ -14,6 +14,7 @@ const defaultRenderConfig = <RenderConfigModel>{
         alpha: 0.0,
         color: '#000000'
     },
+    continuousRendering: false,
     outputEncoding: sRGBEncoding,
     pixelRatio: 1,
     renderSize: {
@@ -108,16 +109,6 @@ export class RenderService implements IRenderService {
     }
 
 
-    setContinuousRenderingEnabled(enabled: boolean): void {
-        this.continuousRenderEnabled = enabled;
-        if (this.continuousRenderEnabled) {
-            this.renderer.setAnimationLoop(this.renderSingleFrame.bind(this));
-        } else {
-            this.renderer.setAnimationLoop(null);
-        }
-    }
-
-
     setPostProcessingEnabled(enabled: boolean): void {
         this.postProcessingEnabled = enabled;
     }
@@ -137,6 +128,10 @@ export class RenderService implements IRenderService {
                         // @ts-ignore
                         this.renderer.setClearAlpha(config.clearColor.alpha);
                     }
+                    break;
+                case 'continuousRendering':
+                    // @ts-ignore
+                    this.setContinuousRenderingEnabled(config.continuousRendering);
                     break;
                 case 'renderSize':
                     // @ts-ignore
@@ -160,5 +155,15 @@ export class RenderService implements IRenderService {
         });
         this.renderConfig = Object.assign({}, this.renderConfig, config);
         this.renderConfig$.next(this.renderConfig);
+    }
+
+
+    private setContinuousRenderingEnabled(enabled: boolean): void {
+        this.continuousRenderEnabled = enabled;
+        if (this.continuousRenderEnabled) {
+            this.renderer.setAnimationLoop(this.renderSingleFrame.bind(this));
+        } else {
+            this.renderer.setAnimationLoop(null);
+        }
     }
 }

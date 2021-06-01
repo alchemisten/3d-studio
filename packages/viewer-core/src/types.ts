@@ -72,6 +72,7 @@ export type ClearColor = {
 export interface RenderConfigModel {
     autoClear: boolean;
     clearColor: ClearColor;
+    continuousRendering: boolean;
     outputEncoding: TextureEncoding;
     pixelRatio: number;
     renderSize: SizeModel;
@@ -265,7 +266,6 @@ export interface IRenderService {
     getRenderConfig(): Observable<RenderConfigModel>;
     renderSingleFrame(): void;
     setCameraConfig(config: Partial<CameraConfigModel>): void;
-    setContinuousRenderingEnabled(enabled: boolean): void;
     setPostProcessingEnabled(enabled: boolean): void;
     setRenderConfig(config: Partial<RenderConfigModel>): void;
 }

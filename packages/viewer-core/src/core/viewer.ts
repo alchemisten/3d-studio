@@ -70,8 +70,6 @@ export class Viewer implements IViewer {
             'ambient': new AmbientLight('#aaaaaa'),
             'directional': directionalLight
         });
-
-        this.renderService.renderSingleFrame();
     }
 
 
