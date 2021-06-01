@@ -77,7 +77,11 @@ export class RenderService implements IRenderService {
 
 
     renderSingleFrame(): void {
-        this.animate();
+        if (this.sceneService.scene && this.camera) {
+            this.hookBeforeRender$.next(true);
+            this.renderer.render(this.sceneService.scene, this.camera);
+            this.hookAfterRender$.next(true);
+        }
     }
 
 
@@ -106,6 +110,11 @@ export class RenderService implements IRenderService {
 
     setContinuousRenderingEnabled(enabled: boolean): void {
         this.continuousRenderEnabled = enabled;
+        if (this.continuousRenderEnabled) {
+            this.renderer.setAnimationLoop(this.renderSingleFrame.bind(this));
+        } else {
+            this.renderer.setAnimationLoop(null);
+        }
     }
 
 
@@ -151,18 +160,5 @@ export class RenderService implements IRenderService {
         });
         this.renderConfig = Object.assign({}, this.renderConfig, config);
         this.renderConfig$.next(this.renderConfig);
-    }
-
-
-    private animate() {
-        this.hookBeforeRender$.next(true);
-        if (this.continuousRenderEnabled) {
-            requestAnimationFrame(this.animate);
-            // this.controls.update();
-        }
-        if (this.sceneService.scene && this.camera) {
-            this.renderer.render(this.sceneService.scene, this.camera);
-        }
-        this.hookAfterRender$.next(true);
     }
 }
