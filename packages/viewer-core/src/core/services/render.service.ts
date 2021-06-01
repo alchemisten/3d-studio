@@ -53,7 +53,7 @@ export class RenderService implements IRenderService {
     ) {
         this.hookAfterRender$ = new Subject<boolean>();
         this.hookBeforeRender$ = new Subject<boolean>();
-        this.renderer = new WebGLRenderer();
+        this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
         this.composer = new EffectComposer(this.renderer);
         this.camera = new PerspectiveCamera();
         this.camera$ = new Subject<PerspectiveCamera>();
@@ -115,11 +115,40 @@ export class RenderService implements IRenderService {
 
 
     setRenderConfig(config: Partial<RenderConfigModel>): void {
-        // TODO: Complete implementation
-        if (config.renderSize) {
-            this.renderer.setSize(config.renderSize.width, config.renderSize.height);
-            this.composer.setSize(config.renderSize.width, config.renderSize.height);
-        }
+        // TODO: Find better way to apply config then switch with ts-ignore
+        Object.entries(config).forEach(([key, value]) => {
+            switch (key) {
+                case 'clearColor':
+                    // @ts-ignore
+                    if (config.clearColor.color) {
+                        // @ts-ignore
+                        this.renderer.setClearColor(config.clearColor.color, config.clearColor.alpha);
+                    // @ts-ignore
+                    } else if (config.clearColor.alpha) {
+                        // @ts-ignore
+                        this.renderer.setClearAlpha(config.clearColor.alpha);
+                    }
+                    break;
+                case 'renderSize':
+                    // @ts-ignore
+                    this.renderer.setSize(config.renderSize.width, config.renderSize.height);
+                    // @ts-ignore
+                    this.composer.setSize(config.renderSize.width, config.renderSize.height);
+                    break;
+                case 'shadowMapEnabled':
+                    // @ts-ignore
+                    this.renderer.shadowMap.enabled = config.shadowMapEnabled;
+                    break;
+                case 'shadowMapType':
+                    // @ts-ignore
+                    this.renderer.shadowMap.type = config.shadowMapType;
+                    break;
+                default:
+                    // @ts-ignore
+                    this.renderer[key] = config[key];
+                    break;
+            }
+        });
         this.renderConfig = Object.assign({}, this.renderConfig, config);
         this.renderConfig$.next(this.renderConfig);
     }
