@@ -1,5 +1,6 @@
 import {provide} from 'inversify-binding-decorators';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
 import {IViewer, SizeModel, UIControlModel, ViewerConfigModel, ViewerStateModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {
@@ -46,7 +47,9 @@ export class Viewer implements IViewer {
         });
         this.node.appendChild(this.renderService.renderer.domElement);
 
-        window.addEventListener('resize', this.onWindowResize.bind(this));
+        fromEvent(window, 'resize').pipe(
+            debounceTime(300)
+        ).subscribe(this.onWindowResize.bind(this));
 
         this.config.objects.forEach(object => {
             this.assetService.loadObject(object.path).then((loaded) => {
