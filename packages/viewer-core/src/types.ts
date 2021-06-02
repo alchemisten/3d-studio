@@ -6,16 +6,15 @@ import {
     Object3D,
     PerspectiveCamera,
     Scene, ShadowMapType,
-    Texture, TextureEncoding,
+    Texture, TextureEncoding, Vector2,
     Vector3,
     WebGLCubeRenderTarget,
     WebGLRenderer
 } from 'three';
-import {Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
-export interface ViewerStateModel {}
 export interface ViewerConfigModel {
     objects: ObjectSetupModel[];
 }
@@ -29,24 +28,28 @@ export interface SizeModel {
     height: number;
 }
 
+export type I18nTranslations = Record<string, string>;
+export type I18nLanguageMap = Record<string, I18nTranslations>;
 
-export type I18nStringModel = Record<string, Record<string, string>>;
 
-
+export type HighlightWorldPosition = { positionType: 'WORLD', position: Vector3 };
+export type HighlightScreenPosition = { positionType: 'SCREEN', position: Vector2 };
 export type HighlightModelId = string;
-export interface HighlightModel {
+export type HighlightModel = {
+    cameraPosition: Vector3;
     cameraTarget: Vector3;
     description: string;
-    i18n: I18nStringModel;
+    i18n: I18nLanguageMap;
     id: HighlightModelId;
     name: string;
     object: Object3D;
-    position: Vector3;
-}
+} & (HighlightWorldPosition | HighlightScreenPosition);
+
+
 
 export type LightScenarioId = string;
 export interface LightScenarioModel {
-    i18n: I18nStringModel;
+    i18n: I18nLanguageMap;
     id: LightScenarioId;
     lights: Light[];
     backgroundEnvironment: string; // Background image or skybox
@@ -57,7 +60,7 @@ export interface LightScenarioModel {
 export type UIControlId = string;
 export interface UIControlModel {
     controls?: UIControlModel[];
-    i18n: I18nStringModel;
+    i18n: I18nLanguageMap;
     id: UIControlId;
     type: any;
     value: any;
@@ -94,54 +97,43 @@ export interface CameraConfigModel {
 }
 
 
-export interface IControllable<ControllableState> {
+export interface IControllable {
     getControls(): UIControlModel[];
-    getState(): Observable<ControllableState>;
 }
 
 export type FeatureId = string;
-export interface IFeature<FeatureState> extends IControllable<FeatureState> {
-    i18n: I18nStringModel;
+export interface IFeature extends IControllable {
+    i18n: I18nLanguageMap;
     id: FeatureId;
     getEnabled(): Observable<boolean>;
-    toggle(): void;
+    setEnabled(enabled: boolean): void;
 }
 
-export interface LightScenarioFeatureState {}
-export interface ILightScenarioFeature extends IFeature<LightScenarioFeatureState> {
-    // lightService: ILightService;
+export interface ILightScenarioFeature extends IFeature {
     getActiveScenario(): Observable<LightScenarioModel>;
     getLightScenarios(): LightScenarioModel[];
     setActiveScenario(id: LightScenarioId): void;
 }
 
 
-export interface HighlightFeatureState {}
-export interface IHighlightFeature extends IFeature<HighlightFeatureState> {
-    // sceneService: ISceneService;
+export interface IHighlightFeature extends IFeature {
     focusHighlight(id: HighlightModelId): void;
     getFocusedHighlight(): Observable<HighlightModel | null>;
     getHighlights(): HighlightModel[];
 }
 
 
-export interface CameraRotationFeatureState {}
-export interface ICameraRotationFeature extends IFeature<CameraRotationFeatureState> {
-    // controlService: IControlService;
+export interface ICameraRotationFeature extends IFeature {
     setRotationEnabled(enabled: boolean): void;
 }
 
 
-export interface WireframeFeatureState {}
-export interface IWireframeFeature extends IFeature<WireframeFeatureState> {
-    // materialService: IMaterialService;
+export interface IWireframeFeature extends IFeature {
     setWireframeEnabled(enabled: boolean): void;
 }
 
 
-export interface MaterialChangerFeatureState {}
-export interface IMaterialChangeFeature extends IFeature<MaterialChangerFeatureState> {
-    // materialService: IMaterialService;
+export interface IMaterialChangeFeature extends IFeature {
     addNewMaterial(material: Material): void;
     assignMaterialToSlot(slotName: string, material: Material): void;
     changeMaterialColor(materialName: string, color: Color): void;
@@ -150,15 +142,7 @@ export interface IMaterialChangeFeature extends IFeature<MaterialChangerFeatureS
 }
 
 
-export interface ViewerState {}
-export interface IViewer extends IControllable<ViewerState> {
-    // animationService: IAnimationService;
-    // assetService: IAssetService;
-    // featureService: IFeatureService;
-    // materialService: IMaterialService;
-    // lightService: ILightService;
-    // renderService: IRenderService;
-    // sceneService: ISceneService;
+export interface IViewer extends IControllable {
     init(node: HTMLElement, config: ViewerConfigModel): void;
 }
 
@@ -181,17 +165,16 @@ export interface IAnimationService {
 
 
 export interface IAssetService {
-    // renderService: IRenderService;
-    hookObjectLoaded$: Subject<Object3D>;
+    readonly hookObjectLoaded$: Observable<Object3D>;
     loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
     loadObject(path: string): Promise<Object3D>;
     loadTexture(path: string): Promise<Texture>;
 }
 
 
-export interface IFeatureService<FeatureState> {
-    addFeature(feature: IFeature<FeatureState>): void;
-    getFeatures(): Observable<IFeature<FeatureState>[]>;
+export interface IFeatureService {
+    addFeature(feature: IFeature): void;
+    getFeatures(): Observable<IFeature[]>;
     removeFeature(featureId: string): void;
     setFeatureEnabled(featureId: string, enabled: boolean): void;
 }
@@ -249,9 +232,8 @@ export interface MaterialSetupModel {
 
 
 export interface IMaterialService {
-    // assetService: IAssetService;
     createMaterials(materialObjects: MaterialSetupModel[]): void;
-    getAssignedMaterials(): Observable<Record<string, Material[]>>;
+    getAssignedMaterials(): Observable<Record<string, Material>>;
     getMaterials(): Observable<Material[]>;
     setAssignedMaterial(materialSlot: string, material: Material): void;
     setMaterialProperties(materials: Record<string, Partial<Material>>): void;
@@ -260,8 +242,8 @@ export interface IMaterialService {
 
 export interface IRenderService {
     readonly composer: EffectComposer;
-    hookAfterRender$: Subject<boolean>;
-    hookBeforeRender$: Subject<boolean>;
+    readonly hookAfterRender$: Observable<boolean>;
+    readonly hookBeforeRender$: Observable<boolean>;
     readonly renderer: WebGLRenderer;
     getCamera(): Observable<PerspectiveCamera>;
     getRenderConfig(): Observable<RenderConfigModel>;

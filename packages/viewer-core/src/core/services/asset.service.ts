@@ -8,7 +8,7 @@ import {
 } from 'three';
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {IAssetService} from '../../types';
 import {RenderService} from './render.service';
 import {Constants} from 'util/constants';
@@ -18,9 +18,10 @@ import {provideSingleton} from 'util/inversify';
 
 @provideSingleton(AssetService)
 export class AssetService implements IAssetService {
-    hookObjectLoaded$: Subject<Object3D>;
+    readonly hookObjectLoaded$: Observable<Object3D>;
     private readonly dracoLoader: DRACOLoader;
     private readonly gltfLoader: GLTFLoader;
+    private readonly objectLoaded$: Subject<Object3D>;
     private readonly loadingManager: LoadingManager;
     private readonly textureLoader: TextureLoader;
 
@@ -37,6 +38,8 @@ export class AssetService implements IAssetService {
         this.gltfLoader = new GLTFLoader(this.loadingManager);
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
         this.textureLoader = new TextureLoader(this.loadingManager);
+        this.objectLoaded$ = new Subject();
+        this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
     }
 
 
@@ -56,6 +59,7 @@ export class AssetService implements IAssetService {
             case 'gltf':
                 return this.loadGLTF(path).then(gltf => {
                     gltf.scene.animations = gltf.animations;
+                    this.objectLoaded$.next(gltf.scene);
                     return gltf.scene;
                 });
             default:

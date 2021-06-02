@@ -39,9 +39,11 @@ const defaultCameraConfig = <CameraConfigModel>{
 @provideSingleton(RenderService)
 export class RenderService implements IRenderService {
     readonly composer: EffectComposer;
-    hookAfterRender$: Subject<boolean>;
-    hookBeforeRender$: Subject<boolean>;
+    readonly hookAfterRender$: Observable<boolean>;
+    readonly hookBeforeRender$: Observable<boolean>;
     readonly renderer: WebGLRenderer;
+    private readonly afterRender$: Subject<boolean>;
+    private readonly beforeRender$: Subject<boolean>;
     private camera: PerspectiveCamera;
     private readonly camera$: Subject<PerspectiveCamera>;
     private continuousRenderEnabled: boolean;
@@ -52,8 +54,10 @@ export class RenderService implements IRenderService {
     constructor(
         private sceneService: SceneService
     ) {
-        this.hookAfterRender$ = new Subject<boolean>();
-        this.hookBeforeRender$ = new Subject<boolean>();
+        this.afterRender$ = new Subject<boolean>();
+        this.hookAfterRender$ = this.afterRender$.asObservable();
+        this.beforeRender$ = new Subject<boolean>();
+        this.hookBeforeRender$ = this.beforeRender$.asObservable();
         this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
         this.composer = new EffectComposer(this.renderer);
         this.camera = new PerspectiveCamera();
@@ -79,9 +83,10 @@ export class RenderService implements IRenderService {
 
     renderSingleFrame(): void {
         if (this.sceneService.scene && this.camera) {
-            this.hookBeforeRender$.next(true);
+            // TODO: Check if hooks are received in sequence
+            this.beforeRender$.next(true);
             this.renderer.render(this.sceneService.scene, this.camera);
-            this.hookAfterRender$.next(true);
+            this.afterRender$.next(true);
         }
     }
 

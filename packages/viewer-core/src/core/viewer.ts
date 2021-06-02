@@ -1,7 +1,7 @@
 import {provide} from 'inversify-binding-decorators';
-import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
+import {fromEvent} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import {IViewer, SizeModel, UIControlModel, ViewerConfigModel, ViewerStateModel} from '../types';
+import {IViewer, SizeModel, UIControlModel, ViewerConfigModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {
     AmbientLight,
@@ -19,7 +19,6 @@ import {ControlService} from './services/control.service';
 export class Viewer implements IViewer {
     private config: ViewerConfigModel;
     private node: HTMLElement;
-    private state: BehaviorSubject<ViewerStateModel>;
 
     constructor(
         private assetService: AssetService,
@@ -27,9 +26,7 @@ export class Viewer implements IViewer {
         private lightService: LightService,
         private renderService: RenderService,
         private sceneService: SceneService,
-    ) {
-        this.state = new BehaviorSubject<ViewerStateModel>({});
-    }
+    ) {}
 
 
 
@@ -75,11 +72,6 @@ export class Viewer implements IViewer {
 
     getControls(): UIControlModel[] {
         return [];
-    }
-
-
-    getState(): Observable<ViewerStateModel> {
-        return this.state.asObservable();
     }
 
 
