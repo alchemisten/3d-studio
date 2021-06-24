@@ -5,13 +5,14 @@ import {IViewer, SizeModel, UIControlModel, ViewerConfigModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {
     AmbientLight,
-    DirectionalLight,
+    DirectionalLight, Material,
     Object3D,
 } from 'three';
 import {RenderService} from './services/render.service';
 import {LightService} from './services/light.service';
 import {AssetService} from './services/asset.service';
 import {ControlService} from './services/control.service';
+import {MaterialService} from './services/material.service';
 import { ConfigService } from './services/config.service';
 
 
@@ -25,6 +26,7 @@ export class Viewer implements IViewer {
         private configService: ConfigService,
         private controlService: ControlService,
         private lightService: LightService,
+        private materialService: MaterialService,
         private renderService: RenderService,
         private sceneService: SceneService,
     ) {}
@@ -54,6 +56,9 @@ export class Viewer implements IViewer {
                 this.sceneService.addObjectToScene(loaded);
                 this.renderService.renderSingleFrame();
             });
+        });
+        this.materialService.getMaterials().subscribe((materials: Material[]) => {
+            console.log(materials);
         });
 
         const directionalLight = new DirectionalLight(0xffffff, 1.9);

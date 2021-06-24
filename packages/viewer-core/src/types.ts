@@ -241,8 +241,9 @@ export interface MaterialSetupModel {
 }
 
 
+// TODO: Rethink concept for material assignment, material slots and identifying materials
 export interface IMaterialService {
-    createMaterials(materialObjects: MaterialSetupModel[]): void;
+    addMaterial(material: Material): void;
     getAssignedMaterials(): Observable<Record<string, Material>>;
     getMaterials(): Observable<Material[]>;
     setAssignedMaterial(materialSlot: string, material: Material): void;
