@@ -12,16 +12,17 @@ import {RenderService} from './services/render.service';
 import {LightService} from './services/light.service';
 import {AssetService} from './services/asset.service';
 import {ControlService} from './services/control.service';
+import { ConfigService } from './services/config.service';
 
 
 
 @provide(Viewer)
 export class Viewer implements IViewer {
-    private config: ViewerConfigModel;
     private node: HTMLElement;
 
     constructor(
         private assetService: AssetService,
+        private configService: ConfigService,
         private controlService: ControlService,
         private lightService: LightService,
         private renderService: RenderService,
@@ -33,7 +34,7 @@ export class Viewer implements IViewer {
     init(node: HTMLElement, config: ViewerConfigModel): void {
         const screenSize = node.getBoundingClientRect() as SizeModel;
         this.node = node;
-        this.config = config;
+        this.configService.loadConfig(config);
         // TODO: Check alternative use cases for rendering without node attachment
         this.renderService.setCameraConfig({
             aspect: screenSize.width / screenSize.height
@@ -48,7 +49,7 @@ export class Viewer implements IViewer {
             debounceTime(300)
         ).subscribe(this.onWindowResize.bind(this));
 
-        this.config.objects.forEach(object => {
+        config.objects.forEach(object => {
             this.assetService.loadObject(object.path).then((loaded) => {
                 this.sceneService.addObjectToScene(loaded);
                 this.renderService.renderSingleFrame();

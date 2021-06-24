@@ -17,10 +17,20 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 export interface ViewerConfigModel {
     objects: ObjectSetupModel[];
+    project: ProjectConfigModel;
 }
 export interface ObjectSetupModel {
     name: string;
     path: string;
+}
+
+export interface ProjectConfigModel {
+    basedir: string;
+    folder: string;
+    introText: I18nLanguageMap;
+    languages: string[];
+    name: string;
+    projectID: string;
 }
 
 export interface SizeModel {
@@ -271,4 +281,9 @@ export interface ILightService {
 
 export interface IControlService {
     getControls(): Observable<OrbitControls>;
+}
+
+export interface IConfigService {
+    getConfig(): ViewerConfigModel;
+    loadConfig(config: ViewerConfigModel): void;
 }

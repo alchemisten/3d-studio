@@ -15,6 +15,18 @@ if (container) {
                 name: 'Milk-Truck',
                 path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf'
             }
-        ]
+        ],
+        project: {
+            basedir: 'localhost:9000',
+            folder: 'test123',
+            introText: {
+                de: {
+                    intro: 'Stuff'
+                }
+            },
+            languages: ['de'],
+            name: 'A test project',
+            projectID: 'TEST123',
+        }
     });
 }
