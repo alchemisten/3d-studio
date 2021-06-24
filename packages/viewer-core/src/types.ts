@@ -163,7 +163,7 @@ export interface IViewerLauncher {
 
 
 export interface AnimationIdModel {
-    objectId: string;
+    objectName: string;
     animationName: string;
 }
 
@@ -173,9 +173,9 @@ export interface IAnimationService {
     getActiveAnimations(): Observable<AnimationAction[]>;
     getMixers(): Observable<Record<string, AnimationMixer>>;
     getMixerForObject(objectId: string): AnimationMixer | null;
-    playObjectAnimation(animId: AnimationIdModel): void;
-    setAnimationEnabled(enabled: boolean, animIds?: AnimationIdModel[]): void;
-    setAnimationTime(time: number, animIds?: AnimationIdModel[]): void;
+    playObjectAnimation(animId: AnimationIdModel): boolean;
+    setAnimationEnabled(enabled: boolean): void;
+    setAnimationTime(time: number): void;
 }
 
 

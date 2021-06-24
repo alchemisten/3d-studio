@@ -14,6 +14,7 @@ import {AssetService} from './services/asset.service';
 import {ControlService} from './services/control.service';
 import {MaterialService} from './services/material.service';
 import { ConfigService } from './services/config.service';
+import { AnimationService } from './services/animation.service';
 
 
 
@@ -22,6 +23,7 @@ export class Viewer implements IViewer {
     private node: HTMLElement;
 
     constructor(
+        private animationService: AnimationService,
         private assetService: AssetService,
         private configService: ConfigService,
         private controlService: ControlService,
@@ -39,6 +41,7 @@ export class Viewer implements IViewer {
             aspect: screenSize.width / screenSize.height
         });
         this.renderService.setRenderConfig({
+            continuousRendering: true,
             pixelRatio: window ? window.devicePixelRatio : 1,
             renderSize: screenSize
         });
@@ -55,6 +58,7 @@ export class Viewer implements IViewer {
             this.assetService.loadObject(object.path).then((loaded) => {
                 this.sceneService.addObjectToScene(loaded);
                 this.renderService.renderSingleFrame();
+                this.animationService.addMixerForObject(loaded);
             });
         });
         this.materialService.getMaterials().subscribe((materials: Material[]) => {
