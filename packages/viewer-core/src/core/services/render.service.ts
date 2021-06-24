@@ -1,38 +1,10 @@
-import {PCFSoftShadowMap, PerspectiveCamera, sRGBEncoding, Vector3, WebGLRenderer} from 'three';
+import {PerspectiveCamera, WebGLRenderer} from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {Observable, Subject} from 'rxjs';
 import {CameraConfigModel, IRenderService, RenderConfigModel} from '../../types';
 import {SceneService} from './scene.service';
 import {provideSingleton} from 'util/inversify';
-
-
-
-// TODO: Move default config to config service
-const defaultRenderConfig = <RenderConfigModel>{
-    autoClear: true,
-    clearColor: {
-        alpha: 0.0,
-        color: '#000000'
-    },
-    continuousRendering: false,
-    outputEncoding: sRGBEncoding,
-    pixelRatio: 1,
-    renderSize: {
-        height: 768,
-        width: 1024
-    },
-    shadowMapEnabled: true,
-    shadowMapType: PCFSoftShadowMap
-};
-
-const defaultCameraConfig = <CameraConfigModel>{
-    aspect: 1024 / 768,
-    far: 20000,
-    fov: 37,
-    near: 0.1,
-    position: new Vector3(10, 10, 5),
-    target: new Vector3(0, 0, 0)
-};
+import { defaultCameraConfig, defaultRenderConfig } from './config.service';
 
 
 
@@ -83,7 +55,6 @@ export class RenderService implements IRenderService {
 
     renderSingleFrame(): void {
         if (this.sceneService.scene && this.camera) {
-            // TODO: Check if hooks are received in sequence
             this.beforeRender$.next(true);
             this.renderer.render(this.sceneService.scene, this.camera);
             this.afterRender$.next(true);

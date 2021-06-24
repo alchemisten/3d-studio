@@ -23,8 +23,8 @@ export class SceneService implements ISceneService {
 
     addObjectToScene(object: Object3D): void {
         this.group.add(object);
-        this.objects$.next(this.group.children);
         console.log('Object added', this.group);
+        this.objects$.next(this.group.children);
     }
 
 
