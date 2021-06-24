@@ -153,7 +153,12 @@ export interface IMaterialChangeFeature extends IFeature {
 
 
 export interface IViewer extends IControllable {
-    init(node: HTMLElement, config: ViewerConfigModel): void;
+    init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement): void;
+}
+
+export interface IViewerLauncher {
+    createHTMLViewer(node: HTMLElement, config: ViewerConfigModel): void;
+    createImageViewer(renderSize: SizeModel, config: ViewerConfigModel): Observable<string>;
 }
 
 

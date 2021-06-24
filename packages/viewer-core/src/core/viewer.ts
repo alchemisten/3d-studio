@@ -33,23 +33,23 @@ export class Viewer implements IViewer {
 
 
 
-    init(node: HTMLElement, config: ViewerConfigModel): void {
-        const screenSize = node.getBoundingClientRect() as SizeModel;
-        this.node = node;
+    init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement) {
         this.configService.loadConfig(config);
-        // TODO: Check alternative use cases for rendering without node attachment
         this.renderService.setCameraConfig({
             aspect: screenSize.width / screenSize.height
         });
         this.renderService.setRenderConfig({
-            pixelRatio: window.devicePixelRatio,
+            pixelRatio: window ? window.devicePixelRatio : 1,
             renderSize: screenSize
         });
-        this.node.appendChild(this.renderService.renderer.domElement);
+        if (node && window) {
+            this.node = node;
+            this.node.appendChild(this.renderService.renderer.domElement);
 
-        fromEvent(window, 'resize').pipe(
-            debounceTime(300)
-        ).subscribe(this.onWindowResize.bind(this));
+            fromEvent(window, 'resize').pipe(
+                debounceTime(300)
+            ).subscribe(this.onWindowResize.bind(this));
+        }
 
         config.objects.forEach(object => {
             this.assetService.loadObject(object.path).then((loaded) => {
@@ -82,6 +82,10 @@ export class Viewer implements IViewer {
 
 
     private onWindowResize() {
+        if (!this.node) {
+            return;
+        }
+
         const screenSize = this.node.getBoundingClientRect() as SizeModel;
         this.renderService.setRenderConfig({
             renderSize: screenSize

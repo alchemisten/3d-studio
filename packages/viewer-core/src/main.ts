@@ -1,15 +1,13 @@
-import {Container} from 'inversify';
-import 'reflect-metadata';
-import {Viewer} from './core/viewer';
-import {buildProviderModule} from 'inversify-binding-decorators';
+import { ViewerLauncher } from './core/viewer-launcher';
 
-const containerDI = new Container();
-containerDI.load(buildProviderModule());
+(function() {
+    const container = document.getElementById('viewer-container');
+    if (!container) {
+        return;
+    }
 
-const container = document.getElementById('viewer-container');
-if (container) {
-    const viewer = containerDI.get<Viewer>(Viewer);
-    viewer.init(container, {
+    const launcher = new ViewerLauncher();
+    launcher.createHTMLViewer(container, {
         objects: [
             {
                 name: 'Milk-Truck',
@@ -29,4 +27,4 @@ if (container) {
             projectID: 'TEST123',
         }
     });
-}
+}());
