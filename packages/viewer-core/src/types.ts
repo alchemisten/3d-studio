@@ -290,6 +290,6 @@ export interface IControlService {
 }
 
 export interface IConfigService {
-    getConfig(): ViewerConfigModel;
+    getConfig(): Observable<ViewerConfigModel>;
     loadConfig(config: ViewerConfigModel): void;
 }

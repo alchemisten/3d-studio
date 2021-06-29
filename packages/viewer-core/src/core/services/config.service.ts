@@ -1,5 +1,6 @@
 import { PCFSoftShadowMap, sRGBEncoding, Vector3 } from 'three';
 import { provideSingleton } from 'util/inversify';
+import { Observable, Subject } from 'rxjs';
 import { CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
 
 
@@ -35,15 +36,18 @@ export const defaultCameraConfig = <CameraConfigModel>{
 @provideSingleton(ConfigService)
 export class ConfigService implements IConfigService {
     private config: ViewerConfigModel;
+    private config$: Subject<ViewerConfigModel>;
 
     constructor() {
+        this.config$ = new Subject<ViewerConfigModel>();
     }
 
-    getConfig(): ViewerConfigModel {
-        return this.config;
+    getConfig(): Observable<ViewerConfigModel> {
+        return this.config$.asObservable();
     }
 
     loadConfig(config: ViewerConfigModel) {
         this.config = config;
+        this.config$.next(this.config);
     }
 }
