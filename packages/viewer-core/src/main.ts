@@ -8,6 +8,9 @@ import { ViewerLauncher } from './core/viewer-launcher';
 
     const launcher = new ViewerLauncher();
     launcher.createHTMLViewer(container, {
+        features: {
+            'wireframe': true
+        },
         objects: [
             {
                 name: 'Milk-Truck',
