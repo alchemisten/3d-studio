@@ -14,8 +14,12 @@ import {
 import {Observable} from 'rxjs';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import { Container, interfaces } from 'inversify';
+import ServiceIdentifier = interfaces.ServiceIdentifier;
 
+export type FeatureSetup = Record<string, boolean>;
 export interface ViewerConfigModel {
+    features?: FeatureSetup;
     objects: ObjectSetupModel[];
     project: ProjectConfigModel;
 }
@@ -113,9 +117,9 @@ export interface IControllable {
 
 export type FeatureId = string;
 export interface IFeature extends IControllable {
-    i18n: I18nLanguageMap;
     id: FeatureId;
     getEnabled(): Observable<boolean>;
+    init(enabled: boolean): void;
     setEnabled(enabled: boolean): void;
 }
 
@@ -192,6 +196,13 @@ export interface IFeatureService {
     getFeatures(): Observable<IFeature[]>;
     removeFeature(featureId: string): void;
     setFeatureEnabled(featureId: string, enabled: boolean): void;
+}
+
+
+export interface IFeatureRegistryService {
+    getFeatureInstance(id: string): IFeature | null;
+    registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void;
+    setDIContainer(containerDI: Container): void;
 }
 
 

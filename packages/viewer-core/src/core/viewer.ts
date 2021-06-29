@@ -15,6 +15,7 @@ import {ControlService} from './services/control.service';
 import {MaterialService} from './services/material.service';
 import { ConfigService } from './services/config.service';
 import { AnimationService } from './services/animation.service';
+import { FeatureService } from '../feature/services/feature.service';
 
 
 
@@ -27,6 +28,7 @@ export class Viewer implements IViewer {
         private assetService: AssetService,
         private configService: ConfigService,
         private controlService: ControlService,
+        private featureService: FeatureService,
         private lightService: LightService,
         private materialService: MaterialService,
         private renderService: RenderService,

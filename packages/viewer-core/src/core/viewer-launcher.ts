@@ -1,20 +1,25 @@
 import 'reflect-metadata';
-import { Container } from 'inversify';
+import { Container, interfaces } from 'inversify';
 import { buildProviderModule } from 'inversify-binding-decorators';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IViewer, IViewerLauncher, SizeModel, ViewerConfigModel } from '../types';
+import { IFeature, IViewer, IViewerLauncher, SizeModel, ViewerConfigModel } from '../types';
 import { Viewer } from './viewer';
 import { RenderService } from './services/render.service';
+import { FeatureRegistryService } from '../feature/services/feature-registry.service';
+import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 
 
 export class ViewerLauncher implements IViewerLauncher {
     private readonly containerDI: Container;
+    private readonly featureRegistry: FeatureRegistryService;
 
     constructor() {
         this.containerDI = new Container();
         this.containerDI.load(buildProviderModule());
+        this.featureRegistry = this.containerDI.get<FeatureRegistryService>(FeatureRegistryService);
+        this.featureRegistry.setDIContainer(this.containerDI);
     }
 
 
@@ -35,5 +40,10 @@ export class ViewerLauncher implements IViewerLauncher {
         return rendererService.hookAfterRender$.pipe(
             map(() => rendererService.renderer.domElement.toDataURL())
         );
+    }
+
+
+    registerFeature(id: string, feature: ServiceIdentifier<IFeature>) {
+        this.featureRegistry.registerFeature(id, feature);
     }
 }
