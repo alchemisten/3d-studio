@@ -7,11 +7,14 @@ module.exports = {
     context: ROOT,
 
     entry: {
-        'main': './main.ts'
+        'alcm.studio.js': './main.ts'
     },
 
     output: {
-        filename: '[name].bundle.js',
+        filename: '[name]',
+        library: ['alcm', 'studio'],
+        libraryExport: 'default',
+        libraryTarget: 'umd',
         path: DESTINATION
     },
 
