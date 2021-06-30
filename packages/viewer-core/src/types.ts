@@ -21,7 +21,7 @@ export type FeatureSetup = Record<string, boolean>;
 export interface ViewerConfigModel {
     features?: FeatureSetup;
     objects: ObjectSetupModel[];
-    project: ProjectConfigModel;
+    project?: ProjectConfigModel;
 }
 export interface ObjectSetupModel {
     name: string;
