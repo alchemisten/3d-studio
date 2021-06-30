@@ -44,6 +44,10 @@ export class ViewerLauncher implements IViewerLauncher {
 
 
     registerFeature(id: string, feature: ServiceIdentifier<IFeature>) {
-        this.featureRegistry.registerFeature(id, feature);
+        try {
+            this.featureRegistry.registerFeature(id, feature);
+        } catch (exception) {
+            console.warn(exception);
+        }
     }
 }

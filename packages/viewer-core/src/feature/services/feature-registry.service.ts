@@ -3,6 +3,11 @@ import ServiceIdentifier = interfaces.ServiceIdentifier;
 import { IFeature, IFeatureRegistryService } from '../../types';
 import { coreFeatures } from '../core-feature.map';
 import { provideSingleton } from 'util/inversify';
+import {
+    FeatureAlreadyRegisteredError,
+    FeatureNotRegisteredError,
+    MissingDIContainerError
+} from '../../core/exceptions';
 
 
 /**
@@ -25,15 +30,13 @@ export class FeatureRegistryService implements IFeatureRegistryService {
     }
 
 
-    getFeatureInstance(id: string): IFeature | null {
+    getFeatureInstance(id: string): IFeature {
         if (!this.containerDI) {
-            console.warn('Dependency injection container not set');
-            return null;
+            throw new MissingDIContainerError('Dependency injection container not set');
         }
 
         if (!Object.prototype.hasOwnProperty.call(this.registry, id)) {
-            console.warn(`No feature registered with id: ${id}`);
-            return null;
+            throw new FeatureNotRegisteredError(`No feature registered with id: ${id}`);
         }
 
         return this.containerDI.get<IFeature>(this.registry[id]);
@@ -41,9 +44,11 @@ export class FeatureRegistryService implements IFeatureRegistryService {
 
 
     registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void {
-        if (!Object.prototype.hasOwnProperty.call(this.registry, id)) {
-            this.registry[id] = feature;
+        // TODO: Check if id is needed or can be deduced from feature via Decorator
+        if (Object.prototype.hasOwnProperty.call(this.registry, feature)) {
+            throw new FeatureAlreadyRegisteredError(`Feature with id ${id} already registered`);
         }
+        this.registry[id] = feature;
     }
 
 

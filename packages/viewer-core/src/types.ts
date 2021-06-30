@@ -176,8 +176,8 @@ export interface IAnimationService {
     addMixerForObject(object: Object3D): boolean;
     getActiveAnimations(): Observable<AnimationAction[]>;
     getMixers(): Observable<Record<string, AnimationMixer>>;
-    getMixerForObject(objectId: string): AnimationMixer | null;
-    playObjectAnimation(animId: AnimationIdModel): boolean;
+    getMixerForObject(objectId: string): AnimationMixer;
+    playObjectAnimation(animId: AnimationIdModel): void;
     setAnimationEnabled(enabled: boolean): void;
     setAnimationTime(time: number): void;
 }
@@ -200,7 +200,7 @@ export interface IFeatureService {
 
 
 export interface IFeatureRegistryService {
-    getFeatureInstance(id: string): IFeature | null;
+    getFeatureInstance(id: string): IFeature;
     registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void;
     setDIContainer(containerDI: Container): void;
 }

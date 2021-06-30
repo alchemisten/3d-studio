@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { provideSingleton } from 'util/inversify';
 import { AnimationIdModel, IAnimationService } from '../../types';
 import { RenderService } from './render.service';
+import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
 
 
 
@@ -58,8 +59,12 @@ export class AnimationService implements IAnimationService {
     }
 
 
-    getMixerForObject(objectName: string): AnimationMixer | null {
-        return this.mixers[objectName] || null;
+    getMixerForObject(objectName: string): AnimationMixer {
+        if (!this.mixers[objectName]) {
+            throw new MissingMixerError(`No mixer available for object ${objectName}`);
+        }
+
+        return this.mixers[objectName];
     }
 
 
@@ -68,19 +73,19 @@ export class AnimationService implements IAnimationService {
     }
 
 
-    playObjectAnimation(animId: AnimationIdModel): boolean {
-        const  animation = this.getAnimation(animId);
-        if (animation && this.mixers[animId.objectName]) {
+    playObjectAnimation(animId: AnimationIdModel): void {
+        try {
+            const animation = this.getAnimation(animId);
+            const mixer = this.getMixerForObject(animId.objectName);
+
             this.animationToggle(false);
             this.activeActions = [];
-            this.activeActions.push(this.mixers[animId.objectName].clipAction(animation));
+            this.activeActions.push(mixer.clipAction(animation));
             this.activeActions$.next(this.activeActions);
             this.animationToggle(true);
-
-            return true;
+        } catch (exception) {
+            console.warn(exception);
         }
-
-        return false;
     }
 
 
@@ -132,16 +137,18 @@ export class AnimationService implements IAnimationService {
     }
 
 
-    private getAnimation(animId: AnimationIdModel): AnimationClip | null {
-        if (this.animations[animId.objectName]) {
-            const aLength = this.animations[animId.objectName].length;
-            for (let i = 0; i < aLength; i++) {
-                if (this.animations[animId.objectName][i].name === animId.animationName) {
-                    return this.animations[animId.objectName][i];
-                }
+    private getAnimation(animId: AnimationIdModel): AnimationClip {
+        if (!this.animations[animId.objectName]) {
+            throw new ObjectHasNoAnimationsError(`Object ${animId.objectName} doesn't have any animations`);
+        }
+
+        const aLength = this.animations[animId.objectName].length;
+        for (let i = 0; i < aLength; i++) {
+            if (this.animations[animId.objectName][i].name === animId.animationName) {
+                return this.animations[animId.objectName][i];
             }
         }
 
-        return null;
+        throw new MissingAnimationError(`Animation ${animId.animationName} doesn't exist on object ${animId.objectName}`);
     }
 }
