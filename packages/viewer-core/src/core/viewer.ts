@@ -1,7 +1,7 @@
 import {provide} from 'inversify-binding-decorators';
 import {fromEvent} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import {IViewer, SizeModel, UIControlModel, ViewerConfigModel} from '../types';
+import {IViewer, SizeModel, ViewerConfigModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {
     AmbientLight,
@@ -43,7 +43,7 @@ export class Viewer implements IViewer {
             aspect: screenSize.width / screenSize.height
         });
         this.renderService.setRenderConfig({
-            continuousRendering: true,
+            continuousRendering: false,
             pixelRatio: window ? window.devicePixelRatio : 1,
             renderSize: screenSize
         });
@@ -79,11 +79,6 @@ export class Viewer implements IViewer {
             'ambient': new AmbientLight('#aaaaaa'),
             'directional': directionalLight
         });
-    }
-
-
-    getControls(): UIControlModel[] {
-        return [];
     }
 
 

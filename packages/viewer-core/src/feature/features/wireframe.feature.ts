@@ -1,7 +1,7 @@
 import { Material, MeshStandardMaterial } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { provide } from 'inversify-binding-decorators';
-import { FeatureId, IWireframeFeature, UIControlModel } from '../../types';
+import { FeatureId, IWireframeFeature } from '../../types';
 import { MaterialService } from '../../core/services/material.service';
 import { CoreFeature } from '../core-feature.map';
 
@@ -14,7 +14,6 @@ import { CoreFeature } from '../core-feature.map';
 @provide(WireframeFeature)
 export class WireframeFeature implements IWireframeFeature {
     readonly id: FeatureId = CoreFeature.Wireframe;
-    private readonly controls: UIControlModel[];
     private enabled: boolean;
     private readonly enabled$: Subject<boolean>;
     private materials: Material[];
@@ -22,26 +21,7 @@ export class WireframeFeature implements IWireframeFeature {
     constructor(
         private materialService: MaterialService
     ) {
-        this.controls = [
-            {
-                i18n: {
-                    de: {
-                        label: 'Wireframe'
-                    },
-                    en: {
-                        label: 'Wireframe'
-                    }
-                },
-                id: 'wireframeEnabled',
-                type: 'toggle',
-                value: false
-            }
-        ];
         this.enabled$ = new Subject<boolean>();
-    }
-
-    getControls(): UIControlModel[] {
-        return this.controls;
     }
 
     getEnabled(): Observable<boolean> {
@@ -55,7 +35,6 @@ export class WireframeFeature implements IWireframeFeature {
             this.materials = materials;
             this.setWireframeEnabled(this.enabled);
         });
-        this.controls[0].value = this.enabled;
     }
 
     setEnabled(enabled: boolean): void {

@@ -116,7 +116,7 @@ export interface IControllable {
 }
 
 export type FeatureId = string;
-export interface IFeature extends IControllable {
+export interface IFeature {
     id: FeatureId;
     getEnabled(): Observable<boolean>;
     init(enabled: boolean): void;
@@ -156,7 +156,7 @@ export interface IMaterialChangeFeature extends IFeature {
 }
 
 
-export interface IViewer extends IControllable {
+export interface IViewer {
     init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement): void;
 }
 
