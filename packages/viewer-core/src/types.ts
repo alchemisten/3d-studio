@@ -19,9 +19,11 @@ import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 export type FeatureSetup = Record<string, boolean>;
 export interface ViewerConfigModel {
+    camera?: Partial<CameraConfigModel>;
     features?: FeatureSetup;
     objects: ObjectSetupModel[];
     project?: ProjectConfigModel;
+    render?: Partial<RenderConfigModel>;
 }
 export interface ObjectSetupModel {
     name: string;
