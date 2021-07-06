@@ -33,6 +33,11 @@ export const defaultCameraConfig = <CameraConfigModel>{
 
 
 
+/**
+ * The config service holds the configuration for the viewer. Other services
+ * and features using the config will get notified when a new configuration
+ * is loaded.
+ */
 @provideSingleton(ConfigService)
 export class ConfigService implements IConfigService {
     private config: ViewerConfigModel;

@@ -6,6 +6,10 @@ import {provideSingleton} from 'util/inversify';
 
 
 
+/**
+ * The light service keeps a record of all lights in the scene and should be
+ * used any time lights are added or removed.
+ */
 @provideSingleton(LightService)
 export class LightService implements ILightService {
     private readonly lightGroup: Object3D;

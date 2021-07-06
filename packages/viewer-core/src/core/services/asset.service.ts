@@ -16,6 +16,16 @@ import {provideSingleton} from 'util/inversify';
 
 
 
+/**
+ * The asset service handles all file loading for the 3D scene, like
+ * object files and textures and should be used for any loading activity
+ * so it can be tracked. All loading is done via a central loading manager
+ * to keep track of requested and loaded files as accurately as possible. Due
+ * to the implementation of the loaders in three.js, the file count is not
+ * entirely reliable.
+ *
+ * TODO: Look into implementing more reliable file count and possible file size tracking
+ */
 @provideSingleton(AssetService)
 export class AssetService implements IAssetService {
     readonly hookObjectLoaded$: Observable<Object3D>;

@@ -8,6 +8,11 @@ import { defaultCameraConfig, defaultRenderConfig } from './config.service';
 
 
 
+/**
+ * The render service renders the current scene to its internal canvas. By
+ * default a single image will be rendered on demand, but the renderer can be
+ * configured to continuously render a new image every frame.
+ */
 @provideSingleton(RenderService)
 export class RenderService implements IRenderService {
     readonly composer: EffectComposer;

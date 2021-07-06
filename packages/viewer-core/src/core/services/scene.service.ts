@@ -5,6 +5,11 @@ import {provideSingleton} from 'util/inversify';
 
 
 
+/**
+ * The scene service provides access to the rendered scene and keeps track of
+ * all objects within. All loaded objects should be added to and removed from
+ * the scene via this service.
+ */
 @provideSingleton(SceneService)
 export class SceneService implements ISceneService {
     readonly scene: Scene;

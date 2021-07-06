@@ -19,6 +19,9 @@ import { FeatureService } from '../feature/services/feature.service';
 
 
 
+/**
+ * The viewer initializes all required services with the provided config.
+ */
 @provide(Viewer)
 export class Viewer implements IViewer {
     private node: HTMLElement;
@@ -66,6 +69,7 @@ export class Viewer implements IViewer {
             console.log(materials);
         });
 
+        // TODO: Move default light setup initialization to more sensible place
         const directionalLight = new DirectionalLight(0xffffff, 1.9);
         directionalLight.position.set(3, 10, -5);
         directionalLight.target = new Object3D();

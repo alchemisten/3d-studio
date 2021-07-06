@@ -5,7 +5,10 @@ import { ConfigService } from '../../core/services/config.service';
 import { FeatureRegistryService } from './feature-registry.service';
 
 
-
+/**
+ * The feature service provides access to all feature instances created for
+ * the current viewer instance.
+ */
 @provideSingleton(FeatureService)
 export class FeatureService implements IFeatureService {
     private features: IFeature[];

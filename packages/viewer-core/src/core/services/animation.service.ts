@@ -7,6 +7,15 @@ import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } 
 
 
 
+/**
+ * The animation service handles animations for all objects loaded in the
+ * viewer. It provides access to the animations and object mixers for each
+ * object and keeps track of the animation clock. To play any animations for an
+ * object, a mixer has to be registered for it with animation service.
+ *
+ * Currently running animations are updated before each render call
+ * automatically.
+ */
 @provideSingleton(AnimationService)
 export class AnimationService implements IAnimationService {
     private activeActions: AnimationAction[];

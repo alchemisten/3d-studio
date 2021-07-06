@@ -9,6 +9,16 @@ import { SceneService } from './scene.service';
 
 
 
+/**
+ * The material service keeps a record of all materials available in the
+ * viewer. Whenever an object is loaded, the materials are automatically
+ * extracted and tracked in the service. Additional materials can be added
+ * manually.
+ *
+ * The service allows to the change properties of tracked materials.
+ *
+ * TODO: Implement changing assigned materials on objects
+ */
 @provideSingleton(MaterialService)
 export class MaterialService implements IMaterialService {
     private assignedMaterials$: BehaviorSubject<Record<string, Material>>;

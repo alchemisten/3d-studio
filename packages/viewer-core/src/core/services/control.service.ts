@@ -8,6 +8,13 @@ import {RenderService} from './render.service';
 
 
 
+/**
+ * The control service provides access to orbit controls.
+ *
+ * Note that using the orbit controls does not require continuous rendering to
+ * be active since a new frame will rendered automatically everytime the
+ * controls are updated.
+ */
 @provideSingleton(ControlService)
 export class ControlService implements IControlService {
     private controls: OrbitControls;
