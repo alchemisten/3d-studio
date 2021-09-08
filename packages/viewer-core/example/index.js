@@ -10,6 +10,7 @@
     const launcher = alcm.studio();
     launcher.createHTMLViewer(container, {
         features: {
+            'cameraRotation': true,
             'wireframe': false
         },
         objects: [
@@ -29,6 +30,9 @@
             languages: ['de'],
             name: 'A test project',
             projectID: 'TEST123',
+        },
+        render: {
+            continuousRendering: true
         }
     });
 }());
