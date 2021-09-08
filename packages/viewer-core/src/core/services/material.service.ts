@@ -14,6 +14,9 @@ import { SceneService } from './scene.service';
  * viewer. Whenever an object is loaded, the materials are automatically
  * extracted and tracked in the service. Additional materials can be added
  * manually.
+ * Materials are tracked by their name. If multiple objects have a material
+ * with the same name, the material of the first object will be assigned to
+ * all other objects.
  *
  * The service allows to the change properties of tracked materials.
  *
