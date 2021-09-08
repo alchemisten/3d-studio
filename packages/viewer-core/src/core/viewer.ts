@@ -5,7 +5,7 @@ import {IViewer, SizeModel, ViewerConfigModel} from '../types';
 import {SceneService} from './services/scene.service';
 import {
     AmbientLight,
-    DirectionalLight, Material,
+    DirectionalLight,
     Object3D,
 } from 'three';
 import {RenderService} from './services/render.service';
@@ -64,9 +64,6 @@ export class Viewer implements IViewer {
                 this.renderService.renderSingleFrame();
                 this.animationService.addMixerForObject(loaded);
             });
-        });
-        this.materialService.getMaterials().subscribe((materials: Material[]) => {
-            console.log(materials);
         });
 
         // TODO: Move default light setup initialization to more sensible place
