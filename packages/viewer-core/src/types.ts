@@ -252,7 +252,6 @@ export interface MaterialSetupModel {
     roughnessMap?: string;
     side: number;
     shininess: number;
-    skinning: boolean;
     specular: string;
     specularMap?: string;
     type: MaterialType;
