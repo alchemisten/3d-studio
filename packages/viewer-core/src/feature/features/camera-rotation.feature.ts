@@ -2,7 +2,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Observable, Subject } from 'rxjs';
 import { provide } from 'inversify-binding-decorators';
 
-import { FeatureId, ICameraRotationFeature } from '../../types';
+import { CameraRotationFeatureConfig, FeatureId, ICameraRotationFeature } from '../../types';
 import { ControlService } from '../../core/services/control.service';
 import { CoreFeature } from '../core-feature.map';
 
@@ -28,21 +28,29 @@ export class CameraRotationFeature implements ICameraRotationFeature {
         return this.enabled$.asObservable();
     }
 
-    init(enabled: boolean): void {
-        this.enabled = enabled;
+    init(config: CameraRotationFeatureConfig): void {
+        this.enabled = config.enabled;
         this.enabled$.next(this.enabled);
         this.controlService.getControls().subscribe((controls) => {
             this.controls = controls;
             this.setRotationEnabled(this.enabled);
+            if (config.rotationSpeed) {
+                this.setRotationSpeed(config.rotationSpeed);
+            }
         });
+    }
+
+
+    setEnabled(enabled: boolean): void {
+        this.enabled = enabled;
+        this.enabled$.next(this.enabled);
     }
 
     setRotationEnabled(enabled: boolean): void {
         this.controls.autoRotate = enabled;
     }
 
-    setEnabled(enabled: boolean): void {
-        this.enabled = enabled;
-        this.enabled$.next(this.enabled);
+    setRotationSpeed(speed: number) {
+        this.controls.autoRotateSpeed = speed;
     }
 }

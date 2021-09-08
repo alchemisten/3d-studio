@@ -1,7 +1,7 @@
 import { Material, MeshStandardMaterial } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { provide } from 'inversify-binding-decorators';
-import { FeatureId, IWireframeFeature } from '../../types';
+import { FeatureConfig, FeatureId, IWireframeFeature } from '../../types';
 import { MaterialService } from '../../core/services/material.service';
 import { CoreFeature } from '../core-feature.map';
 
@@ -28,8 +28,8 @@ export class WireframeFeature implements IWireframeFeature {
         return this.enabled$.asObservable();
     }
 
-    init(enabled: boolean) {
-        this.enabled = enabled;
+    init(config: FeatureConfig) {
+        this.enabled = config.enabled;
         this.enabled$.next(this.enabled);
         this.materialService.getMaterials().subscribe((materials) => {
             this.materials = materials;

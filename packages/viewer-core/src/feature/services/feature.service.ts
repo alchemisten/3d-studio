@@ -60,10 +60,10 @@ export class FeatureService implements IFeatureService {
 
 
     private initializeFeatures(features: FeatureSetup): void {
-        Object.entries(features).forEach(([id, enabled]) => {
+        Object.entries(features).forEach(([id, config]) => {
             try {
                 const feature = this.featureRegistry.getFeatureInstance(id);
-                feature.init(enabled);
+                feature.init(config);
                 this.addFeature(feature);
             } catch (errorMessage) {
                 console.warn(errorMessage);

@@ -10,8 +10,8 @@
     const launcher = alcm.studio();
     launcher.createHTMLViewer(container, {
         features: {
-            'cameraRotation': true,
-            'wireframe': false
+            'cameraRotation': { enabled: true, rotationSpeed: 1 },
+            'wireframe': { enabled: false }
         },
         objects: [
             {

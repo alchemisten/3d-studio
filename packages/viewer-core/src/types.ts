@@ -17,7 +17,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import { Container, interfaces } from 'inversify';
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 
-export type FeatureSetup = Record<string, boolean>;
+export type FeatureSetup = Record<string, FeatureConfig>;
 export interface ViewerConfigModel {
     camera?: Partial<CameraConfigModel>;
     features?: FeatureSetup;
@@ -118,10 +118,14 @@ export interface IControllable {
 }
 
 export type FeatureId = string;
+export interface FeatureConfig {
+    enabled: boolean;
+    [key: string]: string | number | boolean | object | undefined;
+}
 export interface IFeature {
     id: FeatureId;
     getEnabled(): Observable<boolean>;
-    init(enabled: boolean): void;
+    init(config: FeatureConfig): void;
     setEnabled(enabled: boolean): void;
 }
 
@@ -138,9 +142,12 @@ export interface IHighlightFeature extends IFeature {
     getHighlights(): HighlightModel[];
 }
 
-
+export interface CameraRotationFeatureConfig extends FeatureConfig {
+    rotationSpeed?: number;
+}
 export interface ICameraRotationFeature extends IFeature {
     setRotationEnabled(enabled: boolean): void;
+    setRotationSpeed(speed: number): void;
 }
 
 
