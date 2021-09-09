@@ -67,9 +67,10 @@ export type LightScenarioId = string;
 export interface LightScenarioModel {
     i18n: I18nLanguageMap;
     id: LightScenarioId;
-    lights: Light[];
-    backgroundEnvironment: string; // Background image or skybox
-    reflectionEnvironment: WebGLCubeRenderTarget;
+    lights: Record<string, Light>;
+    lightSetups?: LightSetupModel[];
+    backgroundEnvironment?: string; // Background image or skybox
+    reflectionEnvironment?: WebGLCubeRenderTarget;
 }
 
 
@@ -127,6 +128,13 @@ export interface IFeature {
     getEnabled(): Observable<boolean>;
     init(config: FeatureConfig): void;
     setEnabled(enabled: boolean): void;
+}
+
+
+export interface LightScenarioFeatureConfig extends FeatureConfig {
+    initialScenarioId: string;
+    makeStudioDefaultSelectable?: boolean;
+    scenarios: LightScenarioModel[];
 }
 
 export interface ILightScenarioFeature extends IFeature {
@@ -296,6 +304,41 @@ export interface ISceneService {
     removeObjectFromScene(objectName: string): void;
 }
 
+
+export enum LightType {
+    Ambient = 'ambient',
+    Directional = 'directional',
+    Point = 'point',
+    Spot = 'spot'
+}
+
+export interface LightSetupModel {
+    angle?: number;
+    castShadow?: boolean;
+    color: string;
+    decay?: number;
+    distance?: number;
+    intensity?: number;
+    name: string;
+    penumbra?: number;
+    position?: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    shadow?: {
+        camera?: {
+            far?: number;
+            near?: number;
+        };
+        focus?: number;
+        mapSize?: {
+            height: number;
+            width: number;
+        }
+    };
+    type: LightType;
+}
 
 export interface ILightService {
     addLights(lights: Record<string, Light>): void;

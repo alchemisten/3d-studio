@@ -14,6 +14,10 @@ export class MissingDIContainerError extends Error {
     constructor(message: string) { super(message); }
 }
 
+export class MissingLightScenarioError extends Error {
+    constructor(message: string) { super(message); }
+}
+
 export class MissingMixerError extends Error {
     constructor(message: string) { super(message); }
 }
@@ -21,3 +25,8 @@ export class MissingMixerError extends Error {
 export class ObjectHasNoAnimationsError extends Error {
     constructor(message: string) { super(message); }
 }
+
+export class UnknowLightTypeError extends Error {
+    constructor(message: string) { super(message); }
+}
+
