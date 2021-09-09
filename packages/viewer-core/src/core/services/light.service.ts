@@ -1,8 +1,9 @@
-import { AmbientLight, DirectionalLight, Group, Light, Object3D } from 'three';
+import { AmbientLight, DirectionalLight, Group, Light, Object3D, PointLight, SpotLight } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ILightService } from '../../types';
-import { SceneService } from './scene.service';
 import { provideSingleton } from 'util/inversify';
+import { ILightService, LightSetupModel, LightType } from '../../types';
+import { SceneService } from './scene.service';
+import { UnknowLightTypeError } from '../exceptions';
 
 
 
@@ -76,5 +77,64 @@ export class LightService implements ILightService {
             'ambient': new AmbientLight('#aaaaaa'),
             'directional': directionalLight
         });
+    }
+
+
+    static transformLightSetup(setup: LightSetupModel): AmbientLight | DirectionalLight | PointLight | SpotLight {
+        switch (setup.type) {
+            case LightType.Ambient:
+                return new AmbientLight(
+                    setup.color,
+                    setup.intensity
+                );
+            case LightType.Directional:
+                const directionalLight = new DirectionalLight(
+                    setup.color,
+                    setup.intensity
+                );
+                directionalLight.castShadow = setup.castShadow || false;
+                if (setup.position) {
+                    directionalLight.position.set(setup.position.x, setup.position.y, setup.position.z);
+                }
+                return directionalLight;
+            case LightType.Point:
+                const pointLight = new PointLight(
+                    setup.color,
+                    setup.intensity || 1,
+                    setup.distance || 0,
+                    setup.decay || 1
+                );
+                if (setup.position) {
+                    pointLight.position.set(setup.position.x, setup.position.y, setup.position.z);
+                }
+                return pointLight;
+            case LightType.Spot:
+                const spotLight = new SpotLight(
+                    setup.color,
+                    setup.intensity || 1,
+                    setup.distance || 0,
+                    setup.angle || Math.PI / 3,
+                    setup.penumbra || 0,
+                    setup.decay || 1
+                );
+                spotLight.castShadow = setup.castShadow || false;
+                if (setup.position) {
+                    spotLight.position.set(setup.position.x, setup.position.y, setup.position.z);
+                }
+                if (setup.shadow) {
+                    spotLight.shadow.focus = setup.shadow.focus || 1;
+                    if (setup.shadow.camera) {
+                        spotLight.shadow.camera.far = setup.shadow.camera.far || 500;
+                        spotLight.shadow.camera.near = setup.shadow.camera.near || 0.5;
+                    }
+                    if (setup.shadow.mapSize) {
+                        spotLight.shadow.mapSize.height = setup.shadow.mapSize.height;
+                        spotLight.shadow.mapSize.width = setup.shadow.mapSize.width;
+                    }
+                }
+                return spotLight;
+            default:
+                throw new UnknowLightTypeError(`The light type ${setup.type} can not be resolved by the light service`);
+        }
     }
 }
