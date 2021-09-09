@@ -31,6 +31,10 @@ export class LightService implements ILightService {
 
     addLights(lights: Record<string, Light>): void {
         Object.keys(lights).forEach(key => {
+            if (this.lights[key]) {
+                this.removeLights([key]);
+            }
+
             this.lights[key] = (lights[key]);
             this.lightGroup.add(lights[key]);
         });
