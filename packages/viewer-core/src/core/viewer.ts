@@ -65,20 +65,6 @@ export class Viewer implements IViewer {
                 this.animationService.addMixerForObject(loaded);
             });
         });
-
-        // TODO: Move default light setup initialization to more sensible place
-        const directionalLight = new DirectionalLight(0xffffff, 1.9);
-        directionalLight.position.set(3, 10, -5);
-        directionalLight.target = new Object3D();
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 1024;
-        directionalLight.shadow.mapSize.height = 1024;
-        directionalLight.shadow.camera.near = 0.1;
-        directionalLight.shadow.camera.far = 60;
-        this.lightService.addLights({
-            'ambient': new AmbientLight('#aaaaaa'),
-            'directional': directionalLight
-        });
     }
 
 

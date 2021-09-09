@@ -1,8 +1,8 @@
-import {Group, Light, Object3D} from 'three';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {ILightService} from '../../types';
-import {SceneService} from './scene.service';
-import {provideSingleton} from 'util/inversify';
+import { AmbientLight, DirectionalLight, Group, Light, Object3D } from 'three';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ILightService } from '../../types';
+import { SceneService } from './scene.service';
+import { provideSingleton } from 'util/inversify';
 
 
 
@@ -24,6 +24,7 @@ export class LightService implements ILightService {
         this.sceneService.scene.add(this.lightGroup);
         this.lights = {};
         this.lights$ = new BehaviorSubject(this.lights);
+        this.addDefaultLights();
     }
 
 
@@ -55,5 +56,21 @@ export class LightService implements ILightService {
             this.lightGroup.children = [];
         }
         this.lights$.next(this.lights);
+    }
+
+
+    private addDefaultLights() {
+        const directionalLight = new DirectionalLight(0xffffff, 1.9);
+        directionalLight.position.set(3, 10, -5);
+        directionalLight.target = new Object3D();
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        directionalLight.shadow.camera.near = 0.1;
+        directionalLight.shadow.camera.far = 60;
+        this.addLights({
+            'ambient': new AmbientLight('#aaaaaa'),
+            'directional': directionalLight
+        });
     }
 }
