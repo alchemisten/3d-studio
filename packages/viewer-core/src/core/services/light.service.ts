@@ -92,7 +92,7 @@ export class LightService implements ILightService {
                     setup.color,
                     setup.intensity
                 );
-                directionalLight.castShadow = setup.castShadow || false;
+                directionalLight.castShadow = setup.castShadow ?? false;
                 if (setup.position) {
                     directionalLight.position.set(setup.position.x, setup.position.y, setup.position.z);
                 }
@@ -100,9 +100,9 @@ export class LightService implements ILightService {
             case LightType.Point:
                 const pointLight = new PointLight(
                     setup.color,
-                    setup.intensity || 1,
-                    setup.distance || 0,
-                    setup.decay || 1
+                    setup.intensity ?? 1,
+                    setup.distance ?? 0,
+                    setup.decay ?? 1
                 );
                 if (setup.position) {
                     pointLight.position.set(setup.position.x, setup.position.y, setup.position.z);
@@ -111,21 +111,21 @@ export class LightService implements ILightService {
             case LightType.Spot:
                 const spotLight = new SpotLight(
                     setup.color,
-                    setup.intensity || 1,
-                    setup.distance || 0,
-                    setup.angle || Math.PI / 3,
-                    setup.penumbra || 0,
-                    setup.decay || 1
+                    setup.intensity ?? 1,
+                    setup.distance ?? 0,
+                    setup.angle ?? Math.PI / 3,
+                    setup.penumbra ?? 0,
+                    setup.decay ?? 1
                 );
-                spotLight.castShadow = setup.castShadow || false;
+                spotLight.castShadow = setup.castShadow ?? false;
                 if (setup.position) {
                     spotLight.position.set(setup.position.x, setup.position.y, setup.position.z);
                 }
                 if (setup.shadow) {
-                    spotLight.shadow.focus = setup.shadow.focus || 1;
+                    spotLight.shadow.focus = setup.shadow.focus ?? 1;
                     if (setup.shadow.camera) {
-                        spotLight.shadow.camera.far = setup.shadow.camera.far || 500;
-                        spotLight.shadow.camera.near = setup.shadow.camera.near || 0.5;
+                        spotLight.shadow.camera.far = setup.shadow.camera.far ?? 500;
+                        spotLight.shadow.camera.near = setup.shadow.camera.near ?? 0.5;
                     }
                     if (setup.shadow.mapSize) {
                         spotLight.shadow.mapSize.height = setup.shadow.mapSize.height;
