@@ -1,7 +1,7 @@
+import { injectable } from 'inversify';
 import {Group, Object3D, Scene} from 'three';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ISceneService} from '../../types';
-import {provideSingleton} from 'util/inversify';
 
 
 
@@ -10,7 +10,7 @@ import {provideSingleton} from 'util/inversify';
  * all objects within. All loaded objects should be added to and removed from
  * the scene via this service.
  */
-@provideSingleton(SceneService)
+@injectable()
 export class SceneService implements ISceneService {
     readonly scene: Scene;
     private readonly group: Object3D;

@@ -1,8 +1,7 @@
+import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { provideSingleton } from 'util/inversify';
-import { AnimationIdModel, IAnimationService } from '../../types';
-import { RenderService } from './render.service';
+import { AnimationIdModel, IAnimationService, IRenderService, RenderServiceToken } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
 
 
@@ -16,7 +15,7 @@ import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } 
  * Currently running animations are updated before each render call
  * automatically.
  */
-@provideSingleton(AnimationService)
+@injectable()
 export class AnimationService implements IAnimationService {
     private activeActions: AnimationAction[];
     private animations: Record<string, AnimationClip[]>;
@@ -27,7 +26,7 @@ export class AnimationService implements IAnimationService {
     private readonly mixers$: BehaviorSubject<Record<string, AnimationMixer>>;
 
     constructor(
-        private renderService: RenderService
+        @inject(RenderServiceToken) private renderService: IRenderService
     ) {
         this.animations = {};
         this.activeActions = [];

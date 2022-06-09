@@ -1,9 +1,8 @@
+import { inject, injectable } from 'inversify';
 import {PerspectiveCamera, WebGLRenderer} from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {Observable, Subject} from 'rxjs';
-import {CameraConfigModel, IRenderService, RenderConfigModel} from '../../types';
-import {SceneService} from './scene.service';
-import {provideSingleton} from 'util/inversify';
+import { CameraConfigModel, IRenderService, ISceneService, RenderConfigModel, SceneServiceToken } from '../../types';
 import { defaultCameraConfig, defaultRenderConfig } from './config.service';
 
 
@@ -13,7 +12,7 @@ import { defaultCameraConfig, defaultRenderConfig } from './config.service';
  * default a single image will be rendered on demand, but the renderer can be
  * configured to continuously render a new image every frame.
  */
-@provideSingleton(RenderService)
+@injectable()
 export class RenderService implements IRenderService {
     readonly composer: EffectComposer;
     readonly hookAfterRender$: Observable<boolean>;
@@ -29,7 +28,7 @@ export class RenderService implements IRenderService {
     private renderConfig$: Subject<RenderConfigModel>;
 
     constructor(
-        private sceneService: SceneService
+        @inject(SceneServiceToken) private sceneService: ISceneService
     ) {
         this.afterRender$ = new Subject<boolean>();
         this.hookAfterRender$ = this.afterRender$.asObservable();

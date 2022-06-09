@@ -1,9 +1,13 @@
+import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
 import { Observable, Subject } from 'rxjs';
-import { provide } from 'inversify-binding-decorators';
-import { FeatureConfig, FeatureId, IWireframeFeature } from '../../types';
-import { MaterialService } from '../../core/services/material.service';
-import { CoreFeature } from '../core-feature.map';
+import {
+    FeatureConfig,
+    IMaterialService,
+    IWireframeFeature,
+    MaterialServiceToken,
+    WireframeFeatureToken
+} from '../../types';
 
 
 
@@ -11,15 +15,15 @@ import { CoreFeature } from '../core-feature.map';
  * When enabled all materials of all objects in the scene will be set to
  * display as wireframe.
  */
-@provide(WireframeFeature)
+@injectable()
 export class WireframeFeature implements IWireframeFeature {
-    readonly id: FeatureId = CoreFeature.Wireframe;
+    readonly id = WireframeFeatureToken;
     private enabled: boolean;
     private readonly enabled$: Subject<boolean>;
     private materials: Material[];
 
     constructor(
-        private materialService: MaterialService
+        @inject(MaterialServiceToken) private materialService: IMaterialService
     ) {
         this.enabled$ = new Subject<boolean>();
     }

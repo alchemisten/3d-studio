@@ -10,8 +10,8 @@
     const launcher = alcm.studio();
     launcher.createHTMLViewer(container, {
         features: {
-            'cameraRotation': { enabled: true, rotationSpeed: 1 },
-            'lightScenario': {
+            'CameraRotationFeature': { enabled: true, rotationSpeed: 1 },
+            'LightScenarioFeature': {
                 enabled: true,
                 initialScenarioId: 'points',
                 scenarios: [{

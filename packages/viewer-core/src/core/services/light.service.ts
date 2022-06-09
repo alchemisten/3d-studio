@@ -1,8 +1,7 @@
+import { inject, injectable } from 'inversify';
 import { AmbientLight, DirectionalLight, Group, Light, Object3D, PointLight, SpotLight } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { provideSingleton } from 'util/inversify';
-import { ILightService, LightSetupModel, LightType } from '../../types';
-import { SceneService } from './scene.service';
+import { ILightService, ISceneService, LightSetupModel, LightType, SceneServiceToken } from '../../types';
 import { UnknowLightTypeError } from '../exceptions';
 
 
@@ -11,14 +10,14 @@ import { UnknowLightTypeError } from '../exceptions';
  * The light service keeps a record of all lights in the scene and should be
  * used any time lights are added or removed.
  */
-@provideSingleton(LightService)
+@injectable()
 export class LightService implements ILightService {
     private readonly lightGroup: Object3D;
     private lights: Record<string, Light>;
     private lights$: BehaviorSubject<Record<string, Light>>;
 
     constructor(
-        private sceneService: SceneService
+        @inject(SceneServiceToken) private sceneService: ISceneService
     ) {
         this.lightGroup = new Group();
         this.lightGroup.name = 'lights';

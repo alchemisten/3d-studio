@@ -11,7 +11,7 @@
     const launcherOne = alcm.studio();
     launcherOne.createHTMLViewer(containerOne, {
         features: {
-            'wireframe': true
+            'WireframeFeature': true
         },
         objects: [
             {

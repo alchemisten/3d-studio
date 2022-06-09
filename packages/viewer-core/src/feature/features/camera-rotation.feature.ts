@@ -1,25 +1,29 @@
+import { inject, injectable } from 'inversify';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Observable, Subject } from 'rxjs';
-import { provide } from 'inversify-binding-decorators';
 
-import { CameraRotationFeatureConfig, FeatureId, ICameraRotationFeature } from '../../types';
-import { ControlService } from '../../core/services/control.service';
-import { CoreFeature } from '../core-feature.map';
+import { Observable, Subject } from 'rxjs';
+import {
+    CameraRotationFeatureConfig,
+    CameraRotationFeatureToken,
+    ControlServiceToken,
+    ICameraRotationFeature,
+    IControlService
+} from '../../types';
 
 
 
 /**
  * When enabled, the orbit controls rotate around the objects in the scene.
  */
-@provide(CameraRotationFeature)
+@injectable()
 export class CameraRotationFeature implements ICameraRotationFeature {
-    readonly id: FeatureId = CoreFeature.CameraRotation;
+    readonly id = CameraRotationFeatureToken;
     private controls: OrbitControls;
     private enabled: boolean;
     private readonly enabled$: Subject<boolean>;
 
     constructor(
-        private controlService: ControlService,
+        @inject(ControlServiceToken) private controlService: IControlService,
     ) {
         this.enabled$ = new Subject<boolean>();
     }

@@ -1,5 +1,5 @@
+import { injectable } from 'inversify';
 import { PCFSoftShadowMap, sRGBEncoding, Vector3 } from 'three';
-import { provideSingleton } from 'util/inversify';
 import { Observable, Subject } from 'rxjs';
 import { CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
 
@@ -38,7 +38,7 @@ export const defaultCameraConfig = <CameraConfigModel>{
  * and features using the config will get notified when a new configuration
  * is loaded.
  */
-@provideSingleton(ConfigService)
+@injectable()
 export class ConfigService implements IConfigService {
     private config: ViewerConfigModel;
     private config$: Subject<ViewerConfigModel>;

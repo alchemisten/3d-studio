@@ -1,31 +1,32 @@
+import { inject, injectable } from 'inversify';
 import { Light } from 'three';
 import { Observable, Subject } from 'rxjs';
-import { provide } from 'inversify-binding-decorators';
 import { take } from 'rxjs/operators';
 import {
-    FeatureId,
     ILightScenarioFeature,
+    ILightService,
     LightScenarioFeatureConfig,
+    LightScenarioFeatureToken,
     LightScenarioId,
-    LightScenarioModel
+    LightScenarioModel,
+    LightServiceToken
 } from '../../types';
-import { LightService } from '../../core/services/light.service';
+import { LightService } from '../../core/services';
 import { MissingLightScenarioError } from '../../core/exceptions';
-import { CoreFeature } from '../core-feature.map';
 
 
 
 /**
  * When enabled, allows to switch between the provided light scenarios. Each
  * light scenario can contain a number of lights or light setups, which will be
- * automatically transformed into lights via the LightService. Light setup do
+ * automatically transformed into lights via the LightService. Light setups do
  * not support all light types or features, so providing actual lights should
  * be preferred. When providing light setups for a scenario, lights should be
  * set to an empty array in the config.
  */
-@provide(LightScenarioFeature)
+@injectable()
 export class LightScenarioFeature implements ILightScenarioFeature {
-    readonly id: FeatureId = CoreFeature.LightScenario;
+    readonly id = LightScenarioFeatureToken;
     private readonly activeScenario$: Subject<LightScenarioModel>;
     private activeScenario: LightScenarioModel;
     private defaultScenario: LightScenarioModel;
@@ -34,7 +35,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
     private lightScenarios: LightScenarioModel[];
 
     constructor(
-        private lightService: LightService,
+        @inject(LightServiceToken) private lightService: ILightService,
     ) {
         this.activeScenario$ = new Subject<LightScenarioModel>();
         this.enabled$ = new Subject<boolean>();

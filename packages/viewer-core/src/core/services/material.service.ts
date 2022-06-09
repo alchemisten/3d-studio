@@ -1,11 +1,10 @@
+import { inject, injectable } from 'inversify';
 import {
     Material,
     Mesh,
 } from 'three';
 import { BehaviorSubject, Observable} from 'rxjs';
-import { IMaterialService } from '../../types';
-import { provideSingleton } from 'util/inversify';
-import { SceneService } from './scene.service';
+import { IMaterialService, ISceneService, SceneServiceToken } from '../../types';
 
 
 
@@ -22,14 +21,14 @@ import { SceneService } from './scene.service';
  *
  * TODO: Implement changing assigned materials on objects
  */
-@provideSingleton(MaterialService)
+@injectable()
 export class MaterialService implements IMaterialService {
     private assignedMaterials$: BehaviorSubject<Record<string, Material>>;
     private materials: Material[];
     private readonly materials$: BehaviorSubject<Material[]>;
 
     constructor(
-        private sceneService: SceneService
+        @inject(SceneServiceToken) private sceneService: ISceneService
     ) {
         this.assignedMaterials$ = new BehaviorSubject<Record<string, Material>>({});
         this.materials = [];

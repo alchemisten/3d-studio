@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "inversify": "^5.1.1",
-    "inversify-binding-decorators": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.3.0",
     "three": "^0.132.0"

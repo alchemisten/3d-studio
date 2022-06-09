@@ -1,41 +1,48 @@
-import {provide} from 'inversify-binding-decorators';
+import { inject, injectable } from 'inversify';
 import {fromEvent} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import {IViewer, SizeModel, ViewerConfigModel} from '../types';
-import {SceneService} from './services/scene.service';
 import {
-    AmbientLight,
-    DirectionalLight,
-    Object3D,
-} from 'three';
-import {RenderService} from './services/render.service';
-import {LightService} from './services/light.service';
-import {AssetService} from './services/asset.service';
-import {ControlService} from './services/control.service';
-import {MaterialService} from './services/material.service';
-import { ConfigService } from './services/config.service';
-import { AnimationService } from './services/animation.service';
-import { FeatureService } from '../feature/services/feature.service';
+    AnimationServiceToken,
+    AssetServiceToken,
+    ConfigServiceToken,
+    ControlServiceToken,
+    FeatureServiceToken,
+    IAnimationService,
+    IAssetService,
+    IConfigService,
+    IControlService,
+    IFeatureService,
+    ILightService,
+    IMaterialService,
+    IRenderService, ISceneService,
+    IViewer,
+    LightServiceToken,
+    MaterialServiceToken,
+    RenderServiceToken,
+    SceneServiceToken,
+    SizeModel,
+    ViewerConfigModel
+} from '../types';
 
 
 
 /**
  * The viewer initializes all required services with the provided config.
  */
-@provide(Viewer)
+@injectable()
 export class Viewer implements IViewer {
     private node: HTMLElement;
 
     constructor(
-        private animationService: AnimationService,
-        private assetService: AssetService,
-        private configService: ConfigService,
-        private controlService: ControlService,
-        private featureService: FeatureService,
-        private lightService: LightService,
-        private materialService: MaterialService,
-        private renderService: RenderService,
-        private sceneService: SceneService,
+        @inject(AnimationServiceToken) private animationService: IAnimationService,
+        @inject(AssetServiceToken) private assetService: IAssetService,
+        @inject(ConfigServiceToken) private configService: IConfigService,
+        @inject(ControlServiceToken) private controlService: IControlService,
+        @inject(FeatureServiceToken) private featureService: IFeatureService,
+        @inject(LightServiceToken) private lightService: ILightService,
+        @inject(MaterialServiceToken) private materialService: IMaterialService,
+        @inject(RenderServiceToken) private renderService: IRenderService,
+        @inject(SceneServiceToken) private sceneService: ISceneService,
     ) {}
 
 

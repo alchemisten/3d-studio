@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import {
     EquirectangularReflectionMapping,
     LoadingManager,
@@ -9,10 +10,8 @@ import {
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {Observable, Subject} from 'rxjs';
-import {IAssetService} from '../../types';
-import {RenderService} from './render.service';
+import { IAssetService, IRenderService, RenderServiceToken } from '../../types';
 import {Constants} from 'util/constants';
-import {provideSingleton} from 'util/inversify';
 
 
 
@@ -26,7 +25,7 @@ import {provideSingleton} from 'util/inversify';
  *
  * TODO: Look into implementing more reliable file count and possible file size tracking
  */
-@provideSingleton(AssetService)
+@injectable()
 export class AssetService implements IAssetService {
     readonly hookObjectLoaded$: Observable<Object3D>;
     private readonly dracoLoader: DRACOLoader;
@@ -36,7 +35,7 @@ export class AssetService implements IAssetService {
     private readonly textureLoader: TextureLoader;
 
     constructor(
-        private renderService: RenderService
+        @inject(RenderServiceToken) private renderService: IRenderService
     ) {
         this.loadingManager = new LoadingManager(
             this.onLoadingComplete.bind(this),

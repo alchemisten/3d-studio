@@ -118,7 +118,7 @@ export interface IControllable {
     getControls(): UIControlModel[];
 }
 
-export type FeatureId = string;
+export type FeatureId = symbol;
 export interface FeatureConfig {
     enabled: boolean;
     [key: string]: string | number | boolean | object | undefined;
@@ -137,6 +137,7 @@ export interface LightScenarioFeatureConfig extends FeatureConfig {
     scenarios: LightScenarioModel[];
 }
 
+export const LightScenarioFeatureToken = Symbol.for('LightScenarioFeature');
 export interface ILightScenarioFeature extends IFeature {
     getActiveScenario(): Observable<LightScenarioModel>;
     getLightScenarios(): LightScenarioModel[];
@@ -144,6 +145,7 @@ export interface ILightScenarioFeature extends IFeature {
 }
 
 
+export const HighlightFeatureToken = Symbol.for('HighlightFeature');
 export interface IHighlightFeature extends IFeature {
     focusHighlight(id: HighlightModelId): void;
     getFocusedHighlight(): Observable<HighlightModel | null>;
@@ -153,17 +155,20 @@ export interface IHighlightFeature extends IFeature {
 export interface CameraRotationFeatureConfig extends FeatureConfig {
     rotationSpeed?: number;
 }
+export const CameraRotationFeatureToken = Symbol.for('CameraRotationFeature');
 export interface ICameraRotationFeature extends IFeature {
     setRotationEnabled(enabled: boolean): void;
     setRotationSpeed(speed: number): void;
 }
 
 
+export const WireframeFeatureToken = Symbol.for('WireframeFeature');
 export interface IWireframeFeature extends IFeature {
     setWireframeEnabled(enabled: boolean): void;
 }
 
 
+export const MaterialChangeFeatureToken = Symbol.for('MaterialChangeFeature');
 export interface IMaterialChangeFeature extends IFeature {
     addNewMaterial(material: Material): void;
     assignMaterialToSlot(slotName: string, material: Material): void;
@@ -172,7 +177,7 @@ export interface IMaterialChangeFeature extends IFeature {
     getMaterials(): Observable<Material[]>;
 }
 
-
+export const ViewerToken = Symbol.for('Viewer');
 export interface IViewer {
     init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement): void;
 }
@@ -188,7 +193,7 @@ export interface AnimationIdModel {
     animationName: string;
 }
 
-
+export const AnimationServiceToken = Symbol.for('AnimationService');
 export interface IAnimationService {
     addMixerForObject(object: Object3D): boolean;
     getActiveAnimations(): Observable<AnimationAction[]>;
@@ -200,6 +205,7 @@ export interface IAnimationService {
 }
 
 
+export const AssetServiceToken = Symbol.for('AssetService');
 export interface IAssetService {
     readonly hookObjectLoaded$: Observable<Object3D>;
     loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
@@ -208,14 +214,15 @@ export interface IAssetService {
 }
 
 
+export const FeatureServiceToken = Symbol.for('FeatureService');
 export interface IFeatureService {
     addFeature(feature: IFeature): void;
     getFeatures(): Observable<IFeature[]>;
-    removeFeature(featureId: string): void;
-    setFeatureEnabled(featureId: string, enabled: boolean): void;
+    removeFeature(featureId: symbol): void;
+    setFeatureEnabled(featureId: symbol, enabled: boolean): void;
 }
 
-
+export const FeatureRegistryServiceToken = Symbol.for('FeatureRegistryService');
 export interface IFeatureRegistryService {
     getFeatureInstance(id: string): IFeature;
     registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void;
@@ -274,6 +281,7 @@ export interface MaterialSetupModel {
 
 
 // TODO: Rethink concept for material assignment, material slots and identifying materials
+export const MaterialServiceToken = Symbol.for('MaterialService');
 export interface IMaterialService {
     addMaterial(material: Material): void;
     getAssignedMaterials(): Observable<Record<string, Material>>;
@@ -283,6 +291,7 @@ export interface IMaterialService {
 }
 
 
+export const RenderServiceToken = Symbol.for('RenderService');
 export interface IRenderService {
     readonly composer: EffectComposer;
     readonly hookAfterRender$: Observable<boolean>;
@@ -297,6 +306,7 @@ export interface IRenderService {
 }
 
 
+export const SceneServiceToken = Symbol.for('SceneService');
 export interface ISceneService {
     readonly scene: Scene;
     addObjectToScene(object: Object3D): void;
@@ -340,6 +350,8 @@ export interface LightSetupModel {
     type: LightType;
 }
 
+
+export const LightServiceToken = Symbol.for('LightService');
 export interface ILightService {
     addLights(lights: Record<string, Light>): void;
     getLights(): Observable<Record<string, Light>>;
@@ -347,10 +359,13 @@ export interface ILightService {
 }
 
 
+export const ControlServiceToken = Symbol.for('ControlService');
 export interface IControlService {
     getControls(): Observable<OrbitControls>;
 }
 
+
+export const ConfigServiceToken = Symbol.for('ConfigService');
 export interface IConfigService {
     getConfig(): Observable<ViewerConfigModel>;
     loadConfig(config: ViewerConfigModel): void;

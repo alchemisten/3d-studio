@@ -1,13 +1,47 @@
 import 'reflect-metadata';
 import { Container, interfaces } from 'inversify';
-import { buildProviderModule } from 'inversify-binding-decorators';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IFeature, IViewer, IViewerLauncher, SizeModel, ViewerConfigModel } from '../types';
+import {
+    AnimationServiceToken,
+    AssetServiceToken,
+    ConfigServiceToken,
+    ControlServiceToken,
+    FeatureRegistryServiceToken,
+    FeatureServiceToken,
+    IAnimationService,
+    IAssetService,
+    IConfigService,
+    IControlService,
+    IFeature,
+    IFeatureRegistryService,
+    IFeatureService,
+    ILightService,
+    IMaterialService,
+    IRenderService,
+    ISceneService,
+    IViewer,
+    IViewerLauncher,
+    LightServiceToken,
+    MaterialServiceToken,
+    RenderServiceToken,
+    SceneServiceToken,
+    SizeModel,
+    ViewerConfigModel, ViewerToken
+} from '../types';
 import { Viewer } from './viewer';
-import { RenderService } from './services/render.service';
-import { FeatureRegistryService } from '../feature/services/feature-registry.service';
 import ServiceIdentifier = interfaces.ServiceIdentifier;
+import {
+    AnimationService,
+    AssetService,
+    ConfigService,
+    ControlService,
+    LightService,
+    MaterialService,
+    SceneService,
+    RenderService
+} from './services';
+import { FeatureService, FeatureRegistryService } from '../feature';
 
 
 
@@ -17,12 +51,23 @@ import ServiceIdentifier = interfaces.ServiceIdentifier;
  */
 export class ViewerLauncher implements IViewerLauncher {
     private readonly containerDI: Container;
-    private readonly featureRegistry: FeatureRegistryService;
+    private readonly featureRegistry: IFeatureRegistryService;
 
     constructor() {
         this.containerDI = new Container();
-        this.containerDI.load(buildProviderModule());
-        this.featureRegistry = this.containerDI.get<FeatureRegistryService>(FeatureRegistryService);
+        this.containerDI.bind<IAnimationService>(AnimationServiceToken).to(AnimationService).inSingletonScope();
+        this.containerDI.bind<IAssetService>(AssetServiceToken).to(AssetService).inSingletonScope();
+        this.containerDI.bind<IConfigService>(ConfigServiceToken).to(ConfigService).inSingletonScope();
+        this.containerDI.bind<IControlService>(ControlServiceToken).to(ControlService).inSingletonScope();
+        this.containerDI.bind<ILightService>(LightServiceToken).to(LightService).inSingletonScope();
+        this.containerDI.bind<IMaterialService>(MaterialServiceToken).to(MaterialService).inSingletonScope();
+        this.containerDI.bind<IRenderService>(RenderServiceToken).to(RenderService).inSingletonScope();
+        this.containerDI.bind<ISceneService>(SceneServiceToken).to(SceneService).inSingletonScope();
+        this.containerDI.bind<IFeatureService>(FeatureServiceToken).to(FeatureService).inSingletonScope();
+        this.containerDI.bind<IFeatureRegistryService>(FeatureRegistryServiceToken).to(FeatureRegistryService).inSingletonScope();
+        this.containerDI.bind<IViewer>(ViewerToken).to(Viewer);
+
+        this.featureRegistry = this.containerDI.get<IFeatureRegistryService>(FeatureRegistryServiceToken);
         this.featureRegistry.setDIContainer(this.containerDI);
     }
 
@@ -38,7 +83,7 @@ export class ViewerLauncher implements IViewerLauncher {
      * @returns The created viewer instance
      */
     createHTMLViewer(container: HTMLElement, config: ViewerConfigModel): IViewer {
-        const viewer = this.containerDI.get<Viewer>(Viewer);
+        const viewer = this.containerDI.get<IViewer>(ViewerToken);
         const screenSize = container.getBoundingClientRect() as SizeModel;
         viewer.init(screenSize, config, container);
 
@@ -57,12 +102,12 @@ export class ViewerLauncher implements IViewerLauncher {
      * @returns An Observable of base64 encoded image source strings
      */
     createImageViewer(renderSize: SizeModel, config: ViewerConfigModel): Observable<string> {
-        const viewer = this.containerDI.get<Viewer>(Viewer);
+        const viewer = this.containerDI.get<IViewer>(ViewerToken);
         viewer.init(renderSize, config);
-        const rendererService = this.containerDI.get<RenderService>(RenderService);
+        const renderService = this.containerDI.get<IRenderService>(RenderServiceToken);
 
-        return rendererService.hookAfterRender$.pipe(
-            map(() => rendererService.renderer.domElement.toDataURL())
+        return renderService.hookAfterRender$.pipe(
+            map(() => renderService.renderer.domElement.toDataURL())
         );
     }
 

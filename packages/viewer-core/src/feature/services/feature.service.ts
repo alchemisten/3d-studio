@@ -1,22 +1,28 @@
+import { inject, injectable } from 'inversify';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { provideSingleton } from 'util/inversify';
-import { FeatureSetup, IFeature, IFeatureService } from '../../types';
-import { ConfigService } from '../../core/services/config.service';
-import { FeatureRegistryService } from './feature-registry.service';
+import {
+    ConfigServiceToken,
+    FeatureRegistryServiceToken,
+    FeatureSetup,
+    IConfigService,
+    IFeature,
+    IFeatureRegistryService,
+    IFeatureService
+} from '../../types';
 
 
 /**
  * The feature service provides access to all feature instances created for
  * the current viewer instance.
  */
-@provideSingleton(FeatureService)
+@injectable()
 export class FeatureService implements IFeatureService {
     private features: IFeature[];
     private features$: BehaviorSubject<IFeature[]>;
 
     constructor(
-        private configService: ConfigService,
-        private featureRegistry: FeatureRegistryService
+        @inject(ConfigServiceToken) private configService: IConfigService,
+        @inject(FeatureRegistryServiceToken) private featureRegistry: IFeatureRegistryService
     ) {
         this.features = [];
         this.features$ = new BehaviorSubject<IFeature[]>(this.features);
@@ -41,7 +47,7 @@ export class FeatureService implements IFeatureService {
     }
 
 
-    removeFeature(featureId: string): void {
+    removeFeature(featureId: symbol): void {
         const featureIndex = this.features.findIndex((feature) => feature.id === featureId);
         if (featureIndex !== -1) {
             this.features[featureIndex].setEnabled(false);
@@ -51,7 +57,7 @@ export class FeatureService implements IFeatureService {
     }
 
 
-    setFeatureEnabled(featureId: string, enabled: boolean): void {
+    setFeatureEnabled(featureId: symbol, enabled: boolean): void {
         const feature = this.features.find((feature) => feature.id === featureId);
         if (feature) {
             feature.setEnabled(enabled);
@@ -60,9 +66,9 @@ export class FeatureService implements IFeatureService {
 
 
     private initializeFeatures(features: FeatureSetup): void {
-        Object.entries(features).forEach(([id, config]) => {
+        Object.entries(features).forEach(([token, config]) => {
             try {
-                const feature = this.featureRegistry.getFeatureInstance(id);
+                const feature = this.featureRegistry.getFeatureInstance(token);
                 feature.init(config);
                 this.addFeature(feature);
             } catch (errorMessage) {

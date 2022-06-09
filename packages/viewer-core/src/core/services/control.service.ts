@@ -1,10 +1,9 @@
+import { inject, injectable } from 'inversify';
 import {PerspectiveCamera} from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {fromEvent, Observable, Subject, Subscription} from 'rxjs';
 import {take, withLatestFrom} from 'rxjs/operators';
-import {IControlService} from '../../types';
-import {provideSingleton} from 'util/inversify';
-import {RenderService} from './render.service';
+import { IControlService, IRenderService, RenderServiceToken } from '../../types';
 
 
 
@@ -15,14 +14,14 @@ import {RenderService} from './render.service';
  * be active since a new frame will rendered automatically everytime the
  * controls are updated.
  */
-@provideSingleton(ControlService)
+@injectable()
 export class ControlService implements IControlService {
     private controls: OrbitControls;
     private controls$: Subject<OrbitControls>;
     private changeSub: Subscription;
 
     constructor(
-        private renderService: RenderService
+        @inject(RenderServiceToken) private renderService: IRenderService
     ) {
         this.controls$ = new Subject<OrbitControls>();
         this.renderService.getCamera().pipe(
