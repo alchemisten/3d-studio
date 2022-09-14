@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "3d-studio-viewer-core": "libs/viewer-core",
+    "gltf-extension-validator": "libs/gltf-extension-validator"
+  }
+}

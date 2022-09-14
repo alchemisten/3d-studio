@@ -1,6 +1,5 @@
 {
   "name": "@alchemisten/gltf-extension",
-  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,16 +12,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "camelcase": "^5.3.1",
-    "fs": "0.0.1-security",
-    "path": "^0.12.7",
-    "ts-json-schema-generator": "^0.56.0",
-    "typescript-json-schema": "^0.42.0"
-  },
-  "devDependencies": {
-    "eslint": "^7.1.0",
-    "json-schema-to-typescript": "^3.1.4"
-  }
+  "license": "ISC"
 }
