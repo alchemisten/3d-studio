@@ -1,20 +1,22 @@
 import { Container, injectable, interfaces } from 'inversify';
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 import {
-    CameraRotationFeatureToken,
-    ICameraRotationFeature,
-    IFeature,
-    IFeatureRegistryService, ILightScenarioFeature, IWireframeFeature,
-    LightScenarioFeatureToken, WireframeFeatureToken
+  CameraRotationFeatureToken,
+  ICameraRotationFeature,
+  IFeature,
+  IFeatureRegistryService,
+  ILightScenarioFeature,
+  IWireframeFeature,
+  LightScenarioFeatureToken,
+  WireframeFeatureToken,
 } from '../../types';
 import { coreFeatures } from '../core-feature.map';
 import {
-    FeatureAlreadyRegisteredError,
-    FeatureNotRegisteredError,
-    MissingDIContainerError
+  FeatureAlreadyRegisteredError,
+  FeatureNotRegisteredError,
+  MissingDIContainerError,
 } from '../../core/exceptions';
 import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '../features';
-
 
 /**
  * The feature registry service maintains a record of all features available
@@ -28,43 +30,43 @@ import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '.
  */
 @injectable()
 export class FeatureRegistryService implements IFeatureRegistryService {
-    private readonly registry: Record<symbol, ServiceIdentifier<IFeature>>;
-    private containerDI: Container;
+  private readonly registry: Record<symbol, ServiceIdentifier<IFeature>>;
+  private containerDI!: Container;
 
-    constructor() {
-        this.registry = coreFeatures;
+  public constructor() {
+    this.registry = coreFeatures;
+  }
+
+  public getFeatureInstance(id: string): IFeature {
+    if (!this.containerDI) {
+      throw new MissingDIContainerError('Dependency injection container not set');
     }
 
-
-    getFeatureInstance(id: string): IFeature {
-        if (!this.containerDI) {
-            throw new MissingDIContainerError('Dependency injection container not set');
-        }
-
-        const token = Symbol.for(id);
-        if (!Object.prototype.hasOwnProperty.call(this.registry, token)) {
-            throw new FeatureNotRegisteredError(`No feature registered with id: ${token.toString()}`);
-        }
-
-        return this.containerDI.get<IFeature>(token);
+    const token = Symbol.for(id);
+    if (!Object.prototype.hasOwnProperty.call(this.registry, token)) {
+      throw new FeatureNotRegisteredError(`No feature registered with id: ${token.toString()}`);
     }
 
+    return this.containerDI.get<IFeature>(token);
+  }
 
-    registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void {
-        // TODO: Check if id is needed or can be deduced from feature via Decorator
-        const token = Symbol.for(id);
-        if (Object.prototype.hasOwnProperty.call(this.registry, token)) {
-            throw new FeatureAlreadyRegisteredError(`Feature with id ${token.toString()} already registered`);
-        }
-        // TODO: Find out how to bind registered features or pass containerDI to new features so they can bind themselves
-        this.registry[token] = feature;
+  public registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void {
+    // TODO: Check if id is needed or can be deduced from feature via Decorator
+    const token = Symbol.for(id);
+    if (Object.prototype.hasOwnProperty.call(this.registry, token)) {
+      throw new FeatureAlreadyRegisteredError(`Feature with id ${token.toString()} already registered`);
     }
+    // TODO: Find out how to bind registered features or pass containerDI to new features so they can bind themselves
+    this.registry[token] = feature;
+  }
 
-
-    setDIContainer(containerDI: Container): void {
-        this.containerDI = containerDI;
-        this.containerDI.bind<ICameraRotationFeature>(CameraRotationFeatureToken).to(CameraRotationFeature).inSingletonScope();
-        this.containerDI.bind<ILightScenarioFeature>(LightScenarioFeatureToken).to(LightScenarioFeature).inSingletonScope();
-        this.containerDI.bind<IWireframeFeature>(WireframeFeatureToken).to(WireframeFeature).inSingletonScope();
-    }
+  public setDIContainer(containerDI: Container): void {
+    this.containerDI = containerDI;
+    this.containerDI
+      .bind<ICameraRotationFeature>(CameraRotationFeatureToken)
+      .to(CameraRotationFeature)
+      .inSingletonScope();
+    this.containerDI.bind<ILightScenarioFeature>(LightScenarioFeatureToken).to(LightScenarioFeature).inSingletonScope();
+    this.containerDI.bind<IWireframeFeature>(WireframeFeatureToken).to(WireframeFeature).inSingletonScope();
+  }
 }

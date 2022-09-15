@@ -1,12 +1,7 @@
 import { inject, injectable } from 'inversify';
-import {
-    Material,
-    Mesh,
-} from 'three';
-import { BehaviorSubject, Observable} from 'rxjs';
+import { Material, Mesh } from 'three';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IMaterialService, ISceneService, SceneServiceToken } from '../../types';
-
-
 
 /**
  * The material service keeps a record of all materials available in the
@@ -23,80 +18,76 @@ import { IMaterialService, ISceneService, SceneServiceToken } from '../../types'
  */
 @injectable()
 export class MaterialService implements IMaterialService {
-    private assignedMaterials$: BehaviorSubject<Record<string, Material>>;
-    private materials: Material[];
-    private readonly materials$: BehaviorSubject<Material[]>;
+  private assignedMaterials$: BehaviorSubject<Record<string, Material>>;
+  private materials: Material[];
+  private readonly materials$: BehaviorSubject<Material[]>;
 
-    constructor(
-        @inject(SceneServiceToken) private sceneService: ISceneService
-    ) {
-        this.assignedMaterials$ = new BehaviorSubject<Record<string, Material>>({});
-        this.materials = [];
-        this.materials$ = new BehaviorSubject<Material[]>(this.materials);
+  public constructor(@inject(SceneServiceToken) private sceneService: ISceneService) {
+    this.assignedMaterials$ = new BehaviorSubject<Record<string, Material>>({});
+    this.materials = [];
+    this.materials$ = new BehaviorSubject<Material[]>(this.materials);
 
-        const scope = this;
-        this.sceneService.getObjects().subscribe(objects => {
-            objects.forEach(object => {
-                object.traverse(function (node: Mesh) {
-                    if (node.isMesh) {
-                        scope.handleMeshMaterial(node, (material: Material) => {
-                            if (material.name) {
-                                const existingMaterial = scope.materials.find((sMaterial) => sMaterial.name === material.name);
-                                if (!existingMaterial) {
-                                    scope.materials = scope.materials.concat(material);
-                                } else {
-                                    node.material = existingMaterial;
-                                }
-                            }
-                        });
-                    }
-                });
+    this.sceneService.getObjects().subscribe((objects) => {
+      objects.forEach((object) => {
+        object.traverse((node: unknown) => {
+          if ((node as Mesh).isMesh) {
+            this.handleMeshMaterial(node as Mesh, (material: Material) => {
+              if (material.name) {
+                const existingMaterial = this.materials.find((sMaterial) => sMaterial.name === material.name);
+                if (!existingMaterial) {
+                  this.materials = this.materials.concat(material);
+                } else {
+                  (node as Mesh).material = existingMaterial;
+                }
+              }
             });
-            scope.materials$.next(scope.materials);
+          }
         });
+      });
+      this.materials$.next(this.materials);
+    });
+  }
+
+  public addMaterial(material: Material): void {
+    if (this.materials.findIndex((sMaterial) => sMaterial.name === material.name) === -1) {
+      this.materials.push(material);
+      this.materials$.next(this.materials);
     }
+  }
 
+  public getAssignedMaterials(): Observable<Record<string, Material>> {
+    return this.assignedMaterials$.asObservable();
+  }
 
+  public getMaterials(): Observable<Material[]> {
+    return this.materials$.asObservable();
+  }
 
-    addMaterial(material: Material): void {
-        if (this.materials.findIndex((sMaterial) => sMaterial.name === material.name) === -1) {
-            this.materials.push(material);
-            this.materials$.next(this.materials);
-        }
+  public setAssignedMaterial(materialSlot: string, material: Material): void {
+    // TODO: Implement me
+  }
+
+  public setMaterialProperties(materials: Record<string, Partial<Material>>): void {
+    this.materials = this.materials.reduce((all: Material[], material: Material) => {
+      if (materials[material.name]) {
+        all.push(Object.assign(material, materials[material.name], { needsUpdate: true }));
+      } else {
+        all.push(material);
+      }
+      return all;
+    }, []);
+    this.materials$.next(this.materials);
+  }
+
+  private handleMeshMaterial(mesh: Mesh, materialHandler: (material: Material) => void): void {
+    const meshMaterials: Material[] = [];
+    if (Array.isArray(mesh.material)) {
+      meshMaterials.concat(mesh.material);
+    } else {
+      meshMaterials.push(mesh.material);
     }
-
-
-    getAssignedMaterials(): Observable<Record<string, Material>> {
-        return this.assignedMaterials$.asObservable();
-    }
-
-
-    getMaterials(): Observable<Material[]> {
-        return this.materials$.asObservable();
-    }
-
-
-    setAssignedMaterial(materialSlot: string, material: Material): void {}
-
-
-    setMaterialProperties(materials: Record<string, Partial<Material>>): void {
-        this.materials = this.materials.reduce((all: Material[], material: Material) => {
-            if (materials[material.name]) {
-                all.push(Object.assign(material, materials[material.name], { needsUpdate: true }));
-            } else {
-                all.push(material);
-            }
-            return all;
-        }, []);
-        this.materials$.next(this.materials);
-    }
-
-
-
-    private handleMeshMaterial(mesh: Mesh, materialHandler: (material: Material) => void): void {
-        const meshMaterials: Material[] = new Array().concat(mesh.material);
-        meshMaterials.forEach((meshMaterial) => {
-            materialHandler(meshMaterial);
-        });
-    }
+    meshMaterials.forEach((meshMaterial) => {
+      materialHandler(meshMaterial);
+    });
+  }
 }
