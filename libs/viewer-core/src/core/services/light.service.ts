@@ -1,8 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { AmbientLight, DirectionalLight, Group, Light, Object3D, PointLight, SpotLight } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ILightService, ISceneService, LightSetupModel, LightType, SceneServiceToken } from '../../types';
+import type { ILightService, ISceneService, LightSetupModel } from '../../types';
 import { UnknownLightTypeError } from '../exceptions';
+import { SceneServiceToken } from '../../util';
+import { LightType } from '../../enums';
 
 /**
  * The light service keeps a record of all lights in the scene and should be

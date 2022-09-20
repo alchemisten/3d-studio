@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { Material, Mesh } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IMaterialService, ISceneService, SceneServiceToken } from '../../types';
+import type { IMaterialService, ISceneService } from '../../types';
+import { SceneServiceToken } from '../../util';
 
 /**
  * The material service keeps a record of all materials available in the

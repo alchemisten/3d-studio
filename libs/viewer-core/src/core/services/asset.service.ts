@@ -11,8 +11,8 @@ import {
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Observable, Subject } from 'rxjs';
-import { IAssetService, IRenderService, RenderServiceToken } from '../../types';
-import { Constants } from '../../util/constants';
+import type { IAssetService, IRenderService } from '../../types';
+import { Constants, RenderServiceToken } from '../../util';
 
 /**
  * The asset service handles all file loading for the 3D scene, like

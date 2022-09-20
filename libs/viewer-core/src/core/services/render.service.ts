@@ -2,8 +2,9 @@ import { inject, injectable } from 'inversify';
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { Observable, Subject } from 'rxjs';
-import { CameraConfigModel, IRenderService, ISceneService, RenderConfigModel, SceneServiceToken } from '../../types';
+import type { CameraConfigModel, IRenderService, ISceneService, RenderConfigModel } from '../../types';
 import { defaultCameraConfig, defaultRenderConfig } from './config.service';
+import { SceneServiceToken } from '../../util';
 
 /**
  * The render service renders the current scene to its internal canvas. By

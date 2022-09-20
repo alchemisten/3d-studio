@@ -1,22 +1,16 @@
-import { Container, injectable, interfaces } from 'inversify';
-import ServiceIdentifier = interfaces.ServiceIdentifier;
-import {
-  CameraRotationFeatureToken,
+import { injectable } from 'inversify';
+import type { Container, interfaces } from 'inversify';
+import type {
   ICameraRotationFeature,
   IFeature,
   IFeatureRegistryService,
   ILightScenarioFeature,
   IWireframeFeature,
-  LightScenarioFeatureToken,
-  WireframeFeatureToken,
 } from '../../types';
 import { coreFeatures } from '../core-feature.map';
-import {
-  FeatureAlreadyRegisteredError,
-  FeatureNotRegisteredError,
-  MissingDIContainerError,
-} from '../../core/exceptions';
+import { FeatureAlreadyRegisteredError, FeatureNotRegisteredError, MissingDIContainerError } from '../../core';
 import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '../features';
+import { CameraRotationFeatureToken, LightScenarioFeatureToken, WireframeFeatureToken } from '../../util';
 
 /**
  * The feature registry service maintains a record of all features available
@@ -30,7 +24,7 @@ import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '.
  */
 @injectable()
 export class FeatureRegistryService implements IFeatureRegistryService {
-  private readonly registry: Record<symbol, ServiceIdentifier<IFeature>>;
+  private readonly registry: Record<symbol, interfaces.ServiceIdentifier<IFeature>>;
   private containerDI!: Container;
 
   public constructor() {
@@ -50,7 +44,7 @@ export class FeatureRegistryService implements IFeatureRegistryService {
     return this.containerDI.get<IFeature>(token);
   }
 
-  public registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void {
+  public registerFeature(id: string, feature: interfaces.ServiceIdentifier<IFeature>): void {
     // TODO: Check if id is needed or can be deduced from feature via Decorator
     const token = Symbol.for(id);
     if (Object.prototype.hasOwnProperty.call(this.registry, token)) {

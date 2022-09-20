@@ -1,4 +1,4 @@
-import { ViewerLauncher } from './core/viewer-launcher';
+import { ViewerLauncher } from './core';
 
 export default function launcherFactory() {
   return new ViewerLauncher();

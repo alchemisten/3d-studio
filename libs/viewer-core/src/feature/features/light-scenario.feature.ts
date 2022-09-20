@@ -2,17 +2,15 @@ import { inject, injectable } from 'inversify';
 import { Light } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
-import {
+import type {
   ILightScenarioFeature,
   ILightService,
   LightScenarioFeatureConfig,
-  LightScenarioFeatureToken,
   LightScenarioId,
   LightScenarioModel,
-  LightServiceToken,
 } from '../../types';
-import { LightService } from '../../core/services';
-import { MissingLightScenarioError } from '../../core/exceptions';
+import { LightService, MissingLightScenarioError } from '../../core';
+import { LightScenarioFeatureToken, LightServiceToken } from '../../util';
 
 /**
  * When enabled, allows to switch between the provided light scenarios. Each

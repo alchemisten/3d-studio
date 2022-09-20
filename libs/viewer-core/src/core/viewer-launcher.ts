@@ -1,14 +1,9 @@
 import 'reflect-metadata';
-import { Container, interfaces } from 'inversify';
+import { Container } from 'inversify';
+import type { interfaces } from 'inversify';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  AnimationServiceToken,
-  AssetServiceToken,
-  ConfigServiceToken,
-  ControlServiceToken,
-  FeatureRegistryServiceToken,
-  FeatureServiceToken,
+import type {
   IAnimationService,
   IAssetService,
   IConfigService,
@@ -22,16 +17,10 @@ import {
   ISceneService,
   IViewer,
   IViewerLauncher,
-  LightServiceToken,
-  MaterialServiceToken,
-  RenderServiceToken,
-  SceneServiceToken,
   SizeModel,
   ViewerConfigModel,
-  ViewerToken,
 } from '../types';
 import { Viewer } from './viewer';
-import ServiceIdentifier = interfaces.ServiceIdentifier;
 import {
   AnimationService,
   AssetService,
@@ -43,6 +32,19 @@ import {
   SceneService,
 } from './services';
 import { FeatureRegistryService, FeatureService } from '../feature';
+import {
+  AnimationServiceToken,
+  AssetServiceToken,
+  ConfigServiceToken,
+  ControlServiceToken,
+  FeatureRegistryServiceToken,
+  FeatureServiceToken,
+  LightServiceToken,
+  MaterialServiceToken,
+  RenderServiceToken,
+  SceneServiceToken,
+  ViewerToken,
+} from '../util';
 
 /**
  * The viewer launcher is used to initialize the actual viewer and register
@@ -118,7 +120,7 @@ export class ViewerLauncher implements IViewerLauncher {
    * @param feature ServiceIdentifier class implementing the IFeature
    * interface
    */
-  public registerFeature(id: string, feature: ServiceIdentifier<IFeature>): void {
+  public registerFeature(id: string, feature: interfaces.ServiceIdentifier<IFeature>): void {
     try {
       this.featureRegistry.registerFeature(id, feature);
     } catch (exception) {

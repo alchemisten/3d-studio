@@ -3,7 +3,8 @@ import { PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
-import { IControlService, IRenderService, RenderServiceToken } from '../../types';
+import type { IControlService, IRenderService } from '../../types';
+import { RenderServiceToken } from '../../util';
 
 /**
  * The control service provides access to orbit controls.

@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AnimationIdModel, IAnimationService, IRenderService, RenderServiceToken } from '../../types';
+import type { AnimationIdModel, IAnimationService, IRenderService } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
+import { RenderServiceToken } from '../../util';
 
 /**
  * The animation service handles animations for all objects loaded in the

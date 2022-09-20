@@ -1,14 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { BehaviorSubject, Observable } from 'rxjs';
-import {
-  ConfigServiceToken,
-  FeatureRegistryServiceToken,
-  FeatureSetup,
-  IConfigService,
-  IFeature,
-  IFeatureRegistryService,
-  IFeatureService,
-} from '../../types';
+import type { FeatureSetup, IConfigService, IFeature, IFeatureRegistryService, IFeatureService } from '../../types';
+import { ConfigServiceToken, FeatureRegistryServiceToken } from '../../util';
 
 /**
  * The feature service provides access to all feature instances created for

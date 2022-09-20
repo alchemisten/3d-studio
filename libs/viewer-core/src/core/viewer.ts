@@ -1,12 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import {
-  AnimationServiceToken,
-  AssetServiceToken,
-  ConfigServiceToken,
-  ControlServiceToken,
-  FeatureServiceToken,
+import type {
   IAnimationService,
   IAssetService,
   IConfigService,
@@ -17,13 +12,20 @@ import {
   IRenderService,
   ISceneService,
   IViewer,
+  SizeModel,
+  ViewerConfigModel,
+} from '../types';
+import {
+  AnimationServiceToken,
+  AssetServiceToken,
+  ConfigServiceToken,
+  ControlServiceToken,
+  FeatureServiceToken,
   LightServiceToken,
   MaterialServiceToken,
   RenderServiceToken,
   SceneServiceToken,
-  SizeModel,
-  ViewerConfigModel,
-} from '../types';
+} from '../util';
 
 /**
  * The viewer initializes all required services with the provided config.

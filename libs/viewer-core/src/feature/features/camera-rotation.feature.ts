@@ -2,13 +2,8 @@ import { inject, injectable } from 'inversify';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { Observable, Subject } from 'rxjs';
-import {
-  CameraRotationFeatureConfig,
-  CameraRotationFeatureToken,
-  ControlServiceToken,
-  ICameraRotationFeature,
-  IControlService,
-} from '../../types';
+import type { CameraRotationFeatureConfig, ICameraRotationFeature, IControlService } from '../../types';
+import { CameraRotationFeatureToken, ControlServiceToken } from '../../util';
 
 /**
  * When enabled, the orbit controls rotate around the objects in the scene.
