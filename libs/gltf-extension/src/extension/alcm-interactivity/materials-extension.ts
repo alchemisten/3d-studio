@@ -1,23 +1,23 @@
 export interface MaterialsExtension {
-    optionGroup: MaterialOptionGroup;
+  optionGroup: MaterialOptionGroup;
 }
 
 export interface MaterialOptionGroup {
-    id: String;
-    options: MaterialOption[]
+  id: string;
+  options: MaterialOption[];
 }
 
 export interface MaterialOption {
-    id: String;
-    name: String;
-    overrides: {[key: string]: object};
+  id: string;
+  name: string;
+  overrides: { [key: string]: object };
 }
 
 export interface MaterialOptionEntry {
-    /** @schemaInclude:glTFid */
-    material: number
-    /** @schemaInclude:glTFid */
-    materialOptionGroup?: number
+  /** @schemaInclude:glTFid */
+  material: number;
+  /** @schemaInclude:glTFid */
+  materialOptionGroup?: number;
 
-    ignoreOptions?: boolean
+  ignoreOptions?: boolean;
 }

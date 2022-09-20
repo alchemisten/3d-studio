@@ -1,10 +1,10 @@
-import {MaterialOptionEntry} from "./materials-extension";
+import { MaterialOptionEntry } from './materials-extension';
 
 export interface MeshesExtension {
-    /** @schemaInclude:glTFid */
-    defaultMaterialOptionGroup: number;
+  /** @schemaInclude:glTFid */
+  defaultMaterialOptionGroup: number;
 
-    ignoreOptions?: boolean
+  ignoreOptions?: boolean;
 
-    materials: MaterialOptionEntry[]
+  materials: MaterialOptionEntry[];
 }

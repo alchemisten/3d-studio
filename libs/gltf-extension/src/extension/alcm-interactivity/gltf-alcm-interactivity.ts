@@ -11,19 +11,21 @@ import { MaterialOptionGroup } from './materials-extension';
  * @member highlights - Contains all highlights for each scene. The highlights do not have to be bound to a specific node in the hierarchy, they can also stand alone.
  */
 export interface Interactivity {
-    i18n: Internationalization
-    materialOptionGroups: MaterialOptionGroup[]
-    anchorExtension: AnchorExtension
-    viewerFeatures: ViewerFeatures
-    projectInformation: ProjectInformation
-    highlights: Highlight[]
-    background?: { // TODO make array
-        type: 'color' | 'texture' | 'cubeTexture'
-        value: ColorString | string // TODO add documentation and definition for "URLLike"
-    }
-    environment?: { // TODO make array
-        texture: string
-    }
+  i18n: Internationalization;
+  materialOptionGroups: MaterialOptionGroup[];
+  anchorExtension: AnchorExtension;
+  viewerFeatures: ViewerFeatures;
+  projectInformation: ProjectInformation;
+  highlights: Highlight[];
+  background?: {
+    // TODO make array
+    type: 'color' | 'texture' | 'cubeTexture';
+    value: ColorString | string; // TODO add documentation and definition for "URLLike"
+  };
+  environment?: {
+    // TODO make array
+    texture: string;
+  };
 }
 
 /**
@@ -42,16 +44,16 @@ export interface Interactivity {
  * @member tags - Additional information to allow for filtering, UI overlays, etc.
  */
 export interface ProjectInformation {
-    id: string
-    projectKey: string
-    name: string
-    version?: number
-    changeDate?: Date
-    baseUrl: string
-    orientation?: ViewOrientation
-    heading?: TemplateString
-    intro?: TemplateString
-    tags: [ string ]
+  id: string;
+  projectKey: string;
+  name: string;
+  version?: number;
+  changeDate?: Date;
+  baseUrl: string;
+  orientation?: ViewOrientation;
+  heading?: TemplateString;
+  intro?: TemplateString;
+  tags: [string];
 }
 
 /**
@@ -61,8 +63,8 @@ export interface ProjectInformation {
  * @member languageMap - The i18n dictionary containing the translations for specific locales and keys (@see LanguageMap.)
  */
 export interface Internationalization {
-    supportedLocales: String[]
-    languageMap: LanguageMap
+  supportedLocales: string[];
+  languageMap: LanguageMap;
 }
 
 // TODO (FlorianDe): Discuss
@@ -73,35 +75,35 @@ export interface Internationalization {
  * y
  */
 export enum Positioning {
-    TopLeft = 'tl',
-    Top = 't',
-    TopRight = 'tr',
-    Left = 'l',
-    Center = 'c',
-    Right = 'r',
-    BottomLeft = 'bl',
-    Bottom = 'b',
-    BottomRight = 'br'
+  TopLeft = 'tl',
+  Top = 't',
+  TopRight = 'tr',
+  Left = 'l',
+  Center = 'c',
+  Right = 'r',
+  BottomLeft = 'bl',
+  Bottom = 'b',
+  BottomRight = 'br',
 }
 
 // TODO
 export interface Vec2Like {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
 }
 
 export const PositionRoots: {
-    [k in Positioning]: Vec2Like;
+  [k in Positioning]: Vec2Like;
 } = {
-    [ Positioning.TopLeft ]: { x: 0, y: 0 },
-    [ Positioning.Top ]: { x: 0.5, y: 0 },
-    [ Positioning.TopRight ]: { x: 1.0, y: 0 },
-    [ Positioning.Left ]: { x: 0, y: 0.5 },
-    [ Positioning.Center ]: { x: 0.5, y: 0.5 },
-    [ Positioning.Right ]: { x: 1.0, y: 0.5 },
-    [ Positioning.BottomLeft ]: { x: 0, y: 1.0 },
-    [ Positioning.Bottom ]: { x: 0.5, y: 1.0 },
-    [ Positioning.BottomRight ]: { x: 1.0, y: 1.0 }
+  [Positioning.TopLeft]: { x: 0, y: 0 },
+  [Positioning.Top]: { x: 0.5, y: 0 },
+  [Positioning.TopRight]: { x: 1.0, y: 0 },
+  [Positioning.Left]: { x: 0, y: 0.5 },
+  [Positioning.Center]: { x: 0.5, y: 0.5 },
+  [Positioning.Right]: { x: 1.0, y: 0.5 },
+  [Positioning.BottomLeft]: { x: 0, y: 1.0 },
+  [Positioning.Bottom]: { x: 0.5, y: 1.0 },
+  [Positioning.BottomRight]: { x: 1.0, y: 1.0 },
 };
 
 /**
@@ -112,9 +114,9 @@ export const PositionRoots: {
  * All - The project can either be displayed in portrait or landscape mode.
  */
 export enum ViewOrientation {
-    Portrait = 'PORTRAIT',
-    Landscape = 'LANDSCAPE',
-    All = 'ALL'
+  Portrait = 'PORTRAIT',
+  Landscape = 'LANDSCAPE',
+  All = 'ALL',
 }
 
 /**
@@ -125,26 +127,26 @@ export enum ViewOrientation {
  * Fixed - Can be used to restrict any transformation for a property. E.g. to place a highlight always at a specific position on the screen.
  */
 export enum LocationTransformType {
-    Local = 'LOCAL',
-    Global = 'GLOBAL'
+  Local = 'LOCAL',
+  Global = 'GLOBAL',
 }
 
-export type ColorString = string
-export type TemplateString = string
+export type ColorString = string;
+export type TemplateString = string;
 
 /**
  * Type description for a dictionary.
  *
  * It is a nested map structure where the first key represents a locale value and the second key is a translation key to retrieve the translation.
  */
-export type LanguageMap = { [ lang: string ]: { [ key: string ]: string } };
+export type LanguageMap = { [lang: string]: { [key: string]: string } };
 
 /**
  * Type description for a n:m number map.
  *
  * N:M mapping for compatible anchors with their corresponding gltfIds
  */
-export type AnchorMap = { [ anchorId: number ]: number[] };
+export type AnchorMap = { [anchorId: number]: number[] };
 
 /**
  * Type description for an anchor object.
@@ -156,12 +158,12 @@ export type AnchorMap = { [ anchorId: number ]: number[] };
  * @member transformationType - The transformation type for the anchor position in relation to the scene/hierarchy (@see LocationTransformType).
  */
 export interface Anchor {
-    id: string
-    name?: TemplateString
-    categories?: string[]
-    /**@schemaInclude:Accessor.type.MAT4 */
-    matrix: number[]
-    transformationType: LocationTransformType
+  id: string;
+  name?: TemplateString;
+  categories?: string[];
+  /**@schemaInclude:Accessor.type.MAT4 */
+  matrix: number[];
+  transformationType: LocationTransformType;
 }
 
 /**
@@ -171,117 +173,116 @@ export interface Anchor {
  * @member anchorCompatibilities - The compatability n:m map for suitable anchors (@see AnchorMap.)
  */
 export interface AnchorExtension {
-    anchors: Anchor[]
-    anchorCompatibilities: AnchorMap
+  anchors: Anchor[];
+  anchorCompatibilities: AnchorMap;
 }
 
 export interface ViewerFeatures {
-    useSkyBox: ViewerFeature<boolean>
-    useAutoRotate: ViewerFeature<boolean>
-    showHighlight: ViewerFeature<boolean>
-    useFullscreen: ViewerFeature<boolean>
-    useSettings: ViewerFeature<boolean>
-    useAnimations: ViewerFeature<boolean>
-    useFloatingLight: ViewerFeature<boolean>
-    useWireframe: ViewerFeature<boolean>
-    useVideo: ViewerFeature<boolean>
-    usePostProcessing: ViewerFeature<boolean>
-    useTransparency: ViewerFeature<boolean>
-    useFog: ViewerFeature<FogOptions>
-    useBackground: ViewerFeature<boolean> // TODO (FlorianDe): Could specify a more convenient type to allow selection of a background
-    useEnvironment: ViewerFeature<boolean> // TODO (FlorianDe): Could specify a more convenient type to allow selection of an environment
+  useSkyBox: ViewerFeature<boolean>;
+  useAutoRotate: ViewerFeature<boolean>;
+  showHighlight: ViewerFeature<boolean>;
+  useFullscreen: ViewerFeature<boolean>;
+  useSettings: ViewerFeature<boolean>;
+  useAnimations: ViewerFeature<boolean>;
+  useFloatingLight: ViewerFeature<boolean>;
+  useWireframe: ViewerFeature<boolean>;
+  useVideo: ViewerFeature<boolean>;
+  usePostProcessing: ViewerFeature<boolean>;
+  useTransparency: ViewerFeature<boolean>;
+  useFog: ViewerFeature<FogOptions>;
+  useBackground: ViewerFeature<boolean>; // TODO (FlorianDe): Could specify a more convenient type to allow selection of a background
+  useEnvironment: ViewerFeature<boolean>; // TODO (FlorianDe): Could specify a more convenient type to allow selection of an environment
 }
 
 /**
  * This interface describes a generic feature for a viewer implementation which can be enabled/disabled for a project and which has as set default value.
  */
 export interface ViewerFeature<T> {
-    active: boolean,
-    default: T
+  active: boolean;
+  default: T;
 }
 
 export interface FogOptions {
-    color: ColorString
-    near: number
-    far: number
+  color: ColorString;
+  near: number;
+  far: number;
 }
 
 export type StrokeOptions = {
-    color: ColorString
-    thickness: number
-    alpha?: number
-}
+  color: ColorString;
+  thickness: number;
+  alpha?: number;
+};
 
 export type NodeStyleMap = {
-    [ nodeId: number ]: {
-        strokeOptions: StrokeOptions
-        duration?: number
-    }
-}
+  [nodeId: number]: {
+    strokeOptions: StrokeOptions;
+    duration?: number;
+  };
+};
 
 export enum HighlightPositioning {
-    World = 'WORLD',
-    Screen = 'SCREEN'
+  World = 'WORLD',
+  Screen = 'SCREEN',
 }
 
 // TODO define what each value does
-export type AnimationTimeUnit = 'r' | 's' | 'ms' | 'f'
+export type AnimationTimeUnit = 'r' | 's' | 'ms' | 'f';
 
 export interface AnimationLocation {
-    time: number;
-    unit: AnimationTimeUnit;
+  time: number;
+  unit: AnimationTimeUnit;
 }
 
 export type ContentStyleMap = {
-    [ containerSelector: string ]: any;
-}
+  [containerSelector: string]: any;
+};
 
 export interface Highlight {
-    name: string
-    attachedToNode: boolean
-    target: number | number[]
-    position: number | number[]
-    camera: number | number[] //gltfId or cam x,y,z
-    positioning: HighlightPositioning
-    visualLink: {
-        path: number[][]
-        interpolation: string //linear e.g.?
-        strokeOptions: StrokeOptions
-    }
-    style: {
-        billboard: boolean
-        fov: number
-    }
-    triggerAnimation?: {
-        animationId: number | number[] //should be under animations/x
-        teleport?: boolean
-        loopBehavior?:  'loop' | 'clamp'
-        type: 'relative' | 'absolute' | 'play' | 'pause'
-        speed?: number
-        target: AnimationLocation
-        start?: AnimationLocation
-        delay?: number
-        visibleThroughAnimation: boolean
-    }
-    visibility?: {
-        from: AnimationTimeUnit,
-        to: AnimationTimeUnit,
-        // TODO discuss -> Blending?
-    }
-    cameraTransitionOptions?: {
-        duration: number //in ms
-        easing: string //animejs easing name/function like cubicBezier(.5, .05, .1, .3)
-        delay?: number //in ms
-        visibleThroughTransition: boolean
-    }
-    highlightNodesOnHover: NodeStyleMap
-    highlightNodesOnClick: NodeStyleMap
-    content?: {
-        headline: TemplateString
-        body: TemplateString
-        position: Positioning | Vec2Like
-        offset?: Vec2Like
-        style?: ContentStyleMap
-    }
+  name: string;
+  attachedToNode: boolean;
+  target: number | number[];
+  position: number | number[];
+  camera: number | number[]; //gltfId or cam x,y,z
+  positioning: HighlightPositioning;
+  visualLink: {
+    path: number[][];
+    interpolation: string; //linear e.g.?
+    strokeOptions: StrokeOptions;
+  };
+  style: {
+    billboard: boolean;
+    fov: number;
+  };
+  triggerAnimation?: {
+    animationId: number | number[]; //should be under animations/x
+    teleport?: boolean;
+    loopBehavior?: 'loop' | 'clamp';
+    type: 'relative' | 'absolute' | 'play' | 'pause';
+    speed?: number;
+    target: AnimationLocation;
+    start?: AnimationLocation;
+    delay?: number;
+    visibleThroughAnimation: boolean;
+  };
+  visibility?: {
+    from: AnimationTimeUnit;
+    to: AnimationTimeUnit;
+    // TODO discuss -> Blending?
+  };
+  cameraTransitionOptions?: {
+    duration: number; //in ms
+    easing: string; //animejs easing name/function like cubicBezier(.5, .05, .1, .3)
+    delay?: number; //in ms
+    visibleThroughTransition: boolean;
+  };
+  highlightNodesOnHover: NodeStyleMap;
+  highlightNodesOnClick: NodeStyleMap;
+  content?: {
+    headline: TemplateString;
+    body: TemplateString;
+    position: Positioning | Vec2Like;
+    offset?: Vec2Like;
+    style?: ContentStyleMap;
+  };
 }
-

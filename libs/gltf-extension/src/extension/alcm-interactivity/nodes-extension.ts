@@ -1,15 +1,14 @@
-import {MaterialOptionEntry} from "./materials-extension";
+import { MaterialOptionEntry } from './materials-extension';
 
 export interface NodesExtension {
+  /** @schemaInclude:glTFid */
+  anchor: number;
 
-    /** @schemaInclude:glTFid */
-    anchor: number;
+  /** @schemaInclude:glTFid */
+  defaultMaterialOptionGroup?: number;
 
-    /** @schemaInclude:glTFid */
-    defaultMaterialOptionGroup?: number;
+  materials: MaterialOptionEntry[];
 
-    materials: MaterialOptionEntry[];
-
-    /** @schemaInclude:glTFid */
-    highlight?: number 
+  /** @schemaInclude:glTFid */
+  highlight?: number;
 }
