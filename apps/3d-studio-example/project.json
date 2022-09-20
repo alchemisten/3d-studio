@@ -20,7 +20,9 @@
           "apps/3d-studio-example/src/assets"
         ],
         "styles": ["apps/3d-studio-example/src/styles.css"],
-        "scripts": []
+        "scripts": [],
+        "webpackConfig": "apps/3d-studio-example/custom-webpack.config.js",
+        "generateIndexHtml": false
       },
       "configurations": {
         "production": {

@@ -8,9 +8,6 @@ import { Vector3 } from 'three';
     return;
   }
 
-  /**
-   * @type ViewerLauncher
-   */
   const launcherOne = new ViewerLauncher();
   launcherOne.createHTMLViewer(containerOne, {
     features: {
@@ -24,9 +21,6 @@ import { Vector3 } from 'three';
     ],
   });
 
-  /**
-   * @type ViewerLauncher
-   */
   const launcherTwo = new ViewerLauncher();
   launcherTwo.createHTMLViewer(containerTwo, {
     camera: {
