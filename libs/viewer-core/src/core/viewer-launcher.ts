@@ -12,6 +12,7 @@ import type {
   IFeatureRegistryService,
   IFeatureService,
   ILightService,
+  ILoggerService,
   IMaterialService,
   IRenderService,
   ISceneService,
@@ -27,6 +28,7 @@ import {
   ConfigService,
   ControlService,
   LightService,
+  LoggerService,
   MaterialService,
   RenderService,
   SceneService,
@@ -40,6 +42,7 @@ import {
   FeatureRegistryServiceToken,
   FeatureServiceToken,
   LightServiceToken,
+  LoggerServiceToken,
   MaterialServiceToken,
   RenderServiceToken,
   SceneServiceToken,
@@ -53,6 +56,7 @@ import {
 export class ViewerLauncher implements IViewerLauncher {
   private readonly containerDI: Container;
   private readonly featureRegistry: IFeatureRegistryService;
+  private readonly logger: ILoggerService;
 
   public constructor() {
     this.containerDI = new Container();
@@ -61,6 +65,7 @@ export class ViewerLauncher implements IViewerLauncher {
     this.containerDI.bind<IConfigService>(ConfigServiceToken).to(ConfigService).inSingletonScope();
     this.containerDI.bind<IControlService>(ControlServiceToken).to(ControlService).inSingletonScope();
     this.containerDI.bind<ILightService>(LightServiceToken).to(LightService).inSingletonScope();
+    this.containerDI.bind<ILoggerService>(LoggerServiceToken).to(LoggerService).inSingletonScope();
     this.containerDI.bind<IMaterialService>(MaterialServiceToken).to(MaterialService).inSingletonScope();
     this.containerDI.bind<IRenderService>(RenderServiceToken).to(RenderService).inSingletonScope();
     this.containerDI.bind<ISceneService>(SceneServiceToken).to(SceneService).inSingletonScope();
@@ -73,6 +78,8 @@ export class ViewerLauncher implements IViewerLauncher {
 
     this.featureRegistry = this.containerDI.get<IFeatureRegistryService>(FeatureRegistryServiceToken);
     this.featureRegistry.setDIContainer(this.containerDI);
+
+    this.logger = this.containerDI.get<ILoggerService>(LoggerServiceToken);
   }
 
   /**
@@ -124,7 +131,7 @@ export class ViewerLauncher implements IViewerLauncher {
     try {
       this.featureRegistry.registerFeature(id, feature);
     } catch (exception) {
-      console.warn(exception);
+      this.logger.warn(`Feature ${id} won't be usable`, { error: exception });
     }
   }
 }

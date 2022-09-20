@@ -1,7 +1,8 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Group, Object3D, Scene } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ISceneService } from '../../types';
+import type { ILoggerService, ISceneService } from '../../types';
+import { LoggerServiceToken } from '../../util';
 
 /**
  * The scene service provides access to the rendered scene and keeps track of
@@ -14,7 +15,7 @@ export class SceneService implements ISceneService {
   private readonly group: Object3D;
   private objects$: BehaviorSubject<Object3D[]>;
 
-  public constructor() {
+  public constructor(@inject(LoggerServiceToken) private logger: ILoggerService) {
     this.scene = new Scene();
     this.group = new Group();
     this.group.name = 'objects';
@@ -24,7 +25,7 @@ export class SceneService implements ISceneService {
 
   public addObjectToScene(object: Object3D): void {
     this.group.add(object);
-    console.log('Object added', this.group);
+    this.logger.debug('Object added', { objects: this.group });
     this.objects$.next(this.group.children);
   }
 

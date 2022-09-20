@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { AnimationIdModel, IAnimationService, IRenderService } from '../../types';
+import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
-import { RenderServiceToken } from '../../util';
+import { LoggerServiceToken, RenderServiceToken } from '../../util';
 
 /**
  * The animation service handles animations for all objects loaded in the
@@ -24,7 +24,10 @@ export class AnimationService implements IAnimationService {
   private readonly mixers: Record<string, AnimationMixer>;
   private readonly mixers$: BehaviorSubject<Record<string, AnimationMixer>>;
 
-  public constructor(@inject(RenderServiceToken) private renderService: IRenderService) {
+  public constructor(
+    @inject(LoggerServiceToken) private logger: ILoggerService,
+    @inject(RenderServiceToken) private renderService: IRenderService
+  ) {
     this.animations = {};
     this.activeActions = [];
     this.activeActions$ = new BehaviorSubject<AnimationAction[]>(this.activeActions);
@@ -48,7 +51,7 @@ export class AnimationService implements IAnimationService {
 
     if (!this.mixers[object.name]) {
       this.mixers[object.name] = new AnimationMixer(object);
-      console.log(object);
+      this.logger.debug('Created mixer for', { objects: object });
       this.animations[object.name] = object.animations;
     }
 
@@ -83,7 +86,7 @@ export class AnimationService implements IAnimationService {
       this.activeActions$.next(this.activeActions);
       this.setAnimationEnabled(true);
     } catch (exception) {
-      console.warn(exception);
+      this.logger.warn(`Can't play animation ${animId}`, { error: exception });
     }
   }
 

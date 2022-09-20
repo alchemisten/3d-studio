@@ -19,6 +19,7 @@ import { Observable } from 'rxjs';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { Container, interfaces } from 'inversify';
+import type { ILogger } from '@schablone/logging';
 import { LightType, MaterialType } from './enums';
 
 export type FeatureSetup = Record<string, FeatureConfig>;
@@ -319,3 +320,5 @@ export interface IConfigService {
   getConfig(): Observable<ViewerConfigModel>;
   loadConfig(config: ViewerConfigModel): void;
 }
+
+export type ILoggerService = ILogger;

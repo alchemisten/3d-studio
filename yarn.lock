@@ -1819,6 +1819,14 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
+"@schablone/logging@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@schablone/logging/-/logging-1.0.4.tgz#78b8877ce5a67619ed132a19314e62442ca73d04"
+  integrity sha512-oKHdi2SwKKthl0cHDmIvMKJ2RBIsO0d26BcbJVtdFe2xcEbH/PpHutGQCQx6iE/reZCpcmlAg13V+ImqhVQm3g==
+  dependencies:
+    chalk "^4.1.2"
+    tslib "^2.3.0"
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.41"
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.24.41.tgz"

@@ -11,8 +11,8 @@ import {
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Observable, Subject } from 'rxjs';
-import type { IAssetService, IRenderService } from '../../types';
-import { Constants, RenderServiceToken } from '../../util';
+import type { IAssetService, ILoggerService, IRenderService } from '../../types';
+import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -33,7 +33,10 @@ export class AssetService implements IAssetService {
   private readonly loadingManager: LoadingManager;
   private readonly textureLoader: TextureLoader;
 
-  public constructor(@inject(RenderServiceToken) private renderService: IRenderService) {
+  public constructor(
+    @inject(LoggerServiceToken) private logger: ILoggerService,
+    @inject(RenderServiceToken) private renderService: IRenderService
+  ) {
     this.loadingManager = new LoadingManager(
       this.onLoadingComplete.bind(this),
       this.onLoadingProgress.bind(this),
@@ -92,7 +95,7 @@ export class AssetService implements IAssetService {
       this.gltfLoader.load(
         path,
         (gltf: GLTF) => {
-          console.log(gltf);
+          this.logger.debug('GLTF loaded', { objects: gltf });
           resolve(gltf);
         },
         undefined,
@@ -104,14 +107,14 @@ export class AssetService implements IAssetService {
   }
 
   private onLoadingComplete(): void {
-    console.log('Loading complete');
+    this.logger.debug('Loading complete');
   }
 
   private onLoadingError(url: string): void {
-    console.error(`Error loading ${url}`);
+    this.logger.error(`Error loading ${url}`);
   }
 
   private onLoadingProgress(url: string, itemsLoaded: number, itemsTotal: number): void {
-    console.log(`Finished file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
+    this.logger.debug(`Finished file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
   }
 }

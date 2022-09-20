@@ -5,12 +5,13 @@ import { take } from 'rxjs/operators';
 import type {
   ILightScenarioFeature,
   ILightService,
+  ILoggerService,
   LightScenarioFeatureConfig,
   LightScenarioId,
   LightScenarioModel,
 } from '../../types';
 import { LightService, MissingLightScenarioError } from '../../core';
-import { LightScenarioFeatureToken, LightServiceToken } from '../../util';
+import { LightScenarioFeatureToken, LightServiceToken, LoggerServiceToken } from '../../util';
 
 /**
  * When enabled, allows to switch between the provided light scenarios. Each
@@ -30,7 +31,10 @@ export class LightScenarioFeature implements ILightScenarioFeature {
   private readonly enabled$: Subject<boolean>;
   private lightScenarios!: LightScenarioModel[];
 
-  public constructor(@inject(LightServiceToken) private lightService: ILightService) {
+  public constructor(
+    @inject(LightServiceToken) private lightService: ILightService,
+    @inject(LoggerServiceToken) private logger: ILoggerService
+  ) {
     this.activeScenario$ = new Subject<LightScenarioModel>();
     this.enabled$ = new Subject<boolean>();
   }
@@ -68,7 +72,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
           this.lightScenarios.push(this.defaultScenario);
         }
 
-        this.lightScenarios = LightScenarioFeature.transformLightSetups(config.scenarios);
+        this.lightScenarios = this.transformLightSetups(config.scenarios);
         if (this.enabled) {
           this.setActiveScenario(config.initialScenarioId);
         }
@@ -101,7 +105,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
     }
   }
 
-  private static transformLightSetups(scenarios: LightScenarioModel[]): LightScenarioModel[] {
+  private transformLightSetups(scenarios: LightScenarioModel[]): LightScenarioModel[] {
     return scenarios.reduce((all, scenario) => {
       const newScenario = { ...scenario };
       if (scenario.lightSetups) {
@@ -109,7 +113,8 @@ export class LightScenarioFeature implements ILightScenarioFeature {
           try {
             scenario.lights[setup.name] = LightService.transformLightSetup(setup);
           } catch (error) {
-            console.warn(error);
+            this.logger.warn(`Couldn't transform light setup`, { error: error });
+            this.logger.debug('Light setup', { objects: [setup] });
           }
         });
         delete newScenario.lightSetups;

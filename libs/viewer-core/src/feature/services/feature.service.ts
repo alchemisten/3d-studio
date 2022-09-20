@@ -1,7 +1,14 @@
 import { inject, injectable } from 'inversify';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { FeatureSetup, IConfigService, IFeature, IFeatureRegistryService, IFeatureService } from '../../types';
-import { ConfigServiceToken, FeatureRegistryServiceToken } from '../../util';
+import type {
+  FeatureSetup,
+  IConfigService,
+  IFeature,
+  IFeatureRegistryService,
+  IFeatureService,
+  ILoggerService,
+} from '../../types';
+import { ConfigServiceToken, FeatureRegistryServiceToken, LoggerServiceToken } from '../../util';
 
 /**
  * The feature service provides access to all feature instances created for
@@ -14,7 +21,8 @@ export class FeatureService implements IFeatureService {
 
   public constructor(
     @inject(ConfigServiceToken) private configService: IConfigService,
-    @inject(FeatureRegistryServiceToken) private featureRegistry: IFeatureRegistryService
+    @inject(FeatureRegistryServiceToken) private featureRegistry: IFeatureRegistryService,
+    @inject(LoggerServiceToken) private logger: ILoggerService
   ) {
     this.features = [];
     this.features$ = new BehaviorSubject<IFeature[]>(this.features);
@@ -58,7 +66,7 @@ export class FeatureService implements IFeatureService {
         feature.init(config);
         this.addFeature(feature);
       } catch (errorMessage) {
-        console.warn(errorMessage);
+        this.logger.warn(`Couldn't initialize feature ${token}`, { error: errorMessage });
       }
     });
   }

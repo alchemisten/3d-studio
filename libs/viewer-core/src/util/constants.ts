@@ -14,6 +14,7 @@ export const FeatureServiceToken = Symbol.for('FeatureService');
 export const HighlightFeatureToken = Symbol.for('HighlightFeature');
 export const LightScenarioFeatureToken = Symbol.for('LightScenarioFeature');
 export const LightServiceToken = Symbol.for('LightService');
+export const LoggerServiceToken = Symbol.for('LoggerService');
 export const MaterialChangeFeatureToken = Symbol.for('MaterialChangeFeature');
 export const MaterialServiceToken = Symbol.for('MaterialService');
 export const RenderServiceToken = Symbol.for('RenderService');
