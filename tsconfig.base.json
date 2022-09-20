@@ -5,17 +5,21 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": "./bob",
-    "paths": {}
+    "baseUrl": ".",
+    "paths": {
+      "@alchemisten/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"]
+    }
   },
-  "exclude": [
-      "bob/node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp"]
 }
