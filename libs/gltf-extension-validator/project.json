@@ -7,7 +7,7 @@
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/viewer-core",
+        "outputPath": "dist/libs/gltf-extension-validator",
         "main": "libs/gltf-extension-validator/src/index.ts",
         "tsConfig": "libs/gltf-extension-validator/tsconfig.lib.json",
         "assets": ["libs/gltf-extension-validator/*.md"],
