@@ -11,6 +11,6 @@ for more details:
   extends the default *.gltf file definition with all configuration options
   necessary for the viewer.
 * GLTF Extension Validator: TODO
-* [Viewer Core](./packages/viewer-core/README.md): 
+* [Viewer Core](libs/viewer-core/README.md): 
   Contains the actual viewer and the core features. Examples for the most 
   common use cases are available.

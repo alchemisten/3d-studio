@@ -1,0 +1,16 @@
+{
+  "name": "@alchemisten/gltf-extension",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc --declaration",
+    "generate-alcm-ast": "node scripts/generate-schema-ast.js",
+    "generate-alcm": "node scripts/generate-schema.js",
+    "generate-gltf": "node scripts/generate-gltf-ts.js",
+    "validate-gltf": "node scripts/validate-gltf.js",
+    "test": "node scripts/validate-gltf.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

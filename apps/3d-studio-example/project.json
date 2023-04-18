@@ -1,0 +1,72 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/3d-studio-example/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "apps/3d-studio-example/public",
+        "compiler": "babel",
+        "index": "apps/3d-studio-example/src/index.html",
+        "baseHref": "/",
+        "main": "apps/3d-studio-example/src/main.ts",
+        "polyfills": "apps/3d-studio-example/src/polyfills.ts",
+        "tsConfig": "apps/3d-studio-example/tsconfig.app.json",
+        "assets": [
+          "apps/3d-studio-example/src/assets"
+        ],
+        "styles": ["apps/3d-studio-example/src/styles.css"],
+        "scripts": [],
+        "webpackConfig": "apps/3d-studio-example/custom-webpack.config.js",
+        "generateIndexHtml": false
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/3d-studio-example/src/environments/environment.ts",
+              "with": "apps/3d-studio-example/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/web:dev-server",
+      "options": {
+        "buildTarget": "3d-studio-example:build",
+        "sourceMap": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "3d-studio-example:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/3d-studio-example/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/3d-studio-example"],
+      "options": {
+        "jestConfig": "apps/3d-studio-example/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}
