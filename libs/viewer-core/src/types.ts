@@ -1,7 +1,8 @@
-import {
+import type {
   AnimationAction,
   AnimationMixer,
   Color,
+  ColorSpace,
   Light,
   Material,
   Object3D,
@@ -9,15 +10,14 @@ import {
   Scene,
   ShadowMapType,
   Texture,
-  TextureEncoding,
   Vector2,
   Vector3,
   WebGLCubeRenderTarget,
   WebGLRenderer,
 } from 'three';
-import { Observable } from 'rxjs';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import type { Observable } from 'rxjs';
+import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { Container, interfaces } from 'inversify';
 import type { ILogger } from '@schablone/logging';
 import { LightType, MaterialType } from './enums';
@@ -93,7 +93,7 @@ export interface RenderConfigModel {
   autoClear: boolean;
   clearColor: ClearColor;
   continuousRendering: boolean;
-  outputEncoding: TextureEncoding;
+  outputColorSpace: ColorSpace;
   pixelRatio: number;
   renderSize: SizeModel;
   shadowMapEnabled: boolean;

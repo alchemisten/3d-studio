@@ -3,14 +3,14 @@ import { PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
-import type { IControlService, IRenderService } from '../../types';
+import type { IControlService, IRenderService, RenderConfigModel } from '../../types';
 import { RenderServiceToken } from '../../util';
 
 /**
  * The control service provides access to orbit controls.
  *
  * Note that using the orbit controls does not require continuous rendering to
- * be active since a new frame will rendered automatically everytime the
+ * be active since a new frame will be rendered automatically everytime the
  * controls are updated.
  */
 @injectable()
@@ -24,7 +24,7 @@ export class ControlService implements IControlService {
     this.renderService.getCamera().pipe(take(1)).subscribe(this.createControls.bind(this));
     this.renderService.hookAfterRender$
       .pipe(withLatestFrom(this.renderService.getRenderConfig()))
-      .subscribe(([, config]) => {
+      .subscribe(([, config]: [boolean, RenderConfigModel]) => {
         if (this.controls && this.controls.autoRotate && config.continuousRendering) {
           this.controls.update();
         }
@@ -47,7 +47,7 @@ export class ControlService implements IControlService {
     this.controls.maxDistance = 500;
     this.changeSub = fromEvent(this.controls, 'change')
       .pipe(withLatestFrom(this.renderService.getRenderConfig()))
-      .subscribe(([, config]) => {
+      .subscribe(([, config]: [Event, RenderConfigModel]) => {
         if (!config.continuousRendering) {
           this.renderService.renderSingleFrame();
         }

@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { PCFSoftShadowMap, sRGBEncoding, Vector3 } from 'three';
+import { PCFSoftShadowMap, SRGBColorSpace, Vector3 } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
 
@@ -10,7 +10,7 @@ export const defaultRenderConfig = <RenderConfigModel>{
     color: '#000000',
   },
   continuousRendering: false,
-  outputEncoding: sRGBEncoding,
+  outputColorSpace: SRGBColorSpace,
   pixelRatio: 1,
   renderSize: {
     height: 768,

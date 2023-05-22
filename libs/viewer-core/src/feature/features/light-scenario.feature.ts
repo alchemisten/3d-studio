@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { Light } from 'three';
+import type { Light } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import type {

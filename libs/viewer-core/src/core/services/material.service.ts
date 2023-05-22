@@ -85,7 +85,7 @@ export class MaterialService implements IMaterialService {
     if (Array.isArray(mesh.material)) {
       meshMaterials.concat(mesh.material);
     } else {
-      meshMaterials.push(mesh.material);
+      meshMaterials.push(mesh.material as Material);
     }
     meshMaterials.forEach((meshMaterial) => {
       materialHandler(meshMaterial);

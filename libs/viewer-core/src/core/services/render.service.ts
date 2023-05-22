@@ -101,7 +101,7 @@ export class RenderService implements IRenderService {
             this.renderer.setClearColor(config.clearColor.color, config.clearColor.alpha);
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-          } else if (config.clearColor.alpha) {
+          } else if (config.clearColor?.alpha) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this.renderer.setClearAlpha(config.clearColor.alpha);

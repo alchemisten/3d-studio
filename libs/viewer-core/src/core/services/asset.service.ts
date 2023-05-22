@@ -3,7 +3,7 @@ import {
   EquirectangularReflectionMapping,
   LoadingManager,
   Object3D,
-  sRGBEncoding,
+  SRGBColorSpace,
   Texture,
   TextureLoader,
   WebGLCubeRenderTarget,
@@ -54,7 +54,7 @@ export class AssetService implements IAssetService {
   public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {
     return this.loadTexture(path).then((envTex: Texture) => {
       envTex.mapping = EquirectangularReflectionMapping; // SphericalReflectionMapping
-      envTex.encoding = sRGBEncoding;
+      envTex.colorSpace = SRGBColorSpace;
       return new WebGLCubeRenderTarget(resolution).fromEquirectangularTexture(this.renderService.renderer, envTex);
     });
   }
@@ -82,7 +82,7 @@ export class AssetService implements IAssetService {
         (texture) => {
           resolve(texture);
         },
-        undefined,
+        () => undefined,
         (error) => {
           reject(error);
         }
@@ -98,7 +98,7 @@ export class AssetService implements IAssetService {
           this.logger.debug('GLTF loaded', { objects: gltf });
           resolve(gltf);
         },
-        undefined,
+        () => undefined,
         (error) => {
           reject(error);
         }
