@@ -78,7 +78,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
     objects: [
       {
         name: 'Milk-Truck',
-        path: '../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
       },
     ],
     render: {

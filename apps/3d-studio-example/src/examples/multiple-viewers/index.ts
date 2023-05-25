@@ -16,7 +16,7 @@ import { Vector3 } from 'three';
     objects: [
       {
         name: 'Milk-Truck',
-        path: '../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
       },
     ],
   });
@@ -33,7 +33,7 @@ import { Vector3 } from 'three';
     objects: [
       {
         name: 'Milk-Truck',
-        path: '../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
       },
     ],
   });
