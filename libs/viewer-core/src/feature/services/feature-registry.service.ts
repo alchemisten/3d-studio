@@ -9,8 +9,19 @@ import type {
 } from '../../types';
 import { coreFeatures } from '../core-feature.map';
 import { FeatureAlreadyRegisteredError, FeatureNotRegisteredError, MissingDIContainerError } from '../../core';
-import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '../features';
-import { CameraRotationFeatureToken, LightScenarioFeatureToken, WireframeFeatureToken } from '../../util';
+import {
+  CameraRotationFeature,
+  HighlightFeature,
+  IHighlightFeature,
+  LightScenarioFeature,
+  WireframeFeature,
+} from '../features';
+import {
+  CameraRotationFeatureToken,
+  HighlightFeatureToken,
+  LightScenarioFeatureToken,
+  WireframeFeatureToken,
+} from '../../util';
 
 /**
  * The feature registry service maintains a record of all features available
@@ -60,6 +71,7 @@ export class FeatureRegistryService implements IFeatureRegistryService {
       .bind<ICameraRotationFeature>(CameraRotationFeatureToken)
       .to(CameraRotationFeature)
       .inSingletonScope();
+    this.containerDI.bind<IHighlightFeature>(HighlightFeatureToken).to(HighlightFeature).inSingletonScope();
     this.containerDI.bind<ILightScenarioFeature>(LightScenarioFeatureToken).to(LightScenarioFeature).inSingletonScope();
     this.containerDI.bind<IWireframeFeature>(WireframeFeatureToken).to(WireframeFeature).inSingletonScope();
   }

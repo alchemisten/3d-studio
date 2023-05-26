@@ -10,7 +10,6 @@ import type {
   Scene,
   ShadowMapType,
   Texture,
-  Vector2,
   Vector3,
   WebGLCubeRenderTarget,
   WebGLRenderer,
@@ -52,19 +51,6 @@ export interface SizeModel {
 
 export type I18nTranslations = Record<string, string>;
 export type I18nLanguageMap = Record<string, I18nTranslations>;
-
-export type HighlightWorldPosition = { positionType: 'WORLD'; position: Vector3 };
-export type HighlightScreenPosition = { positionType: 'SCREEN'; position: Vector2 };
-export type HighlightModelId = string;
-export type HighlightModel = {
-  cameraPosition: Vector3;
-  cameraTarget: Vector3;
-  description: string;
-  i18n: I18nLanguageMap;
-  id: HighlightModelId;
-  name: string;
-  object: Object3D;
-} & (HighlightWorldPosition | HighlightScreenPosition);
 
 export type LightScenarioId = string;
 export interface LightScenarioModel {
@@ -138,12 +124,6 @@ export interface ILightScenarioFeature extends IFeature {
   getActiveScenario(): Observable<LightScenarioModel>;
   getLightScenarios(): LightScenarioModel[];
   setActiveScenario(id: LightScenarioId): void;
-}
-
-export interface IHighlightFeature extends IFeature {
-  focusHighlight(id: HighlightModelId): void;
-  getFocusedHighlight(): Observable<HighlightModel | null>;
-  getHighlights(): HighlightModel[];
 }
 
 export interface CameraRotationFeatureConfig extends FeatureConfig {
