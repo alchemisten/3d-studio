@@ -12,217 +12,159 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       CameraRotationFeature: { enabled: false },
       HighlightFeature: {
         enabled: true,
+        groupScale: 4,
         highlightsVisible: true,
         highlightSetup: [
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_1_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: 2.68034,
               y: -3.85099,
               z: 2.10968,
             },
-            target: {
-              x: -2.46729,
-              y: 3.68593,
-              z: -1.97648,
+            i18n: {
+              de: {
+                content: '',
+                headline: 'rundum geschlossen',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2071,
             pos: {
               x: 0,
               y: -0.219888,
               z: 0,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: -2.46729,
+              y: 3.68593,
+              z: -1.97648,
             },
-            id: 2071,
-            headline: 'hl_1_title',
           },
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_2_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: 2.28151,
               y: 1.47695,
               z: 1.88254,
             },
-            target: {
-              x: -3.184,
-              y: -4.77317,
-              z: -3.69098,
+            i18n: {
+              de: {
+                content:
+                  'erleichtert die Reinigung und ist dank der Herstellung aus unbedenklichen Materialien geeignet für den Kontakt mit Lebensmitteln.',
+                headline: 'porenlose Oberfläche mit gerundeten Ecken',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2072,
             pos: {
               x: 0.345544,
               y: 0,
               z: 0.245301,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: -3.184,
+              y: -4.77317,
+              z: -3.69098,
             },
-            id: 2072,
-            headline: 'hl_2_title',
           },
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_3_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: 1.46705,
               y: 1.50173,
               z: -1.85208,
             },
-            target: {
-              x: -2.72539,
-              y: -4.26271,
-              z: 5.1618,
+            i18n: {
+              de: {
+                content: 'hält die Kühlkette beim Transport aufrecht und kühlt während 12h',
+                headline: 'Innenisolation',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2073,
             pos: {
               x: 0.127234,
               y: 0.206625,
               z: -0.202012,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: -2.72539,
+              y: -4.26271,
+              z: 5.1618,
             },
-            id: 2073,
-            headline: 'hl_3_title',
           },
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_4_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: -1.81269,
               y: 1.29626,
               z: 1.88639,
             },
-            target: {
-              x: 4.17453,
-              y: -2.7536,
-              z: -5.02388,
+            i18n: {
+              de: {
+                content: 'kompatibel mit allen ISO und SGL Normen',
+                headline: 'Stülpdeckel - stapelbar',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2074,
             pos: {
               x: -0.246847,
               y: 0.21732,
               z: 0.156787,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: 4.17453,
+              y: -2.7536,
+              z: -5.02388,
             },
-            id: 2074,
-            headline: 'hl_4_title',
           },
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_5_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: 2.20833,
               y: -0.26136,
               z: -0.061664,
             },
-            target: {
-              x: -6.3605,
-              y: 4.89373,
-              z: -0.0458263,
+            i18n: {
+              de: {
+                content: '',
+                headline: '2 Muschelgriffe',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2075,
             pos: {
               x: 0.345273,
               y: 0.0670324,
               z: 0.0150209,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: -6.3605,
+              y: 4.89373,
+              z: -0.0458263,
             },
-            id: 2075,
-            headline: 'hl_5_title',
           },
           {
-            color: '#ffffff',
-            scale: 0.19,
-            isTrigger: false,
-            fov: 40,
-            mount: null,
-            content: 'hl_6_content',
-            speed: {
-              fov: 6,
-              in: 3,
-              out: 6,
-            },
             cam: {
               x: 0.10648,
               y: -0.0680558,
               z: 3.41046,
             },
-            target: {
-              x: -0.205522,
-              y: 0.131358,
-              z: -6.58268,
+            i18n: {
+              de: {
+                content: '',
+                headline: 'Beschriftungs- und Identifikationsfläche',
+              },
             },
-            nodes: [''],
-            delay: 4000,
+            id: 2076,
             pos: {
               x: 0,
               y: 0,
               z: 0.24555,
             },
-            style: {
-              anchor: 'n',
+            scale: 0.04,
+            target: {
+              x: -0.205522,
+              y: 0.131358,
+              z: -6.58268,
             },
-            id: 2076,
-            headline: 'hl_6_title',
           },
         ],
       },
@@ -281,7 +223,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       {
         name: 'Milk-Truck',
         path: 'assets/models/coolbox/COOLBOX--36-412.gltf',
-        // scale: 4,
+        scale: 4,
       },
     ],
     project: {

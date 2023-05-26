@@ -31,7 +31,7 @@ export class SceneService implements ISceneService {
       object.name = objectSetup.name;
     }
     if (objectSetup?.scale) {
-      object.scale.set(objectSetup.scale, objectSetup.scale, objectSetup.scale);
+      object.scale.setScalar(objectSetup.scale);
     }
     this.group.add(object);
     this.logger.debug('Object added', { objects: object });

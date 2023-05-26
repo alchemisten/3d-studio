@@ -36,25 +36,20 @@ export interface HighlightSetupModel {
     y: number;
     z: number;
   };
-  color: string;
-  content: string;
-  delay: number;
-  id: string;
-  isTrigger: boolean;
-  fov: number;
-  headline: string;
-  mount: string | null;
-  nodes: string[];
+  color?: string;
+  i18n?: I18nLanguageMap;
+  id: HighlightModelId;
+  isTrigger?: boolean;
+  fov?: number;
+  mount?: string | null;
+  nodes?: string[];
   pos: {
     x: number;
     y: number;
     z: number;
   };
-  scale: number;
-  speed: HighlightSpeed;
-  style: {
-    anchor: string;
-  };
+  scale?: number;
+  speed?: HighlightSpeed;
   target: {
     x: number;
     y: number;
@@ -96,8 +91,9 @@ export interface HighlightMount {
 }
 
 export interface HighlightFeatureConfig extends FeatureConfig {
+  groupScale?: number;
   highlightSetup: HighlightSetupModel[];
-  highlightsVisible: boolean;
+  highlightsVisible?: boolean;
 }
 
 export interface IHighlightFeature extends IFeature {

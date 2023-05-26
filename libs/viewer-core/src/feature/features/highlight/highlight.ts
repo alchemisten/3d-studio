@@ -11,7 +11,7 @@ import {
   Vector3,
 } from 'three';
 import { ILogger } from '@schablone/logging';
-import {
+import type {
   HighlightAnimation,
   HighlightMount,
   HighlightSetupModel,
@@ -19,20 +19,20 @@ import {
   HighlightTextureMap,
   HighlightVisibility,
 } from './types';
+import type { I18nLanguageMap } from '../../../types';
 
 export default class Highlight {
   public clickzone: Mesh;
   public id: string;
+  public i18n: I18nLanguageMap;
   public glow!: Sprite;
   public speed: HighlightSpeed;
   public visibility!: HighlightVisibility;
   private animation!: HighlightAnimation;
   private cameraTarget: Vector3;
-  private color: ColorRepresentation;
-  private content: string;
+  private readonly color: ColorRepresentation;
   private fov: number;
   private hover: boolean;
-  private headline: string;
   private isTrigger: boolean;
   private logger: ILogger;
   private mount: HighlightMount;
@@ -44,42 +44,42 @@ export default class Highlight {
   private textures: HighlightTextureMap;
 
   public constructor(highData: HighlightSetupModel, logger: ILogger, group: Object3D, textures: HighlightTextureMap) {
-    this.headline = highData.headline;
-    this.content = highData.content;
-    this.position = new Vector3(highData.pos.x, highData.pos.y, highData.pos.z);
     this.cameraTarget = new Vector3(highData.cam.x, highData.cam.y, highData.cam.z);
-    this.target = new Vector3(highData.target.x, highData.target.y, highData.target.z);
-    this.fov = highData.fov;
-    this.textures = textures;
-    this.logger = logger;
-    this.parent = group;
+    this.color = new Color(highData.color || '#ffffff');
+    this.fov = highData.fov || 40;
+    this.hover = false;
+    this.i18n = highData.i18n || {};
     this.id = highData.id;
-    this.scale = highData.scale;
-    this.color = new Color(parseInt(highData.color.replace('#', '0x'), 16));
-    this.speed = highData.speed;
+    this.isTrigger = highData.isTrigger ?? false;
+    this.logger = logger;
     this.mount = {
-      name: highData.mount,
+      name: highData.mount ?? null,
       element: null,
     };
+    this.nodes = [];
+    this.parent = group;
+    this.position = new Vector3(highData.pos.x, highData.pos.y, highData.pos.z);
+    this.scale = highData.scale || 1;
+    this.speed = highData.speed || {
+      fov: 6,
+      in: 3,
+      out: 6,
+    };
+    this.target = new Vector3(highData.target.x, highData.target.y, highData.target.z);
+    this.textures = textures;
+
     this.clickzone = this.initClickzone();
     this.glow = this.initGlow();
-    this.nodes = [];
-    this.glow.scale.x = this.scale;
-    this.glow.scale.y = this.scale;
-    this.glow.scale.z = this.scale;
-    this.clickzone.scale.x = this.scale;
-    this.clickzone.scale.y = this.scale;
-    this.clickzone.scale.z = this.scale;
-    this.isTrigger = highData.isTrigger;
-    this.hover = false;
 
     group.traverse((node) => {
       const nodeName = node.name.trim();
       if (nodeName.length > 0) {
-        if (node instanceof Mesh && highData.nodes.indexOf(node.name) > -1) {
+        // Find nodes corresponding to this highlight for edge highlighting
+        if (highData.nodes && node instanceof Mesh && highData.nodes.indexOf(node.name) > -1) {
           this.nodes.push(node);
         }
 
+        // Find mount element for this highlight
         if (!this.mount.element && this.mount.name && nodeName === this.mount.name) {
           this.mount.element = node;
 
@@ -134,7 +134,6 @@ export default class Highlight {
       const wp = new Vector3();
       wp.setFromMatrixPosition(node.matrix);
       this.logger.debug('', { objects: wp.add(this.mount.relativeTransform) });
-      // this.clickzone.position.copy(wp.add(this.mount.relativeTransform));
     }
   }
 
@@ -166,7 +165,7 @@ export default class Highlight {
     const sp1g = new SphereGeometry(0.15, 20, 20);
     const sphere = new Mesh(sp1g, wFrame);
     sphere.position.copy(this.position);
-    sphere.scale.set(this.scale, this.scale, this.scale);
+    sphere.scale.setScalar(this.scale);
 
     //Add rotation targets to sphere
     sphere.userData['camX'] = this.cameraTarget.x;
@@ -235,12 +234,6 @@ export default class Highlight {
         break;
       case 'color':
         this.setColor(value);
-        break;
-      case 'content':
-        this.content = value;
-        break;
-      case 'headline':
-        this.headline = value;
         break;
       case 'posx':
         this.position.x = value;

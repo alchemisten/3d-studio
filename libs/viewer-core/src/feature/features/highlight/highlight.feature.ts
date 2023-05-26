@@ -28,34 +28,35 @@ export class HighlightFeature implements IHighlightFeature {
   public readonly id = HighlightFeatureToken;
   private baseFov!: number;
   private camera!: PerspectiveCamera;
-  private clickable: Sprite[];
+  private clickable: Sprite[] = [];
   private controls!: OrbitControls;
-  private debugHighlight: Highlight | null;
-  private dragThreshold: number;
+  private debugHighlight: Highlight | null = null;
+  private dragThreshold = 0.01;
   private enabled!: boolean;
   private readonly enabled$: Subject<boolean>;
   private readonly EPS = 0.000001;
   private focusedHighlight$: Subject<Highlight | null>;
-  private FOVAnimateSpeed: number;
-  private fovTarget: number;
-  private highlights: Highlight[];
+  private FOVAnimateSpeed = 6;
+  private fovTarget = 90;
+  private highlights: Highlight[] = [];
   private highlightsVisible!: boolean;
-  private readonly highlightGroup: Group;
-  private inAnimateSpeed: number;
-  private inDelay: boolean;
-  private lastFov: number;
-  private lastTime: number;
-  private logger!: ILogger;
-  private mouseWheelEventEnabled: boolean;
-  private mouseWheelFired: boolean;
-  private outAnimateSpeed: number;
-  private posTarget: Vector3;
-  private segueOnAnimation: boolean;
-  private state: HighlightMode;
-  private startPos: Vector2;
-  private viewCurrent: Vector3;
-  private viewTarget: Vector3;
-  private visibility: Highlight[];
+  private readonly highlightGroup: Group = new Group();
+  private inAnimateSpeed = 3;
+  private inDelay = false;
+  private lastFov = 90;
+  private lastTime: number = Date.now();
+  private readonly logger!: ILogger;
+  private mouseWheelEventEnabled = false;
+  private mouseWheelFired = false;
+  private outAnimateSpeed = 6;
+  private posTarget: Vector3 = new Vector3();
+  private rayCaster: Raycaster = new Raycaster();
+  private segueOnAnimation = true;
+  private state: HighlightMode = HighlightMode.ORBIT;
+  private startPos: Vector2 = new Vector2();
+  private viewCurrent: Vector3 = new Vector3();
+  private viewTarget: Vector3 = new Vector3();
+  private visibility: Highlight[] = [];
 
   public constructor(
     @inject(AssetServiceToken) private assetService: IAssetService,
@@ -74,33 +75,7 @@ export class HighlightFeature implements IHighlightFeature {
       this.camera = camera;
       this.baseFov = this.camera.fov;
     });
-    this.highlightGroup = new Group();
     this.highlightGroup.name = 'highlights';
-    this.clickable = [];
-    this.highlights = [];
-    this.visibility = [];
-
-    this.startPos = new Vector2();
-    this.state = HighlightMode.ORBIT;
-    this.lastTime = Date.now();
-    this.posTarget = new Vector3();
-    this.viewTarget = new Vector3();
-    this.viewCurrent = new Vector3();
-    this.fovTarget = 90;
-
-    this.inDelay = false;
-
-    this.segueOnAnimation = true;
-    this.lastFov = 90;
-    this.dragThreshold = 0.01;
-    this.EPS = 0.000001;
-    this.inAnimateSpeed = 3;
-    this.outAnimateSpeed = 6;
-    this.FOVAnimateSpeed = 6;
-
-    this.debugHighlight = null;
-    this.mouseWheelFired = false;
-    this.mouseWheelEventEnabled = false;
 
     document.addEventListener('touchstart', (event) => {
       if (event.touches && event.touches.length > 0) {
@@ -114,8 +89,11 @@ export class HighlightFeature implements IHighlightFeature {
   public init(config: HighlightFeatureConfig) {
     this.enabled = config.enabled;
     this.enabled$.next(this.enabled);
-    this.highlightsVisible = config.highlightsVisible;
+    this.highlightsVisible = config.highlightsVisible ?? true;
     this.logger.debug('Initializing with config', { objects: config });
+    if (config.groupScale) {
+      this.highlightGroup.scale.setScalar(config.groupScale);
+    }
     this.addHighlightsToScene(config.highlightSetup).then();
     this.renderService.hookAfterRender$.subscribe(() => {
       this.update();
@@ -175,23 +153,22 @@ export class HighlightFeature implements IHighlightFeature {
     setups.forEach((setup) => {
       const highlight = new Highlight(setup, this.logger, this.highlightGroup, textures);
       this.highlights.push(highlight);
-      //
+
       // // animation hooks
       // if (hl.animation && !hl.isTrigger) {
       //   this.animMan.addTimelineHook("highlight", hl.animation.targetTime, hl.animation.timeUnit, hl);
       // }
-      //
+
       // visibility
       if (highlight.visibility) {
         this.visibility.push(highlight);
       }
       this.clickable.push(highlight.glow);
     });
-    this.toggleClickzones();
-    //console.log(this.highlights);
+    this.setClickzonesVisible(this.highlightsVisible);
   }
 
-  private toggleClickzones(value?: boolean): void {
+  private setClickzonesVisible(value?: boolean): void {
     this.highlightsVisible = value ?? !this.highlightsVisible;
     this.highlights.forEach((highlight) => {
       highlight.clickzone.visible = this.highlightsVisible;
@@ -259,15 +236,13 @@ export class HighlightFeature implements IHighlightFeature {
   }
 
   private checkIntersect(event: MouseEvent): Intersection[] {
-    const vector = new Vector3(
+    const vector = new Vector2(
       (event.clientX / window.innerWidth) * 2 - 1,
-      -(event.clientY / window.innerHeight) * 2 + 1,
-      0.5
+      -(event.clientY / window.innerHeight) * 2 + 1
     );
-    vector.unproject(this.camera);
-    const rayCaster = new Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+    this.rayCaster.setFromCamera(vector, this.camera);
 
-    return rayCaster.intersectObjects(this.clickable, true);
+    return this.rayCaster.intersectObjects(this.clickable);
   }
 
   private clamp(val: number, min: number, max: number): number {
