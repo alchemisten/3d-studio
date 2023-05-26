@@ -31,8 +31,9 @@ export interface ViewerConfigModel {
   render?: Partial<RenderConfigModel>;
 }
 export interface ObjectSetupModel {
-  name: string;
+  name?: string;
   path: string;
+  scale?: number;
 }
 
 export interface ProjectConfigModel {
@@ -273,7 +274,7 @@ export interface IRenderService {
 
 export interface ISceneService {
   readonly scene: Scene;
-  addObjectToScene(object: Object3D): void;
+  addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void;
   getObjects(): Observable<Object3D[]>;
   removeObjectFromScene(objectName: string): void;
 }

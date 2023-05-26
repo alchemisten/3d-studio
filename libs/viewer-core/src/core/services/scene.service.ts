@@ -26,9 +26,15 @@ export class SceneService implements ISceneService {
     this.objects$ = new BehaviorSubject<Object3D[]>(this.group.children);
   }
 
-  public addObjectToScene(object: Object3D): void {
+  public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {
+    if (objectSetup?.name) {
+      object.name = objectSetup.name;
+    }
+    if (objectSetup?.scale) {
+      object.scale.set(objectSetup.scale, objectSetup.scale, objectSetup.scale);
+    }
     this.group.add(object);
-    this.logger.debug('Object added', { objects: this.group });
+    this.logger.debug('Object added', { objects: object });
     this.objects$.next(this.group.children);
   }
 
