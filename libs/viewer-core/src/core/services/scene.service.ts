@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { Group, Object3D, Scene } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { ILoggerService, ISceneService } from '../../types';
+import type { ILogger } from '@schablone/logging';
+import type { ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
 import { LoggerServiceToken } from '../../util';
 
 /**
@@ -13,9 +14,11 @@ import { LoggerServiceToken } from '../../util';
 export class SceneService implements ISceneService {
   public readonly scene: Scene;
   private readonly group: Object3D;
+  private readonly logger: ILogger;
   private objects$: BehaviorSubject<Object3D[]>;
 
-  public constructor(@inject(LoggerServiceToken) private logger: ILoggerService) {
+  public constructor(@inject(LoggerServiceToken) logger: ILoggerService) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Scene' } } });
     this.scene = new Scene();
     this.group = new Group();
     this.group.name = 'objects';

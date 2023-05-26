@@ -11,6 +11,7 @@ import {
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Observable, Subject } from 'rxjs';
+import type { ILogger } from '@schablone/logging';
 import type { IAssetService, ILoggerService, IRenderService } from '../../types';
 import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
 
@@ -31,12 +32,14 @@ export class AssetService implements IAssetService {
   private readonly gltfLoader: GLTFLoader;
   private readonly objectLoaded$: Subject<Object3D>;
   private readonly loadingManager: LoadingManager;
+  private readonly logger: ILogger;
   private readonly textureLoader: TextureLoader;
 
   public constructor(
-    @inject(LoggerServiceToken) private logger: ILoggerService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Asset' } } });
     this.loadingManager = new LoadingManager(
       this.onLoadingComplete.bind(this),
       this.onLoadingProgress.bind(this),
