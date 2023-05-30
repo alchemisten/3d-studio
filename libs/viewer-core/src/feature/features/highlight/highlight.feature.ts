@@ -21,7 +21,7 @@ import {
   IHighlightFeature,
 } from './types';
 import Highlight from './highlight';
-import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Texture, Vector2, Vector3 } from 'three';
+import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Vector2, Vector3 } from 'three';
 
 @injectable()
 export class HighlightFeature implements IHighlightFeature {
@@ -79,7 +79,7 @@ export class HighlightFeature implements IHighlightFeature {
 
     document.addEventListener('touchstart', (event) => {
       if (event.touches && event.touches.length > 0) {
-        this.onDocumentMouseDown(event.touches[0]);
+        this.onDocumentMouseDown(event);
       }
     });
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false);
@@ -107,8 +107,8 @@ export class HighlightFeature implements IHighlightFeature {
 
   public focusHighlight(id: HighlightModelId): void {
     const highlight = this.highlights.find((h) => h.id === id);
-    // TODO: Focus highlight
     if (highlight) {
+      this.dispatchHighlightClick(highlight);
       this.focusedHighlight$.next(highlight);
     } else {
       this.logger.warn(`Couldn't focus highlight with id ${id}.`);
@@ -173,7 +173,14 @@ export class HighlightFeature implements IHighlightFeature {
     this.highlights.forEach((highlight) => {
       highlight.clickzone.visible = this.highlightsVisible;
       highlight.glow.traverse((node) => {
-        (node as Mesh).material.opacity = this.highlightsVisible ? 1 : 0;
+        const materials = (node as Mesh).material;
+        if (Array.isArray(materials)) {
+          materials.forEach((material) => {
+            material.opacity = this.highlightsVisible ? 1 : 0;
+          });
+        } else {
+          materials.opacity = this.highlightsVisible ? 1 : 0;
+        }
       });
     });
   }
@@ -202,7 +209,7 @@ export class HighlightFeature implements IHighlightFeature {
     }
   }
 
-  private checkHighLightClickIntersect(event: MouseEvent): void {
+  private checkHighLightClickIntersect(event: MouseEvent | Touch): void {
     const intersects = this.checkIntersect(event);
 
     if (intersects.length > 0 && this.highlightsVisible) {
@@ -235,7 +242,7 @@ export class HighlightFeature implements IHighlightFeature {
     }
   }
 
-  private checkIntersect(event: MouseEvent): Intersection[] {
+  private checkIntersect(event: MouseEvent | Touch): Intersection[] {
     const vector = new Vector2(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
@@ -323,6 +330,10 @@ export class HighlightFeature implements IHighlightFeature {
     this.addListeners('end');
   };
 
+  private handleWheel = () => {
+    this.mouseWheelFired = true;
+  };
+
   private hoverHighlight(id: string, active: boolean): void {
     // TODO: Postprocessing not yet implemented
     // if (this._config.features.usePostProcessing.active
@@ -353,24 +364,24 @@ export class HighlightFeature implements IHighlightFeature {
     return current + deltaMove;
   }
 
-  private onDocumentMouseDown(event: MouseEvent): void {
-    this.checkHighLightClickIntersect(event);
+  private onDocumentMouseDown(event: Event): void {
+    this.checkHighLightClickIntersect(event as MouseEvent);
   }
 
-  private onDocumentMouseMove(event: MouseEvent): void {
-    this.checkHighlightIntersect(event);
+  private onDocumentMouseMove(event: Event): void {
+    this.checkHighlightIntersect(event as MouseEvent);
   }
 
   private onMouseEnd = (): void => {
     this.handleEnd();
   };
 
-  private onMouseMove = (event: MouseEvent): void => {
-    this.handleMove(this.getDirection(event, 'client'));
+  private onMouseMove = (event: Event): void => {
+    this.handleMove(this.getDirection(event as MouseEvent, 'client'));
   };
 
-  private onMouseStart = (event: MouseEvent): void => {
-    this.handleStart(this.getDirection(event, 'client'));
+  private onMouseStart = (event: Event): void => {
+    this.handleStart(this.getDirection(event as MouseEvent, 'client'));
   };
 
   private onMouseWheel = (): void => {
@@ -381,14 +392,14 @@ export class HighlightFeature implements IHighlightFeature {
     this.handleEnd();
   };
 
-  private onTouchMove = (event: TouchEvent): void => {
-    this.handleMove(this.getDirection(event.touches[0], 'page'));
+  private onTouchMove = (event: Event): void => {
+    this.handleMove(this.getDirection((event as TouchEvent).touches[0], 'page'));
   };
 
-  private onTouchStart = (event: TouchEvent): void => {
-    switch (event.touches.length) {
+  private onTouchStart = (event: Event): void => {
+    switch ((event as TouchEvent).touches.length) {
       case 1:
-        this.handleStart(this.getDirection(event.touches[0], 'page'));
+        this.handleStart(this.getDirection((event as TouchEvent).touches[0], 'page'));
         break;
       case 2:
         if (this.mouseWheelEventEnabled) {
@@ -474,13 +485,13 @@ export class HighlightFeature implements IHighlightFeature {
         if (
           this.camera.position.distanceTo(this.posTarget) < this.EPS &&
           this.viewCurrent.distanceTo(this.viewTarget) < this.EPS &&
-          Math.abs(this.camera.fov, this.fovTarget) < this.EPS
+          Math.abs(this.camera.fov - this.fovTarget) < this.EPS
         ) {
           this.state = HighlightMode.HIGHLIGHT;
           // this.dispatcher.dispatch("onstate", this.state);
         }
         break;
-      case HighlightMode.TO_ORBIT:
+      case HighlightMode.TO_ORBIT: {
         // TODO change, if center is not rotationcenter! // orbitSize, if cameradistance is changing, change this too
         const orgTarget = new Vector3();
         const orbitSize = 6;
@@ -524,6 +535,7 @@ export class HighlightFeature implements IHighlightFeature {
         this.camera.lookAt(this.controls.target);
         this.controls.update();
         break;
+      }
       case HighlightMode.HIGHLIGHT:
         this.controls.position0 = this.camera.position.clone();
         this.controls.target0 = this.viewTarget.clone();

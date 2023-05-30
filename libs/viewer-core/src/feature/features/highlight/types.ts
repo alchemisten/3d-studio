@@ -63,6 +63,8 @@ export interface HighlightTextureMap {
   actionTransHoverTex: Texture | null;
   simpleTransTex: Texture | null;
   simpleTransHoverTex: Texture | null;
+
+  [key: string]: Texture | null;
 }
 
 export interface HighlightVisibility {
