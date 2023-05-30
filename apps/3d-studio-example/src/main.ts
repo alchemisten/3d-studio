@@ -193,13 +193,14 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
                 },
                 shadow: {
                   camera: {
-                    far: 10,
-                    near: 3,
+                    far: 30,
+                    near: 1,
                   },
                   mapSize: {
                     height: 2048,
                     width: 2048,
                   },
+                  normalBias: 0.005,
                 },
                 type: 'point',
               },

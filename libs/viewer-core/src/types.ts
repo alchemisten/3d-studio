@@ -242,6 +242,7 @@ export interface LightSetupModel {
     z: number;
   };
   shadow?: {
+    bias?: number;
     camera?: {
       far?: number;
       near?: number;
@@ -251,6 +252,8 @@ export interface LightSetupModel {
       height: number;
       width: number;
     };
+    normalBias?: number;
+    radius?: number;
   };
   type: LightType;
 }

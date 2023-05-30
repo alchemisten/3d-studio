@@ -33,9 +33,9 @@ export class HighlightFeature implements IHighlightFeature {
   private debugHighlight: Highlight | null = null;
   private dragThreshold = 0.01;
   private enabled!: boolean;
-  private readonly enabled$: Subject<boolean>;
+  private readonly enabled$!: Subject<boolean>;
   private readonly EPS = 0.000001;
-  private focusedHighlight$: Subject<Highlight | null>;
+  private focusedHighlight$!: Subject<Highlight | null>;
   private FOVAnimateSpeed = 6;
   private fovTarget = 90;
   private highlights: Highlight[] = [];
@@ -66,6 +66,11 @@ export class HighlightFeature implements IHighlightFeature {
     @inject(SceneServiceToken) private sceneService: ISceneService
   ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Feature: 'Highlight' } } });
+    if (!document || !window) {
+      this.logger.warn('Highlight feature only available in browser environment');
+      return;
+    }
+
     this.enabled$ = new Subject<boolean>();
     this.focusedHighlight$ = new Subject<Highlight | null>();
     this.controlService.getControls().subscribe((controls) => {
