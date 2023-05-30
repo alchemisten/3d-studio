@@ -88,6 +88,17 @@ export class LightService implements ILightService {
         if (setup.position) {
           pointLight.position.set(setup.position.x, setup.position.y, setup.position.z);
         }
+        pointLight.castShadow = setup.castShadow ?? false;
+        if (setup.shadow) {
+          if (setup.shadow.camera) {
+            pointLight.shadow.camera.far = setup.shadow.camera.far ?? 500;
+            pointLight.shadow.camera.near = setup.shadow.camera.near ?? 0.5;
+          }
+          if (setup.shadow.mapSize) {
+            pointLight.shadow.mapSize.height = setup.shadow.mapSize.height;
+            pointLight.shadow.mapSize.width = setup.shadow.mapSize.width;
+          }
+        }
         return pointLight;
       }
       case LightType.Spot: {

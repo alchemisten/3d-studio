@@ -169,7 +169,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
         ],
       },
       LightScenarioFeature: {
-        enabled: false,
+        enabled: true,
         initialScenarioId: 'performance',
         scenarios: [
           {
@@ -182,36 +182,32 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             lights: {},
             lightSetups: [
               {
-                shadowMap: 2048,
-                intensity: 1,
+                castShadow: true,
                 color: '#ffffff',
+                intensity: 1,
+                name: 'PointLight',
                 position: {
                   x: 5,
                   y: 5,
                   z: 5,
                 },
-                onlyShadow: false,
-                castShadow: true,
-                shadowFar: 15,
+                shadow: {
+                  camera: {
+                    far: 10,
+                    near: 3,
+                  },
+                  mapSize: {
+                    height: 2048,
+                    width: 2048,
+                  },
+                },
                 type: 'point',
-                hasShadow: true,
-                shadowNear: 1,
               },
               {
-                shadowMap: 0,
                 intensity: 0.3,
                 color: '#777777',
-                position: {
-                  x: 0,
-                  y: 0,
-                  z: 0,
-                },
-                onlyShadow: false,
-                castShadow: false,
-                shadowFar: 0,
+                name: 'AmbientLight',
                 type: 'ambient',
-                hasShadow: false,
-                shadowNear: 0,
               },
             ],
           },
@@ -221,8 +217,10 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
     },
     objects: [
       {
+        castShadow: true,
         name: 'Milk-Truck',
         path: 'assets/models/coolbox/COOLBOX--36-412.gltf',
+        receiveShadow: true,
         scale: 4,
       },
     ],

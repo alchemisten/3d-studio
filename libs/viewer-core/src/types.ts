@@ -30,9 +30,11 @@ export interface ViewerConfigModel {
   render?: Partial<RenderConfigModel>;
 }
 export interface ObjectSetupModel {
+  castShadow?: boolean;
   name?: string;
   path: string;
   scale?: number;
+  receiveShadow?: boolean;
 }
 
 export interface ProjectConfigModel {

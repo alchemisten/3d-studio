@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { Group, Object3D, Scene } from 'three';
+import { Group, Mesh, Object3D, Scene } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
@@ -27,11 +27,8 @@ export class SceneService implements ISceneService {
   }
 
   public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {
-    if (objectSetup?.name) {
-      object.name = objectSetup.name;
-    }
-    if (objectSetup?.scale) {
-      object.scale.setScalar(objectSetup.scale);
+    if (objectSetup) {
+      this.applyObjectSetup(object, objectSetup);
     }
     this.group.add(object);
     this.logger.debug('Object added', { objects: object });
@@ -49,5 +46,25 @@ export class SceneService implements ISceneService {
       }
     });
     this.objects$.next(this.group.children);
+  }
+
+  private applyObjectSetup(object: Object3D, objectSetup: ObjectSetupModel): void {
+    if (objectSetup.castShadow || objectSetup.receiveShadow) {
+      object.traverse((child) => {
+        if (child instanceof Mesh) {
+          child.castShadow = objectSetup?.castShadow ?? false;
+          child.receiveShadow = objectSetup?.receiveShadow ?? false;
+        }
+      });
+    }
+    if (objectSetup.name) {
+      object.name = objectSetup.name;
+    }
+    if (objectSetup.receiveShadow) {
+      object.receiveShadow = objectSetup.receiveShadow;
+    }
+    if (objectSetup.scale) {
+      object.scale.setScalar(objectSetup.scale);
+    }
   }
 }

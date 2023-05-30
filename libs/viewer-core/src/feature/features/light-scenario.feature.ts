@@ -94,6 +94,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
     this.lightService.removeLights();
     this.lightService.addLights(this.activeScenario.lights);
     this.activeScenario$.next(this.activeScenario);
+    this.logger.debug('Set active light scenario', { objects: [this.activeScenario] });
   }
 
   public setEnabled(enabled: boolean): void {
