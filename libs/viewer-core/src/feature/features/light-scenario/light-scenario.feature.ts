@@ -3,16 +3,10 @@ import type { Light } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import type { ILogger } from '@schablone/logging';
-import type {
-  ILightScenarioFeature,
-  ILightService,
-  ILoggerService,
-  LightScenarioFeatureConfig,
-  LightScenarioId,
-  LightScenarioModel,
-} from '../../types';
-import { LightService, MissingLightScenarioError } from '../../core';
-import { LightScenarioFeatureToken, LightServiceToken, LoggerServiceToken } from '../../util';
+import type { ILightService, ILoggerService } from '../../../types';
+import { LightService, MissingLightScenarioError } from '../../../core';
+import { LightScenarioFeatureToken, LightServiceToken, LoggerServiceToken } from '../../../util';
+import type { ILightScenarioFeature, LightScenarioFeatureConfig, LightScenarioId, LightScenarioModel } from './types';
 
 /**
  * When enabled, allows to switch between the provided light scenarios. Each

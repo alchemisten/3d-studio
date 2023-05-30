@@ -54,16 +54,6 @@ export interface SizeModel {
 export type I18nTranslations = Record<string, string>;
 export type I18nLanguageMap = Record<string, I18nTranslations>;
 
-export type LightScenarioId = string;
-export interface LightScenarioModel {
-  i18n: I18nLanguageMap;
-  id: LightScenarioId;
-  lights: Record<string, Light>;
-  lightSetups?: LightSetupModel[];
-  backgroundEnvironment?: string; // Background image or skybox
-  reflectionEnvironment?: WebGLCubeRenderTarget;
-}
-
 export type UIControlId = string;
 export interface UIControlModel {
   controls?: UIControlModel[];
@@ -114,30 +104,6 @@ export interface IFeature {
   getEnabled(): Observable<boolean>;
   init(config: FeatureConfig): void;
   setEnabled(enabled: boolean): void;
-}
-
-export interface LightScenarioFeatureConfig extends FeatureConfig {
-  initialScenarioId: string;
-  makeStudioDefaultSelectable?: boolean;
-  scenarios: LightScenarioModel[];
-}
-
-export interface ILightScenarioFeature extends IFeature {
-  getActiveScenario(): Observable<LightScenarioModel>;
-  getLightScenarios(): LightScenarioModel[];
-  setActiveScenario(id: LightScenarioId): void;
-}
-
-export interface CameraRotationFeatureConfig extends FeatureConfig {
-  rotationSpeed?: number;
-}
-export interface ICameraRotationFeature extends IFeature {
-  setRotationEnabled(enabled: boolean): void;
-  setRotationSpeed(speed: number): void;
-}
-
-export interface IWireframeFeature extends IFeature {
-  setWireframeEnabled(enabled: boolean): void;
 }
 
 export interface IMaterialChangeFeature extends IFeature {
