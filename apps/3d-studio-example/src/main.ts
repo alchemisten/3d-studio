@@ -214,6 +214,10 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
           },
         ],
       },
+      SkyboxFeature: {
+        enabled: true,
+        skyboxPath: 'blurry',
+      },
       WireframeFeature: { enabled: false },
     },
     objects: [

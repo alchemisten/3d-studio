@@ -19,5 +19,6 @@ export const MaterialChangeFeatureToken = Symbol.for('MaterialChangeFeature');
 export const MaterialServiceToken = Symbol.for('MaterialService');
 export const RenderServiceToken = Symbol.for('RenderService');
 export const SceneServiceToken = Symbol.for('SceneService');
+export const SkyboxFeatureToken = Symbol.for('SkyboxFeature');
 export const ViewerToken = Symbol.for('Viewer');
 export const WireframeFeatureToken = Symbol.for('WireframeFeature');

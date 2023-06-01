@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
 import {
+  CubeTexture,
+  CubeTextureLoader,
   EquirectangularReflectionMapping,
   LoadingManager,
   Object3D,
@@ -28,6 +30,7 @@ import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
 @injectable()
 export class AssetService implements IAssetService {
   public readonly hookObjectLoaded$: Observable<Object3D>;
+  private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
   private readonly objectLoaded$: Subject<Object3D>;
@@ -45,6 +48,7 @@ export class AssetService implements IAssetService {
       this.onLoadingProgress.bind(this),
       this.onLoadingError.bind(this)
     );
+    this.cubeTextureLoader = new CubeTextureLoader(this.loadingManager);
     this.dracoLoader = new DRACOLoader(this.loadingManager);
     this.dracoLoader.setDecoderPath(Constants.DRACO_GOOGLE_STATIC_DECODER_URL);
     this.gltfLoader = new GLTFLoader(this.loadingManager);
@@ -52,6 +56,24 @@ export class AssetService implements IAssetService {
     this.textureLoader = new TextureLoader(this.loadingManager);
     this.objectLoaded$ = new Subject();
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
+  }
+
+  public loadCubeTexture(envName: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
+    const path = `assets/textures/environments/${envName}/`;
+    const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
+
+    return new Promise((resolve, reject) => {
+      this.cubeTextureLoader.setPath(path).load(
+        directions.map((direction) => direction + imageSuffix),
+        (texture) => {
+          resolve(texture);
+        },
+        () => undefined,
+        (error) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {

@@ -3,6 +3,7 @@ import type {
   AnimationMixer,
   Color,
   ColorSpace,
+  CubeTexture,
   Light,
   Material,
   Object3D,
@@ -140,6 +141,7 @@ export interface IAnimationService {
 
 export interface IAssetService {
   readonly hookObjectLoaded$: Observable<Object3D>;
+  loadCubeTexture(envName: string, imageSuffix?: string): Promise<CubeTexture>;
   loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;
   loadTexture(path: string): Promise<Texture>;
