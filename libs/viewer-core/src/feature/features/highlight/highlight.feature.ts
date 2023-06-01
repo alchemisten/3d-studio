@@ -22,6 +22,7 @@ import {
 } from './types';
 import Highlight from './highlight';
 import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Vector2, Vector3 } from 'three';
+import { withLatestFrom } from 'rxjs/operators';
 
 @injectable()
 export class HighlightFeature implements IHighlightFeature {
@@ -81,32 +82,45 @@ export class HighlightFeature implements IHighlightFeature {
       this.baseFov = this.camera.fov;
     });
     this.highlightGroup.name = 'highlights';
+  }
 
+  public init(config: HighlightFeatureConfig) {
+    this.logger.debug('Initializing with config', { objects: config });
+    this.enabled = config.enabled;
+    this.highlightsVisible = config.highlightsVisible ?? true;
+    if (config.groupScale) {
+      this.highlightGroup.scale.setScalar(config.groupScale);
+    }
+    this.createHighlights(config.highlightSetup).then();
+    this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
+      if (enabled) {
+        this.update();
+      }
+    });
     document.addEventListener('touchstart', (event) => {
       if (event.touches && event.touches.length > 0) {
         this.onDocumentMouseDown(event);
       }
     });
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false);
-    document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
-  }
 
-  public init(config: HighlightFeatureConfig) {
-    this.enabled = config.enabled;
-    this.enabled$.next(this.enabled);
-    this.highlightsVisible = config.highlightsVisible ?? true;
-    this.logger.debug('Initializing with config', { objects: config });
-    if (config.groupScale) {
-      this.highlightGroup.scale.setScalar(config.groupScale);
+    if (this.enabled) {
+      this.sceneService.addObjectToScene(this.highlightGroup);
+      document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
     }
-    this.addHighlightsToScene(config.highlightSetup).then();
-    this.renderService.hookAfterRender$.subscribe(() => {
-      this.update();
-    });
+
+    this.enabled$.next(this.enabled);
   }
 
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
+    if (enabled) {
+      this.sceneService.addObjectToScene(this.highlightGroup);
+      document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
+    } else {
+      this.sceneService.removeObjectFromScene('highlights');
+      document.removeEventListener('mousemove', this.onDocumentMouseMove);
+    }
     this.enabled$.next(this.enabled);
   }
 
@@ -132,8 +146,7 @@ export class HighlightFeature implements IHighlightFeature {
     return this.highlights;
   }
 
-  private async addHighlightsToScene(setups: HighlightSetupModel[]) {
-    this.sceneService.addObjectToScene(this.highlightGroup);
+  private async createHighlights(setups: HighlightSetupModel[]) {
     const textures: HighlightTextureMap = {
       actionTransTex: null,
       actionTransHoverTex: null,
