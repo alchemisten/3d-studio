@@ -39,12 +39,12 @@ export interface ObjectSetupModel {
 }
 
 export interface ProjectConfigModel {
-  basedir: string;
-  folder: string;
-  introText: I18nLanguageMap;
-  languages: string[];
-  name: string;
-  projectID: string;
+  basedir?: string;
+  folder?: string;
+  introText?: I18nLanguageMap;
+  languages?: string[];
+  name?: string;
+  projectID?: string;
 }
 
 export interface SizeModel {

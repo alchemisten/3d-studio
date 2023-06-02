@@ -15,7 +15,8 @@ import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { IAssetService, ILoggerService, IRenderService } from '../../types';
-import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
+import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
+import type { ConfigService } from './config.service';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -30,6 +31,7 @@ import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
 @injectable()
 export class AssetService implements IAssetService {
   public readonly hookObjectLoaded$: Observable<Object3D>;
+  private basePath = '';
   private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
@@ -39,6 +41,7 @@ export class AssetService implements IAssetService {
   private readonly textureLoader: TextureLoader;
 
   public constructor(
+    @inject(ConfigServiceToken) private configService: ConfigService,
     @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
@@ -56,14 +59,16 @@ export class AssetService implements IAssetService {
     this.textureLoader = new TextureLoader(this.loadingManager);
     this.objectLoaded$ = new Subject();
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
+    this.configService.getConfig().subscribe((config) => {
+      this.basePath = config.project?.basedir ? `${config.project.basedir}/` : '';
+    });
   }
 
-  public loadCubeTexture(envName: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
-    const path = `assets/textures/environments/${envName}/`;
+  public loadCubeTexture(path: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
     const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
 
     return new Promise((resolve, reject) => {
-      this.cubeTextureLoader.setPath(path).load(
+      this.cubeTextureLoader.setPath(`${this.basePath}${path}/`).load(
         directions.map((direction) => direction + imageSuffix),
         (texture) => {
           resolve(texture);
@@ -103,7 +108,7 @@ export class AssetService implements IAssetService {
   public loadTexture(path: string): Promise<Texture> {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
-        path,
+        `${this.basePath}${path}`,
         (texture) => {
           resolve(texture);
         },
@@ -118,7 +123,7 @@ export class AssetService implements IAssetService {
   private loadGLTF(path: string): Promise<GLTF> {
     return new Promise((resolve, reject) => {
       this.gltfLoader.load(
-        path,
+        `${this.basePath}${path}`,
         (gltf: GLTF) => {
           this.logger.debug('GLTF loaded', { objects: gltf });
           resolve(gltf);

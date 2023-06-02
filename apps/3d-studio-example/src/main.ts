@@ -216,7 +216,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       },
       SkyboxFeature: {
         enabled: true,
-        skyboxPath: 'blurry',
+        skyboxPath: 'assets/textures/environments/blurry',
       },
       WireframeFeature: { enabled: false },
     },
@@ -230,7 +230,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       },
     ],
     project: {
-      basedir: 'localhost:9000',
+      basedir: 'http://127.0.0.1:4200',
       folder: 'test123',
       introText: {
         de: {
