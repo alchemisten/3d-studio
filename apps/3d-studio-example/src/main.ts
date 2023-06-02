@@ -80,7 +80,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             id: 2073,
             pos: {
-              x: 0.127234,
+              x: 0.227234,
               y: 0.206625,
               z: -0.202012,
             },
@@ -224,9 +224,9 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       {
         castShadow: true,
         name: 'Milk-Truck',
-        path: 'assets/models/coolbox/COOLBOX--36-412.gltf',
+        path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
         receiveShadow: true,
-        scale: 4,
+        scale: 0.5,
       },
     ],
     project: {
