@@ -1,16 +1,26 @@
 import { injectable } from 'inversify';
 import type { Container, interfaces } from 'inversify';
-import type {
-  ICameraRotationFeature,
-  IFeature,
-  IFeatureRegistryService,
-  ILightScenarioFeature,
-  IWireframeFeature,
-} from '../../types';
+import type { IFeature, IFeatureRegistryService } from '../../types';
 import { coreFeatures } from '../core-feature.map';
 import { FeatureAlreadyRegisteredError, FeatureNotRegisteredError, MissingDIContainerError } from '../../core';
-import { CameraRotationFeature, LightScenarioFeature, WireframeFeature } from '../features';
-import { CameraRotationFeatureToken, LightScenarioFeatureToken, WireframeFeatureToken } from '../../util';
+import {
+  CameraRotationFeature,
+  HighlightFeature,
+  ICameraRotationFeature,
+  IHighlightFeature,
+  ILightScenarioFeature,
+  IWireframeFeature,
+  LightScenarioFeature,
+  SkyboxFeature,
+  WireframeFeature,
+} from '../features';
+import {
+  CameraRotationFeatureToken,
+  HighlightFeatureToken,
+  LightScenarioFeatureToken,
+  SkyboxFeatureToken,
+  WireframeFeatureToken,
+} from '../../util';
 
 /**
  * The feature registry service maintains a record of all features available
@@ -60,7 +70,9 @@ export class FeatureRegistryService implements IFeatureRegistryService {
       .bind<ICameraRotationFeature>(CameraRotationFeatureToken)
       .to(CameraRotationFeature)
       .inSingletonScope();
+    this.containerDI.bind<IHighlightFeature>(HighlightFeatureToken).to(HighlightFeature).inSingletonScope();
     this.containerDI.bind<ILightScenarioFeature>(LightScenarioFeatureToken).to(LightScenarioFeature).inSingletonScope();
+    this.containerDI.bind<IFeature>(SkyboxFeatureToken).to(SkyboxFeature).inSingletonScope();
     this.containerDI.bind<IWireframeFeature>(WireframeFeatureToken).to(WireframeFeature).inSingletonScope();
   }
 }

@@ -119,7 +119,7 @@ export class ViewerLauncher implements IViewerLauncher {
   }
 
   /**
-   * Adds the provided feature to the feature registry so it can be used in
+   * Adds the provided feature to the feature registry, so it can be used in
    * the viewer. The feature has to be an inversify service and implement the
    * IFeature interface.
    *

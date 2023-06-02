@@ -3,6 +3,7 @@ import type {
   AnimationMixer,
   Color,
   ColorSpace,
+  CubeTexture,
   Light,
   Material,
   Object3D,
@@ -10,7 +11,6 @@ import type {
   Scene,
   ShadowMapType,
   Texture,
-  Vector2,
   Vector3,
   WebGLCubeRenderTarget,
   WebGLRenderer,
@@ -31,17 +31,20 @@ export interface ViewerConfigModel {
   render?: Partial<RenderConfigModel>;
 }
 export interface ObjectSetupModel {
-  name: string;
+  castShadow?: boolean;
+  name?: string;
   path: string;
+  scale?: number;
+  receiveShadow?: boolean;
 }
 
 export interface ProjectConfigModel {
-  basedir: string;
-  folder: string;
-  introText: I18nLanguageMap;
-  languages: string[];
-  name: string;
-  projectID: string;
+  basedir?: string;
+  folder?: string;
+  introText?: I18nLanguageMap;
+  languages?: string[];
+  name?: string;
+  projectID?: string;
 }
 
 export interface SizeModel {
@@ -51,29 +54,6 @@ export interface SizeModel {
 
 export type I18nTranslations = Record<string, string>;
 export type I18nLanguageMap = Record<string, I18nTranslations>;
-
-export type HighlightWorldPosition = { positionType: 'WORLD'; position: Vector3 };
-export type HighlightScreenPosition = { positionType: 'SCREEN'; position: Vector2 };
-export type HighlightModelId = string;
-export type HighlightModel = {
-  cameraPosition: Vector3;
-  cameraTarget: Vector3;
-  description: string;
-  i18n: I18nLanguageMap;
-  id: HighlightModelId;
-  name: string;
-  object: Object3D;
-} & (HighlightWorldPosition | HighlightScreenPosition);
-
-export type LightScenarioId = string;
-export interface LightScenarioModel {
-  i18n: I18nLanguageMap;
-  id: LightScenarioId;
-  lights: Record<string, Light>;
-  lightSetups?: LightSetupModel[];
-  backgroundEnvironment?: string; // Background image or skybox
-  reflectionEnvironment?: WebGLCubeRenderTarget;
-}
 
 export type UIControlId = string;
 export interface UIControlModel {
@@ -127,36 +107,6 @@ export interface IFeature {
   setEnabled(enabled: boolean): void;
 }
 
-export interface LightScenarioFeatureConfig extends FeatureConfig {
-  initialScenarioId: string;
-  makeStudioDefaultSelectable?: boolean;
-  scenarios: LightScenarioModel[];
-}
-
-export interface ILightScenarioFeature extends IFeature {
-  getActiveScenario(): Observable<LightScenarioModel>;
-  getLightScenarios(): LightScenarioModel[];
-  setActiveScenario(id: LightScenarioId): void;
-}
-
-export interface IHighlightFeature extends IFeature {
-  focusHighlight(id: HighlightModelId): void;
-  getFocusedHighlight(): Observable<HighlightModel | null>;
-  getHighlights(): HighlightModel[];
-}
-
-export interface CameraRotationFeatureConfig extends FeatureConfig {
-  rotationSpeed?: number;
-}
-export interface ICameraRotationFeature extends IFeature {
-  setRotationEnabled(enabled: boolean): void;
-  setRotationSpeed(speed: number): void;
-}
-
-export interface IWireframeFeature extends IFeature {
-  setWireframeEnabled(enabled: boolean): void;
-}
-
 export interface IMaterialChangeFeature extends IFeature {
   addNewMaterial(material: Material): void;
   assignMaterialToSlot(slotName: string, material: Material): void;
@@ -191,6 +141,7 @@ export interface IAnimationService {
 
 export interface IAssetService {
   readonly hookObjectLoaded$: Observable<Object3D>;
+  loadCubeTexture(envName: string, imageSuffix?: string): Promise<CubeTexture>;
   loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;
   loadTexture(path: string): Promise<Texture>;
@@ -273,7 +224,7 @@ export interface IRenderService {
 
 export interface ISceneService {
   readonly scene: Scene;
-  addObjectToScene(object: Object3D): void;
+  addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void;
   getObjects(): Observable<Object3D[]>;
   removeObjectFromScene(objectName: string): void;
 }
@@ -293,6 +244,7 @@ export interface LightSetupModel {
     z: number;
   };
   shadow?: {
+    bias?: number;
     camera?: {
       far?: number;
       near?: number;
@@ -302,6 +254,8 @@ export interface LightSetupModel {
       height: number;
       width: number;
     };
+    normalBias?: number;
+    radius?: number;
   };
   type: LightType;
 }

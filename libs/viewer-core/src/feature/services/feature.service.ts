@@ -8,6 +8,7 @@ import type {
   IFeatureService,
   ILoggerService,
 } from '../../types';
+import type { ILogger } from '@schablone/logging';
 import { ConfigServiceToken, FeatureRegistryServiceToken, LoggerServiceToken } from '../../util';
 
 /**
@@ -18,12 +19,14 @@ import { ConfigServiceToken, FeatureRegistryServiceToken, LoggerServiceToken } f
 export class FeatureService implements IFeatureService {
   private features: IFeature[];
   private features$: BehaviorSubject<IFeature[]>;
+  private readonly logger: ILogger;
 
   public constructor(
     @inject(ConfigServiceToken) private configService: IConfigService,
     @inject(FeatureRegistryServiceToken) private featureRegistry: IFeatureRegistryService,
-    @inject(LoggerServiceToken) private logger: ILoggerService
+    @inject(LoggerServiceToken) logger: ILoggerService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Feature' } } });
     this.features = [];
     this.features$ = new BehaviorSubject<IFeature[]>(this.features);
     this.configService.getConfig().subscribe((config) => {

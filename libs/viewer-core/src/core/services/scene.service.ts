@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
-import { Group, Object3D, Scene } from 'three';
+import { Group, Mesh, Object3D, Scene } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { ILoggerService, ISceneService } from '../../types';
+import type { ILogger } from '@schablone/logging';
+import type { ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
 import { LoggerServiceToken } from '../../util';
 
 /**
@@ -13,9 +14,11 @@ import { LoggerServiceToken } from '../../util';
 export class SceneService implements ISceneService {
   public readonly scene: Scene;
   private readonly group: Object3D;
+  private readonly logger: ILogger;
   private objects$: BehaviorSubject<Object3D[]>;
 
-  public constructor(@inject(LoggerServiceToken) private logger: ILoggerService) {
+  public constructor(@inject(LoggerServiceToken) logger: ILoggerService) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Scene' } } });
     this.scene = new Scene();
     this.group = new Group();
     this.group.name = 'objects';
@@ -23,9 +26,12 @@ export class SceneService implements ISceneService {
     this.objects$ = new BehaviorSubject<Object3D[]>(this.group.children);
   }
 
-  public addObjectToScene(object: Object3D): void {
+  public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {
+    if (objectSetup) {
+      this.applyObjectSetup(object, objectSetup);
+    }
     this.group.add(object);
-    this.logger.debug('Object added', { objects: this.group });
+    this.logger.debug('Object added', { objects: object });
     this.objects$.next(this.group.children);
   }
 
@@ -40,5 +46,25 @@ export class SceneService implements ISceneService {
       }
     });
     this.objects$.next(this.group.children);
+  }
+
+  private applyObjectSetup(object: Object3D, objectSetup: ObjectSetupModel): void {
+    if (objectSetup.castShadow || objectSetup.receiveShadow) {
+      object.traverse((child) => {
+        if (child instanceof Mesh) {
+          child.castShadow = objectSetup?.castShadow ?? false;
+          child.receiveShadow = objectSetup?.receiveShadow ?? false;
+        }
+      });
+    }
+    if (objectSetup.name) {
+      object.name = objectSetup.name;
+    }
+    if (objectSetup.receiveShadow) {
+      object.receiveShadow = objectSetup.receiveShadow;
+    }
+    if (objectSetup.scale) {
+      object.scale.setScalar(objectSetup.scale);
+    }
   }
 }

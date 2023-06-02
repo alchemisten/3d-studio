@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
 import {
+  CubeTexture,
+  CubeTextureLoader,
   EquirectangularReflectionMapping,
   LoadingManager,
   Object3D,
@@ -11,8 +13,10 @@ import {
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Observable, Subject } from 'rxjs';
+import type { ILogger } from '@schablone/logging';
 import type { IAssetService, ILoggerService, IRenderService } from '../../types';
-import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
+import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
+import type { ConfigService } from './config.service';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -27,21 +31,27 @@ import { Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
 @injectable()
 export class AssetService implements IAssetService {
   public readonly hookObjectLoaded$: Observable<Object3D>;
+  private basePath = '';
+  private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
   private readonly objectLoaded$: Subject<Object3D>;
   private readonly loadingManager: LoadingManager;
+  private readonly logger: ILogger;
   private readonly textureLoader: TextureLoader;
 
   public constructor(
-    @inject(LoggerServiceToken) private logger: ILoggerService,
+    @inject(ConfigServiceToken) private configService: ConfigService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Asset' } } });
     this.loadingManager = new LoadingManager(
       this.onLoadingComplete.bind(this),
       this.onLoadingProgress.bind(this),
       this.onLoadingError.bind(this)
     );
+    this.cubeTextureLoader = new CubeTextureLoader(this.loadingManager);
     this.dracoLoader = new DRACOLoader(this.loadingManager);
     this.dracoLoader.setDecoderPath(Constants.DRACO_GOOGLE_STATIC_DECODER_URL);
     this.gltfLoader = new GLTFLoader(this.loadingManager);
@@ -49,6 +59,26 @@ export class AssetService implements IAssetService {
     this.textureLoader = new TextureLoader(this.loadingManager);
     this.objectLoaded$ = new Subject();
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
+    this.configService.getConfig().subscribe((config) => {
+      this.basePath = config.project?.basedir ? `${config.project.basedir}/` : '';
+    });
+  }
+
+  public loadCubeTexture(path: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
+    const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
+
+    return new Promise((resolve, reject) => {
+      this.cubeTextureLoader.setPath(`${this.basePath}${path}/`).load(
+        directions.map((direction) => direction + imageSuffix),
+        (texture) => {
+          resolve(texture);
+        },
+        () => undefined,
+        (error) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {
@@ -78,7 +108,7 @@ export class AssetService implements IAssetService {
   public loadTexture(path: string): Promise<Texture> {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
-        path,
+        `${this.basePath}${path}`,
         (texture) => {
           resolve(texture);
         },
@@ -93,7 +123,7 @@ export class AssetService implements IAssetService {
   private loadGLTF(path: string): Promise<GLTF> {
     return new Promise((resolve, reject) => {
       this.gltfLoader.load(
-        path,
+        `${this.basePath}${path}`,
         (gltf: GLTF) => {
           this.logger.debug('GLTF loaded', { objects: gltf });
           resolve(gltf);

@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
+import type { ILogger } from '@schablone/logging';
 import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
 import { LoggerServiceToken, RenderServiceToken } from '../../util';
@@ -21,13 +22,15 @@ export class AnimationService implements IAnimationService {
   private readonly activeActions$: BehaviorSubject<AnimationAction[]>;
   private animationPlaying!: boolean;
   private readonly clock: Clock;
+  private readonly logger: ILogger;
   private readonly mixers: Record<string, AnimationMixer>;
   private readonly mixers$: BehaviorSubject<Record<string, AnimationMixer>>;
 
   public constructor(
-    @inject(LoggerServiceToken) private logger: ILoggerService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Animation' } } });
     this.animations = {};
     this.activeActions = [];
     this.activeActions$ = new BehaviorSubject<AnimationAction[]>(this.activeActions);

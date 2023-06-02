@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
 import { Observable, Subject } from 'rxjs';
-import type { FeatureConfig, IMaterialService, IWireframeFeature } from '../../types';
-import { MaterialServiceToken, WireframeFeatureToken } from '../../util';
+import type { FeatureConfig, IMaterialService } from '../../../types';
+import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
+import type { IWireframeFeature } from './types';
 
 /**
  * When enabled all materials of all objects in the scene will be set to

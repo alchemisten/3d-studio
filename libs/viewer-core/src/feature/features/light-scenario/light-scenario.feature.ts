@@ -2,16 +2,11 @@ import { inject, injectable } from 'inversify';
 import type { Light } from 'three';
 import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
-import type {
-  ILightScenarioFeature,
-  ILightService,
-  ILoggerService,
-  LightScenarioFeatureConfig,
-  LightScenarioId,
-  LightScenarioModel,
-} from '../../types';
-import { LightService, MissingLightScenarioError } from '../../core';
-import { LightScenarioFeatureToken, LightServiceToken, LoggerServiceToken } from '../../util';
+import type { ILogger } from '@schablone/logging';
+import type { ILightService, ILoggerService } from '../../../types';
+import { LightService, MissingLightScenarioError } from '../../../core';
+import { LightScenarioFeatureToken, LightServiceToken, LoggerServiceToken } from '../../../util';
+import type { ILightScenarioFeature, LightScenarioFeatureConfig, LightScenarioId, LightScenarioModel } from './types';
 
 /**
  * When enabled, allows to switch between the provided light scenarios. Each
@@ -30,11 +25,13 @@ export class LightScenarioFeature implements ILightScenarioFeature {
   private enabled!: boolean;
   private readonly enabled$: Subject<boolean>;
   private lightScenarios!: LightScenarioModel[];
+  private readonly logger: ILogger;
 
   public constructor(
     @inject(LightServiceToken) private lightService: ILightService,
-    @inject(LoggerServiceToken) private logger: ILoggerService
+    @inject(LoggerServiceToken) logger: ILoggerService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Feature: 'LightScenario' } } });
     this.activeScenario$ = new Subject<LightScenarioModel>();
     this.enabled$ = new Subject<boolean>();
   }
@@ -91,6 +88,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
     this.lightService.removeLights();
     this.lightService.addLights(this.activeScenario.lights);
     this.activeScenario$.next(this.activeScenario);
+    this.logger.debug('Set active light scenario', { objects: [this.activeScenario] });
   }
 
   public setEnabled(enabled: boolean): void {

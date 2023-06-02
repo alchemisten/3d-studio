@@ -74,7 +74,7 @@ export class Viewer implements IViewer {
 
     config.objects.forEach((object) => {
       this.assetService.loadObject(object.path).then((loaded) => {
-        this.sceneService.addObjectToScene(loaded);
+        this.sceneService.addObjectToScene(loaded, object);
         this.renderService.renderSingleFrame();
         this.animationService.addMixerForObject(loaded);
       });
