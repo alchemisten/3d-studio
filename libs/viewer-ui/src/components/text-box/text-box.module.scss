@@ -1,0 +1,21 @@
+.textBox {
+  background-color: var(--ui-color-element-background);
+  border-radius: var(--ui-size-border-radius);
+  position: absolute;
+  padding: var(--ui-size-box-padding);
+  width: calc(100vw - var(--ui-size-element-margin) * 2);
+
+  &.intro {
+    top: 50%;
+    left: 50%;
+    max-width: 390px;
+    transform: translate(-50%, -50%);
+  }
+
+  &.menu {
+    bottom: 125px;
+    max-height: calc(100vh - 125px - var(--ui-size-element-margin));
+    max-width: 270px;
+    right: var(--ui-size-element-margin);
+  }
+}

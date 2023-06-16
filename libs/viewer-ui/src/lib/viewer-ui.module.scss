@@ -1,10 +1,32 @@
 .viewerUi {
+  --ui-color-element-background: rgba(0,0,0,0.8);
+  --ui-color-interaction: #00c2ff;
+  --ui-font-color: #fff;
+  --ui-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  --ui-font-size: 16px;
+  --ui-size-border-radius: 10px;
+  --ui-size-box-padding: 22px;
+  --ui-size-button-size: 40px;
+  --ui-size-element-margin: 25px;
+  --ui-size-label-line-height: 50px;
+
+  box-sizing: border-box;
+  color: var(--ui-font-color);
+  font-family: var(--ui-font-family);
+  font-size: var(--ui-font-size);
   height: 100%;
   left: 0;
   overflow: hidden;
   position: absolute;
-  pointer-events: none;
-  width: 100%;
   top: 0;
+  width: 100%;
   z-index: 10;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &.clicked {
+    pointer-events: none;
+  }
 }
