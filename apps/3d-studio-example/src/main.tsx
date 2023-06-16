@@ -1,4 +1,8 @@
 import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
+
+import { StrictMode } from 'react';
+import * as ReactDOM from 'react-dom/client';
 
 (function () {
   const container = document.getElementById('viewer-container');
@@ -6,8 +10,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
     return;
   }
 
-  const launcher = new ViewerLauncher();
-  launcher.createHTMLViewer(container, {
+  const config = {
     features: {
       CameraRotationFeature: { enabled: false },
       HighlightFeature: {
@@ -244,5 +247,15 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
     render: {
       continuousRendering: true,
     },
-  });
+  };
+
+  const launcher = new ViewerLauncher();
+  const viewer = launcher.createHTMLViewer(container, config);
+
+  const root = ReactDOM.createRoot(document.getElementById('studio-ui') as HTMLElement);
+  root.render(
+    <StrictMode>
+      <ViewerUI viewer={viewer} />
+    </StrictMode>
+  );
 })();
