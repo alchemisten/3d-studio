@@ -12,7 +12,7 @@ import {
 } from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { IAssetService, ILoggerService, IRenderService } from '../../types';
 import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
@@ -35,6 +35,7 @@ export class AssetService implements IAssetService {
   private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
+  private readonly isLoading$: BehaviorSubject<boolean>;
   private readonly objectLoaded$: Subject<Object3D>;
   private readonly loadingManager: LoadingManager;
   private readonly logger: ILogger;
@@ -59,12 +60,18 @@ export class AssetService implements IAssetService {
     this.textureLoader = new TextureLoader(this.loadingManager);
     this.objectLoaded$ = new Subject();
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
+    this.isLoading$ = new BehaviorSubject(false);
     this.configService.getConfig().subscribe((config) => {
       this.basePath = config.project?.basedir ? `${config.project.basedir}/` : '';
     });
   }
 
+  public getIsLoading(): Observable<boolean> {
+    return this.isLoading$.asObservable();
+  }
+
   public loadCubeTexture(path: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
+    this.isLoading$.next(true);
     const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
 
     return new Promise((resolve, reject) => {
@@ -90,6 +97,7 @@ export class AssetService implements IAssetService {
   }
 
   public loadObject(path: string): Promise<Object3D> {
+    this.isLoading$.next(true);
     const [type] = path.split('.').slice(-1);
     switch (type) {
       case 'gltf':
@@ -106,6 +114,7 @@ export class AssetService implements IAssetService {
   }
 
   public loadTexture(path: string): Promise<Texture> {
+    this.isLoading$.next(true);
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
         `${this.basePath}${path}`,
@@ -145,6 +154,9 @@ export class AssetService implements IAssetService {
   }
 
   private onLoadingProgress(url: string, itemsLoaded: number, itemsTotal: number): void {
+    if (itemsLoaded === itemsTotal) {
+      this.isLoading$.next(false);
+    }
     this.logger.debug(`Finished file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
   }
 }

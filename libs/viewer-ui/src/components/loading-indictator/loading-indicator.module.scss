@@ -1,0 +1,75 @@
+.title {
+  color: #fff;
+  font-size: 32px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.bar {
+  background-clip: padding-box;
+  background-color: #000;
+  display: block;
+  height: 4px;
+  margin: 0.5rem 0 1rem;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.indeterminate {
+  background-color: var(--ui-color-loading-indicator);
+
+  &:after,
+  &:before {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    will-change: left,right;
+  }
+
+  &:after {
+    animation: indeterminate-short 2.1s cubic-bezier(.165,.84,.44,1) infinite;
+    animation-delay: 1.15s;
+  }
+
+  &:before {
+    animation: indeterminate 2.1s cubic-bezier(.65,.815,.735,.395) infinite;
+  }
+}
+
+@keyframes indeterminate {
+  0% {
+    left: -35%;
+    right: 100%
+  }
+
+  60% {
+    left: 100%;
+    right: -90%
+  }
+
+  to {
+    left: 100%;
+    right: -90%
+  }
+}
+
+@keyframes indeterminate-short {
+  0% {
+    left: -200%;
+    right: 100%
+  }
+
+  60% {
+    left: 107%;
+    right: -8%
+  }
+
+  to {
+    left: 107%;
+    right: -8%
+  }
+}

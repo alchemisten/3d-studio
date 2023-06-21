@@ -116,7 +116,16 @@ export interface IMaterialChangeFeature extends IFeature {
 }
 
 export interface IViewer {
+  animationService: IAnimationService;
+  assetService: IAssetService;
+  configService: IConfigService;
+  controlService: IControlService;
+  featureService: IFeatureService;
   init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement): void;
+  lightService: ILightService;
+  materialService: IMaterialService;
+  renderService: IRenderService;
+  sceneService: ISceneService;
 }
 
 export interface IViewerLauncher {
@@ -141,6 +150,7 @@ export interface IAnimationService {
 
 export interface IAssetService {
   readonly hookObjectLoaded$: Observable<Object3D>;
+  getIsLoading(): Observable<boolean>;
   loadCubeTexture(envName: string, imageSuffix?: string): Promise<CubeTexture>;
   loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;

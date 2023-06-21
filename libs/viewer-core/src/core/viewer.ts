@@ -35,15 +35,15 @@ export class Viewer implements IViewer {
   private node!: HTMLElement;
 
   public constructor(
-    @inject(AnimationServiceToken) private animationService: IAnimationService,
-    @inject(AssetServiceToken) private assetService: IAssetService,
-    @inject(ConfigServiceToken) private configService: IConfigService,
-    @inject(ControlServiceToken) private controlService: IControlService,
-    @inject(FeatureServiceToken) private featureService: IFeatureService,
-    @inject(LightServiceToken) private lightService: ILightService,
-    @inject(MaterialServiceToken) private materialService: IMaterialService,
-    @inject(RenderServiceToken) private renderService: IRenderService,
-    @inject(SceneServiceToken) private sceneService: ISceneService
+    @inject(AnimationServiceToken) public animationService: IAnimationService,
+    @inject(AssetServiceToken) public assetService: IAssetService,
+    @inject(ConfigServiceToken) public configService: IConfigService,
+    @inject(ControlServiceToken) public controlService: IControlService,
+    @inject(FeatureServiceToken) public featureService: IFeatureService,
+    @inject(LightServiceToken) public lightService: ILightService,
+    @inject(MaterialServiceToken) public materialService: IMaterialService,
+    @inject(RenderServiceToken) public renderService: IRenderService,
+    @inject(SceneServiceToken) public sceneService: ISceneService
   ) {}
 
   public init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement) {

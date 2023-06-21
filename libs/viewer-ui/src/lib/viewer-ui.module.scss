@@ -1,7 +1,8 @@
 .viewerUi {
   --ui-color-element-background: rgba(0,0,0,0.8);
+  --ui-color-font: #fff;
   --ui-color-interaction: #00c2ff;
-  --ui-font-color: #fff;
+  --ui-color-loading-indicator: #005cb1;
   --ui-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
   --ui-font-size: 16px;
   --ui-size-border-radius: 10px;
@@ -11,7 +12,7 @@
   --ui-size-label-line-height: 50px;
 
   box-sizing: border-box;
-  color: var(--ui-font-color);
+  color: var(--ui-color-font);
   font-family: var(--ui-font-family);
   font-size: var(--ui-font-size);
   height: 100%;
