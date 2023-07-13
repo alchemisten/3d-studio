@@ -1,0 +1,63 @@
+.animationBar {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.rangeSlider {
+  --animation-bar-height: 4px;
+  --animation-bar-handle-size: 24px;
+
+  bottom: 80px;
+  pointer-events: all;
+  height: 24px;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  z-index: 15;
+}
+
+.barWrapper {
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+  display: flex;
+  height: 100%;
+  justify-content: stretch;
+}
+
+.bar {
+  border-left: calc(var(--animation-bar-handle-size) / 2) solid var(--ui-color-interaction);
+  border-right: calc(var(--animation-bar-handle-size) / 2) solid var(--ui-color-font);
+  height: 4px;
+  position: relative;
+  width: 100%;
+}
+
+.handle {
+  background: var(--ui-color-font);
+  border: 5px solid var(--ui-color-interaction);
+  border-radius: 12px;
+  cursor: pointer;
+  height: var(--animation-bar-handle-size);
+  pointer-events: all;
+  position: relative;
+  top: calc((var(--animation-bar-handle-size) - var(--animation-bar-height)) * -0.5);
+  margin-left: calc(var(--animation-bar-handle-size) * -0.5);
+  width: var(--animation-bar-handle-size);
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  padding-bottom: var(--ui-size-element-margin);
+  padding-left: 90px;
+  padding-top: var(--ui-size-element-margin);
+}
