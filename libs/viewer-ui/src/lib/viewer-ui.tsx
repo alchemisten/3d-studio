@@ -7,8 +7,7 @@ import { Subscription } from 'rxjs';
 import { Controls, TextBox } from '../components';
 import { translations } from '../i18n';
 import { ViewerProvider } from '../provider/viewer.provider';
-import { LoadingIndicator } from '../components/loading-indictator/loading-indicator';
-import { AnimationBar } from '../components/animation-bar/animation-bar';
+import { AnimationBar, LoadingIndicator } from '../components';
 import styles from './viewer-ui.module.scss';
 
 export interface ViewerUIProps {
