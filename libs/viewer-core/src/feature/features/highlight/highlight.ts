@@ -13,6 +13,7 @@ import {
 import { ILogger } from '@schablone/logging';
 import type {
   HighlightAnimation,
+  HighlightModel,
   HighlightMount,
   HighlightSetupModel,
   HighlightSpeed,
@@ -21,7 +22,9 @@ import type {
 } from './types';
 import type { I18nLanguageMap } from '../../../types';
 
-export default class Highlight {
+export default class Highlight implements HighlightModel {
+  public cameraPosition: Vector3;
+  public cameraTarget: Vector3;
   public clickzone: Mesh;
   public id: string;
   public i18n: I18nLanguageMap;
@@ -29,7 +32,6 @@ export default class Highlight {
   public speed: HighlightSpeed;
   public visibility!: HighlightVisibility;
   private animation!: HighlightAnimation;
-  private cameraTarget: Vector3;
   private readonly color: ColorRepresentation;
   private fov: number;
   private hover: boolean;
@@ -38,7 +40,6 @@ export default class Highlight {
   private mount: HighlightMount;
   private nodes: Mesh[];
   private parent: Object3D;
-  private position: Vector3;
   private scale: number;
   private target: Vector3;
   private textures: HighlightTextureMap;
@@ -58,7 +59,7 @@ export default class Highlight {
     };
     this.nodes = [];
     this.parent = group;
-    this.position = new Vector3(highData.pos.x, highData.pos.y, highData.pos.z);
+    this.cameraPosition = new Vector3(highData.pos.x, highData.pos.y, highData.pos.z);
     this.scale = highData.scale || 1;
     this.speed = highData.speed || {
       fov: 6,
@@ -93,7 +94,7 @@ export default class Highlight {
               'position of object',
               wp,
               'hl pos',
-              this.position,
+              this.cameraPosition,
               this.getWorldPosition(this.clickzone),
             ],
           });
@@ -142,7 +143,7 @@ export default class Highlight {
   }
 
   public getPosition(): Vector3 {
-    return this.position;
+    return this.cameraPosition;
   }
 
   public getViewTarget(): Vector3 {
@@ -164,7 +165,7 @@ export default class Highlight {
 
     const sp1g = new SphereGeometry(0.15, 20, 20);
     const sphere = new Mesh(sp1g, wFrame);
-    sphere.position.copy(this.position);
+    sphere.position.copy(this.cameraPosition);
     sphere.scale.setScalar(this.scale);
 
     //Add rotation targets to sphere
@@ -217,7 +218,7 @@ export default class Highlight {
   }
 
   public setPosition(position: Vector3): void {
-    this.position = position;
+    this.cameraPosition = position;
     this.clickzone.position.copy(position);
   }
 
@@ -236,16 +237,16 @@ export default class Highlight {
         this.setColor(value);
         break;
       case 'posx':
-        this.position.x = value;
-        this.clickzone.position.setX(this.position.x);
+        this.cameraPosition.x = value;
+        this.clickzone.position.setX(this.cameraPosition.x);
         break;
       case 'posy':
-        this.position.y = value;
-        this.clickzone.position.setY(this.position.y);
+        this.cameraPosition.y = value;
+        this.clickzone.position.setY(this.cameraPosition.y);
         break;
       case 'posz':
-        this.position.z = value;
-        this.clickzone.position.setZ(this.position.z);
+        this.cameraPosition.z = value;
+        this.clickzone.position.setZ(this.cameraPosition.z);
         break;
       case 'scale':
         this.scale = value;

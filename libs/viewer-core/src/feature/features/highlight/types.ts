@@ -22,12 +22,9 @@ export type HighlightModelId = string;
 export type HighlightModel = {
   cameraPosition: Vector3;
   cameraTarget: Vector3;
-  description: string;
   i18n: I18nLanguageMap;
   id: HighlightModelId;
-  name: string;
-  object: Object3D;
-} & (HighlightWorldPosition | HighlightScreenPosition);
+};
 
 export interface HighlightSetupModel {
   animation?: HighlightAnimation;
@@ -101,5 +98,5 @@ export interface HighlightFeatureConfig extends FeatureConfig {
 export interface IHighlightFeature extends IFeature {
   focusHighlight(id: HighlightModelId): void;
   getFocusedHighlight(): Observable<Highlight | null>;
-  getHighlights(): Highlight[];
+  getHighlights(): Observable<Highlight[]>;
 }

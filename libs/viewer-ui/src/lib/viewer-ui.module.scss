@@ -1,10 +1,12 @@
 .viewerUi {
+  --ui-animation-time: 0.2s ease-in-out;
   --ui-color-element-background: rgba(0,0,0,0.8);
   --ui-color-font: #fff;
   --ui-color-interaction: #00c2ff;
   --ui-color-loading-indicator: #005cb1;
   --ui-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
   --ui-font-size: 16px;
+  --ui-select-box-width: 310px;
   --ui-size-border-radius: 10px;
   --ui-size-box-padding: 22px;
   --ui-size-button-size: 40px;
@@ -25,6 +27,28 @@
 
   * {
     box-sizing: border-box;
+  }
+
+  button {
+    align-items: center;
+    appearance: none;
+    background: var(--ui-color-element-background);
+    border: none;
+    color: var(--ui-color-font);
+    cursor: pointer;
+    display: flex;
+    font-family: var(--ui-font-family);
+    font-size: 14px;
+    height: var(--ui-size-button-size);
+    justify-content: center;
+    padding: 0;
+    pointer-events: all;
+    transition: background-color var(--ui-animation-time);
+
+
+    &:hover {
+      background: var(--ui-color-interaction);
+    }
   }
 
   &.clicked {

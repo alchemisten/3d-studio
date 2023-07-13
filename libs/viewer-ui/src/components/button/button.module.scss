@@ -1,21 +1,5 @@
 .button {
-  align-items: center;
-  appearance: none;
-  background: var(--ui-color-element-background);
-  border: none;
   border-radius: calc(var(--ui-size-button-size) / 2);
-  color: var(--ui-color-font);
-  cursor: pointer;
-  display: flex;
-  font-family: var(--ui-font-family);
-  font-size: 14px;
-  height: var(--ui-size-button-size);
-  justify-content: center;
-  pointer-events: all;
   text-transform: uppercase;
   width: var(--ui-size-button-size);
-
-  &:hover {
-    background: var(--ui-color-interaction);
-  }
 }

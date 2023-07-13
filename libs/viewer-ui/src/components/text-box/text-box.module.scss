@@ -18,4 +18,10 @@
     max-width: 270px;
     right: var(--ui-size-element-margin);
   }
+
+  &.highlight {
+    left: var(--ui-size-element-margin);
+    bottom: 300px;
+    max-width: 350px;
+  }
 }

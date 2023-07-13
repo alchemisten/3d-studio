@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ILogger } from '@schablone/logging';
 
@@ -39,6 +39,7 @@ export class HighlightFeature implements IHighlightFeature {
   private focusedHighlight$!: Subject<Highlight | null>;
   private FOVAnimateSpeed = 6;
   private fovTarget = 90;
+  private highlights$!: BehaviorSubject<Highlight[]>;
   private highlights: Highlight[] = [];
   private highlightsVisible!: boolean;
   private readonly highlightGroup: Group = new Group();
@@ -74,6 +75,7 @@ export class HighlightFeature implements IHighlightFeature {
 
     this.enabled$ = new Subject<boolean>();
     this.focusedHighlight$ = new Subject<Highlight | null>();
+    this.highlights$ = new BehaviorSubject<Highlight[]>(this.highlights);
     this.controlService.getControls().subscribe((controls) => {
       this.controls = controls;
     });
@@ -91,7 +93,9 @@ export class HighlightFeature implements IHighlightFeature {
     if (config.groupScale) {
       this.highlightGroup.scale.setScalar(config.groupScale);
     }
-    this.createHighlights(config.highlightSetup).then();
+    this.createHighlights(config.highlightSetup).then(() => {
+      this.highlights$.next(this.highlights);
+    });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
       if (enabled) {
         this.update();
@@ -128,7 +132,6 @@ export class HighlightFeature implements IHighlightFeature {
     const highlight = this.highlights.find((h) => h.id === id);
     if (highlight) {
       this.dispatchHighlightClick(highlight);
-      this.focusedHighlight$.next(highlight);
     } else {
       this.logger.warn(`Couldn't focus highlight with id ${id}.`);
     }
@@ -142,8 +145,8 @@ export class HighlightFeature implements IHighlightFeature {
     return this.focusedHighlight$.asObservable();
   }
 
-  public getHighlights(): Highlight[] {
-    return this.highlights;
+  public getHighlights(): Observable<Highlight[]> {
+    return this.highlights$.asObservable();
   }
 
   private async createHighlights(setups: HighlightSetupModel[]) {
@@ -328,6 +331,7 @@ export class HighlightFeature implements IHighlightFeature {
   private handleMove = (newPos: Vector2): void => {
     if (this.startPos.distanceTo(newPos) > this.dragThreshold && this.state !== HighlightMode.TO_ORBIT) {
       this.state = HighlightMode.TO_ORBIT;
+      this.focusedHighlight$.next(null);
       // this.dispatcher.dispatch("onstate", this.state);
       this.addListeners('wheel');
       this.controls.position0 = this.camera.position.clone();
@@ -462,6 +466,7 @@ export class HighlightFeature implements IHighlightFeature {
 
   private setPOI(highlight: Highlight): void {
     this.logger.debug('Going to highlight', { objects: highlight.id });
+    this.focusedHighlight$.next(highlight);
 
     this.state = HighlightMode.TO_HIGHLIGHT;
     // this.dispatcher.dispatch("onstate", scope.state);

@@ -1,0 +1,47 @@
+.selectBox {
+  bottom: var(--ui-size-element-margin);
+  display: flex;
+  justify-content: stretch;
+  left: 50%;
+  max-width: var(--ui-select-box-width);
+  pointer-events: all;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+.prev,
+.next {
+  flex: 0 0 auto;
+  width: 25px;
+}
+
+.prev {
+  border-radius: var(--ui-size-border-radius) 0 0 var(--ui-size-border-radius);
+}
+
+.next {
+  border-radius: 0 var(--ui-size-border-radius) var(--ui-size-border-radius) 0;
+}
+
+.current {
+  overflow: hidden;
+  padding: 0 10px;
+  width: 100%;
+}
+
+.list {
+  background-color: var(--ui-color-element-background);
+  border-radius: var(--ui-size-border-radius);
+  bottom: 90px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--ui-size-border-radius) 0;
+  position: absolute;
+  width: 100%;
+
+  .listEntry {
+    background-color: transparent;
+  }
+}
+
