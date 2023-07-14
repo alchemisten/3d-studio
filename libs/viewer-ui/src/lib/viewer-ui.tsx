@@ -1,5 +1,5 @@
 import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { FormattedMessage } from 'react-intl';
 import { Subscription } from 'rxjs';
@@ -10,11 +10,11 @@ import { translations } from '../i18n';
 import { ViewerProvider } from '../provider';
 import styles from './viewer-ui.module.scss';
 
-export interface ViewerUIProps {
+export interface ViewerUIProps extends PropsWithChildren {
   viewer: IViewer;
 }
 
-export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
+export const ViewerUI: FC<ViewerUIProps> = ({ children, viewer }) => {
   const [introClosed, setIntroClosed] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [objectLoaded, setObjectLoaded] = useState(false);
@@ -70,6 +70,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
           {features[String(HighlightFeatureToken)] && (
             <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
           )}
+          {children}
         </div>
       </ViewerProvider>
     </TranslationsProvider>
