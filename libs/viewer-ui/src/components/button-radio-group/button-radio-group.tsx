@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { FormattedMessage } from 'react-intl';
+
 import styles from './button-radio-group.module.scss';
 
 export interface RadioElement {

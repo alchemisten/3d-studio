@@ -5,7 +5,7 @@ import { debounce } from 'rxjs/operators';
 import { getTrackBackground, Range } from 'react-range';
 
 import { Button } from '../button/button';
-import { useViewerContext } from '../../provider/viewer.provider';
+import { useViewerContext } from '../../provider';
 import styles from './animation-bar.module.scss';
 
 interface AnimationData {

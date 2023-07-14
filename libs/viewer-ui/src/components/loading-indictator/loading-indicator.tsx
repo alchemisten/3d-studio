@@ -7,7 +7,7 @@ export const LoadingIndicator: FC = () => {
   return (
     <div className="loadingIndicator">
       <h2 className={styles.title}>
-        <FormattedMessage id="loading" />
+        <FormattedMessage id="general.loading" />
       </h2>
       <div className={styles.bar}>
         <div className={styles.indeterminate} />

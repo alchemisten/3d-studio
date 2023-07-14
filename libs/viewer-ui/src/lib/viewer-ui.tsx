@@ -1,21 +1,17 @@
-import { HighlightFeatureToken, IFeature, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
+import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
 import React, { FC, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { FormattedMessage } from 'react-intl';
 import { Subscription } from 'rxjs';
 
-import { Controls, HighlightUi, TextBox } from '../components';
+import type { FeatureMap } from '../types';
+import { AnimationBar, Controls, HighlightUi, LoadingIndicator, TextBox } from '../components';
 import { translations } from '../i18n';
-import { ViewerProvider } from '../provider/viewer.provider';
-import { AnimationBar, LoadingIndicator } from '../components';
+import { ViewerProvider } from '../provider';
 import styles from './viewer-ui.module.scss';
 
 export interface ViewerUIProps {
   viewer: IViewer;
-}
-
-export interface FeatureMap {
-  [key: symbol]: IFeature;
 }
 
 export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
@@ -44,10 +40,10 @@ export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
       })
     );
     subscription.add(
-      viewer.featureService.getFeatures().subscribe((features) => {
+      viewer.featureService.getFeatures().subscribe((featureList) => {
         setFeatures(
-          features.reduce((all, feature) => {
-            all[feature.id] = feature;
+          featureList.reduce((all, feature) => {
+            all[String(feature.id)] = feature;
             return all;
           }, {} as FeatureMap)
         );
@@ -63,7 +59,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
     <TranslationsProvider initialLanguage="de" initialTranslations={translations}>
       <ViewerProvider viewer={viewer}>
         <div className={`${styles.viewerUi} ${introClosed ? styles.clicked : ''}`} onClick={handleUIClick}>
-          <Controls />
+          <Controls features={features} />
           {!introClosed && (
             <TextBox position="intro">
               {isLoading && <LoadingIndicator />}
@@ -71,8 +67,8 @@ export const ViewerUI: FC<ViewerUIProps> = ({ viewer }) => {
             </TextBox>
           )}
           <AnimationBar />
-          {features[HighlightFeatureToken] && (
-            <HighlightUi feature={features[HighlightFeatureToken] as IHighlightFeature} />
+          {features[String(HighlightFeatureToken)] && (
+            <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
           )}
         </div>
       </ViewerProvider>

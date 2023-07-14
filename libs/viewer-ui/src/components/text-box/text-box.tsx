@@ -1,4 +1,5 @@
 import React, { FC, PropsWithChildren } from 'react';
+
 import styles from './text-box.module.scss';
 
 export interface TextBoxProps extends PropsWithChildren {

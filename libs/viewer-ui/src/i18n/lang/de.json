@@ -1,5 +1,10 @@
 {
-  "language-de": "Deutsch",
-  "language-en": "Englisch",
-  "loading": "Lade"
+  "feature.CameraRotationFeature": "Auto Drehen",
+  "feature.HighlightFeature": "Highlights",
+  "feature.LightScenarioFeature": "Lichtszenarien",
+  "feature.SkyboxFeature": "Hintergrund",
+  "feature.WireframeFeature": "Drahtmodell",
+  "general.loading": "Lade",
+  "language.de": "Deutsch",
+  "language.en": "Englisch"
 }

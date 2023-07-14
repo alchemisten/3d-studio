@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+
 import styles from './select-box.module.scss';
 
 export interface SelectBoxEntry {
