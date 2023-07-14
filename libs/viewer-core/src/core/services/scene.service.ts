@@ -40,12 +40,19 @@ export class SceneService implements ISceneService {
   }
 
   public removeObjectFromScene(objectName: string): void {
+    if (!this.group) {
+      return;
+    }
+    let remove: Object3D | undefined;
     this.group.traverse((object) => {
       if (object.name === objectName && object.parent) {
-        object.parent.remove(object);
+        remove = object;
       }
     });
-    this.objects$.next(this.group.children);
+    if (remove && remove.parent) {
+      remove.parent.remove(remove);
+      this.objects$.next(this.group.children);
+    }
   }
 
   private applyObjectSetup(object: Object3D, objectSetup: ObjectSetupModel): void {
