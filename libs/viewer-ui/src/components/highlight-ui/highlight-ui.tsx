@@ -35,10 +35,12 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
               } as SelectBoxEntry)
           )
         );
-        setCurrentEntry({
-          id: highlights[0].id,
-          label: highlights[0].i18n[currentLanguage]?.headline || highlights[0].id,
-        });
+        if (highlights.length > 0) {
+          setCurrentEntry({
+            id: highlights[0].id,
+            label: highlights[0].i18n[currentLanguage]?.headline || highlights[0].id,
+          });
+        }
       })
     );
 
