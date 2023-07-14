@@ -1,9 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
+
 import type { FeatureConfig, IMaterialService } from '../../../types';
-import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
 import type { IWireframeFeature } from './types';
+import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
 
 /**
  * When enabled all materials of all objects in the scene will be set to
@@ -36,9 +37,10 @@ export class WireframeFeature implements IWireframeFeature {
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     this.enabled$.next(this.enabled);
+    this.setWireframeEnabled(this.enabled);
   }
 
-  public setWireframeEnabled(enabled: boolean): void {
+  private setWireframeEnabled(enabled: boolean): void {
     this.materials.forEach((material) => {
       if ((material as MeshStandardMaterial).wireframe !== undefined) {
         (material as MeshStandardMaterial).wireframe = enabled;

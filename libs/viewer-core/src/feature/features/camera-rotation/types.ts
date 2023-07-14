@@ -5,6 +5,5 @@ export interface CameraRotationFeatureConfig extends FeatureConfig {
 }
 
 export interface ICameraRotationFeature extends IFeature {
-  setRotationEnabled(enabled: boolean): void;
   setRotationSpeed(speed: number): void;
 }

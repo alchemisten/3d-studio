@@ -39,13 +39,14 @@ export class CameraRotationFeature implements ICameraRotationFeature {
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     this.enabled$.next(this.enabled);
-  }
-
-  public setRotationEnabled(enabled: boolean): void {
-    this.controls.autoRotate = enabled;
+    this.setRotationEnabled(this.enabled);
   }
 
   public setRotationSpeed(speed: number) {
     this.controls.autoRotateSpeed = speed;
+  }
+
+  private setRotationEnabled(enabled: boolean): void {
+    this.controls.autoRotate = enabled;
   }
 }

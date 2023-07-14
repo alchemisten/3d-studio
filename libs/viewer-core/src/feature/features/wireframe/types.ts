@@ -1,5 +1,3 @@
-import { IFeature } from '../../../types';
+import type { IFeature } from '../../../types';
 
-export interface IWireframeFeature extends IFeature {
-  setWireframeEnabled(enabled: boolean): void;
-}
+export type IWireframeFeature = IFeature;
