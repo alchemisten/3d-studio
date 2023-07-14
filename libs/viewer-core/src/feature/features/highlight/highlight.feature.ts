@@ -34,7 +34,7 @@ export class HighlightFeature implements IHighlightFeature {
   private debugHighlight: Highlight | null = null;
   private dragThreshold = 0.01;
   private enabled!: boolean;
-  private readonly enabled$!: Subject<boolean>;
+  private readonly enabled$!: BehaviorSubject<boolean>;
   private readonly EPS = 0.000001;
   private focusedHighlight$!: Subject<Highlight | null>;
   private FOVAnimateSpeed = 6;
@@ -73,7 +73,7 @@ export class HighlightFeature implements IHighlightFeature {
       return;
     }
 
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
     this.focusedHighlight$ = new Subject<Highlight | null>();
     this.highlights$ = new BehaviorSubject<Highlight[]>(this.highlights);
     this.controlService.getControls().subscribe((controls) => {

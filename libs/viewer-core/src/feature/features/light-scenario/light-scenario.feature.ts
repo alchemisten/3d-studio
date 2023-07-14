@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import type { Light } from 'three';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import type { ILogger } from '@schablone/logging';
 import type { ILightService, ILoggerService } from '../../../types';
@@ -23,7 +23,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
   private activeScenario!: LightScenarioModel;
   private defaultScenario!: LightScenarioModel;
   private enabled!: boolean;
-  private readonly enabled$: Subject<boolean>;
+  private readonly enabled$: BehaviorSubject<boolean>;
   private lightScenarios!: LightScenarioModel[];
   private readonly logger: ILogger;
 
@@ -33,7 +33,7 @@ export class LightScenarioFeature implements ILightScenarioFeature {
   ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Feature: 'LightScenario' } } });
     this.activeScenario$ = new Subject<LightScenarioModel>();
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
   public getActiveScenario(): Observable<LightScenarioModel> {

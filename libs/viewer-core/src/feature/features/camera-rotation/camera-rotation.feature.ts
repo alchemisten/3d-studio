@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import type { IControlService } from '../../../types';
 import { CameraRotationFeatureToken, ControlServiceToken } from '../../../util';
@@ -14,10 +14,10 @@ export class CameraRotationFeature implements ICameraRotationFeature {
   public readonly id = CameraRotationFeatureToken;
   private controls!: OrbitControls;
   private enabled!: boolean;
-  private readonly enabled$: Subject<boolean>;
+  private readonly enabled$: BehaviorSubject<boolean>;
 
   public constructor(@inject(ControlServiceToken) private controlService: IControlService) {
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
   public getEnabled(): Observable<boolean> {
