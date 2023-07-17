@@ -1,11 +1,10 @@
 import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
-import { FormattedMessage } from 'react-intl';
 import { Subscription } from 'rxjs';
 
 import type { FeatureMap } from '../types';
-import { AnimationBar, Controls, HighlightUi, LoadingIndicator, TextBox } from '../components';
+import { AnimationBar, Controls, HighlightUi, Intro } from '../components';
 import { translations } from '../i18n';
 import { ViewerProvider } from '../provider';
 import styles from './viewer-ui.module.scss';
@@ -15,9 +14,8 @@ export interface ViewerUIProps extends PropsWithChildren {
 }
 
 export const ViewerUI: FC<ViewerUIProps> = ({ children, viewer }) => {
-  const [introClosed, setIntroClosed] = useState(true);
+  const [introClosed, setIntroClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [objectLoaded, setObjectLoaded] = useState(false);
   const [features, setFeatures] = useState<FeatureMap>({});
 
   const handleUIClick = () => {
@@ -34,11 +32,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, viewer }) => {
         setIsLoading(loading);
       })
     );
-    subscription.add(
-      viewer.assetService.hookObjectLoaded$.subscribe(() => {
-        setObjectLoaded(true);
-      })
-    );
+
     subscription.add(
       viewer.featureService.getFeatures().subscribe((featureList) => {
         setFeatures(
@@ -60,12 +54,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, viewer }) => {
       <ViewerProvider viewer={viewer}>
         <div className={`${styles.viewerUi} ${introClosed ? styles.clicked : ''}`} onClick={handleUIClick}>
           <Controls features={features} />
-          {!introClosed && (
-            <TextBox position="intro">
-              {isLoading && <LoadingIndicator />}
-              {objectLoaded && <FormattedMessage id="intro" />}
-            </TextBox>
-          )}
+          {!introClosed && <Intro isLoading={isLoading} viewer={viewer} />}
           <AnimationBar />
           {features[String(HighlightFeatureToken)] && (
             <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
