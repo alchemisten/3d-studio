@@ -3,18 +3,26 @@
   display: flex;
   justify-content: stretch;
   left: 50%;
-  max-width: var(--ui-select-box-width);
+  max-width: var(--ui-size-select-list-width);
   pointer-events: all;
   position: absolute;
   transform: translateX(-50%);
   width: 100%;
+
+  .current {
+    height: var(--ui-size-button);
+    font-size: var(--ui-font-size);
+    overflow: hidden;
+    padding: 0 10px;
+    width: 100%;
+  }
 }
 
 .prev,
 .next {
   flex: 0 0 auto;
-  height: var(--ui-size-button-size);
-  width: 25px;
+  height: var(--ui-size-button);
+  width: var(--ui-size-select-step-button-width);
 }
 
 .prev {
@@ -25,26 +33,22 @@
   border-radius: 0 var(--ui-size-border-radius) var(--ui-size-border-radius) 0;
 }
 
-.current {
-  height: var(--ui-size-button-size);
-  overflow: hidden;
-  padding: 0 10px;
-  width: 100%;
-}
-
 .list {
   background-color: var(--ui-color-element-background);
   border-radius: var(--ui-size-border-radius);
-  bottom: 90px;
+  bottom: var(--ui-size-select-list-bottom);
   display: flex;
   flex-direction: column;
+  max-height: calc(100vh - var(--ui-size-menu-bottom) - var(--ui-size-element-margin));
+  overflow-y: auto;
   padding: var(--ui-size-border-radius) 0;
   position: absolute;
   width: 100%;
 
   .listEntry {
     background-color: transparent;
-    height: var(--ui-size-button-size);
+    flex: 0 0 auto;
+    font-size: var(--ui-font-size);
+    height: var(--ui-size-button);
   }
 }
-

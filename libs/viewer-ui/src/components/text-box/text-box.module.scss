@@ -4,24 +4,26 @@
   position: absolute;
   padding: var(--ui-size-box-padding);
   width: calc(100vw - var(--ui-size-element-margin) * 2);
+  z-index: 5;
 
   &.intro {
     top: 50%;
     left: 50%;
-    max-width: 390px;
+    max-width: var(--ui-size-intro-width);
     transform: translate(-50%, -50%);
   }
 
   &.menu {
-    bottom: 125px;
-    max-height: calc(100vh - 125px - var(--ui-size-element-margin));
-    max-width: 270px;
+    bottom: var(--ui-size-menu-bottom);
+    max-height: calc(100vh - var(--ui-size-menu-bottom) - var(--ui-size-element-margin));
+    max-width: var(--ui-size-menu-width);
+    overflow-y: auto;
     right: var(--ui-size-element-margin);
   }
 
   &.highlight {
     left: var(--ui-size-element-margin);
-    bottom: 300px;
-    max-width: 350px;
+    bottom: var(--ui-size-highlight-bottom);
+    max-width: var(--ui-size-highlight-width);
   }
 }

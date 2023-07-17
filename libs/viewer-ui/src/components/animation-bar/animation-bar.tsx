@@ -64,7 +64,6 @@ export const AnimationBar: FC = () => {
       .pipe(debounce(() => timer(10)))
       .subscribe((animationMap) => {
         if (animation && animationMap[animation.name] && animationData) {
-          // console.log('Setting animation data');
           setAnimationData({
             ...animationData,
             time: animationMap[animation.name].time,

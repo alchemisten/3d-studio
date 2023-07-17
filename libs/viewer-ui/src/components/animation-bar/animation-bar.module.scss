@@ -7,16 +7,12 @@
 }
 
 .rangeSlider {
-  --animation-bar-height: 4px;
-  --animation-bar-handle-size: 24px;
-
-  bottom: 80px;
+  bottom: var(--ui-size-animation-bar-bottom);
   pointer-events: all;
-  height: 24px;
+  height: var(--ui-size-animation-bar-handle);
   position: absolute;
   right: 0;
   width: 100%;
-  z-index: 15;
 }
 
 .barWrapper {
@@ -29,9 +25,9 @@
 }
 
 .bar {
-  border-left: calc(var(--animation-bar-handle-size) / 2) solid var(--ui-color-interaction);
-  border-right: calc(var(--animation-bar-handle-size) / 2) solid var(--ui-color-font);
-  height: 4px;
+  border-left: calc(var(--ui-size-animation-bar-handle) / 2) solid var(--ui-color-interaction);
+  border-right: calc(var(--ui-size-animation-bar-handle) / 2) solid var(--ui-color-font);
+  height: var(--ui-size-animation-bar-height);
   position: relative;
   width: 100%;
 }
@@ -41,12 +37,12 @@
   border: 5px solid var(--ui-color-interaction);
   border-radius: 12px;
   cursor: pointer;
-  height: var(--animation-bar-handle-size);
+  height: var(--ui-size-animation-bar-handle);
   pointer-events: all;
   position: relative;
-  top: calc((var(--animation-bar-handle-size) - var(--animation-bar-height)) * -0.5);
-  margin-left: calc(var(--animation-bar-handle-size) * -0.5);
-  width: var(--animation-bar-handle-size);
+  top: calc((var(--ui-size-animation-bar-handle) - var(--ui-size-animation-bar-height)) * -0.5);
+  margin-left: calc(var(--ui-size-animation-bar-handle) * -0.5);
+  width: var(--ui-size-animation-bar-handle);
 
   &:focus-visible {
     outline: none;
@@ -56,8 +52,7 @@
 .controls {
   align-items: center;
   display: flex;
-  gap: 20px;
+  gap: var(--ui-size-element-gap);
   padding-bottom: var(--ui-size-element-margin);
-  padding-left: 90px;
-  padding-top: var(--ui-size-element-margin);
+  padding-left: var(--ui-size-element-margin);
 }

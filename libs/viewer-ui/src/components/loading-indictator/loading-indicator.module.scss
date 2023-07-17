@@ -1,15 +1,13 @@
 .title {
-  color: #fff;
-  font-size: 32px;
+  font-size: calc(var(--ui-font-size) * 2);
   text-align: center;
   text-transform: uppercase;
 }
 
 .bar {
   background-clip: padding-box;
-  background-color: #000;
-  display: block;
-  height: 4px;
+  background-color: var(--ui-color-loading-background);
+  height: var(--ui-size-loading-bar-height);
   margin: 0.5rem 0 1rem;
   overflow: hidden;
   position: relative;
