@@ -1,3 +1,5 @@
+@import '../style/scss-variables.scss';
+
 .viewerUi {
   --ui-animation-time: 0.2s ease-in-out;
   --ui-color-element-background: rgba(0,0,0,0.8);
@@ -14,7 +16,7 @@
   --ui-size-border-radius: 10px;
   --ui-size-box-padding: 22px;
   --ui-size-button: 40px;
-  --ui-size-butto-toggle: 20px;
+  --ui-size-button-toggle: 20px;
   --ui-size-checkbox: 12px;
   --ui-size-element-gap: 20px;
   --ui-size-element-margin: 25px;
@@ -68,5 +70,21 @@
 
   &.clicked {
     pointer-events: none;
+  }
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-md) {
+  .viewerUi {
+    --ui-size-button: 50px;
+    --ui-size-animation-bar-bottom: 70px;
+    --ui-size-animation-bar-handle: 30px;
+    --ui-size-element-gap: 10px;
+    --ui-size-element-margin: 15px;
+    --ui-size-highlight-bottom: 115px;
+    --ui-size-menu-bottom: 115px;
+    --ui-size-select-step-button-width: var(--ui-size-button);
   }
 }

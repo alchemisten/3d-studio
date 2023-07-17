@@ -1,3 +1,5 @@
+@import '../../style/scss-variables.scss';
+
 .animationBar {
   bottom: 0;
   left: 0;
@@ -35,7 +37,7 @@
 .handle {
   background: var(--ui-color-font);
   border: 5px solid var(--ui-color-interaction);
-  border-radius: 12px;
+  border-radius: calc(var(--ui-size-animation-bar-handle) / 2);
   cursor: pointer;
   height: var(--ui-size-animation-bar-handle);
   pointer-events: all;
@@ -55,4 +57,13 @@
   gap: var(--ui-size-element-gap);
   padding-bottom: var(--ui-size-element-margin);
   padding-left: var(--ui-size-element-margin);
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-sm) {
+  .time {
+    display: none;
+  }
 }

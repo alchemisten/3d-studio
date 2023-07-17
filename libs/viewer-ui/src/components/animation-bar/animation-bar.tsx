@@ -152,7 +152,7 @@ export const AnimationBar: FC = () => {
 
         {animationData && (
           <div className={styles.time}>
-            <span className={styles.currentTime}>{(Math.floor(animationData.time * 100) / 100).toFixed(2)}</span> /
+            <span className={styles.currentTime}>{(Math.floor(animationData.time * 100) / 100).toFixed(2)}</span> /{' '}
             <span className={styles.totalTime}>{(Math.floor(animationData.duration * 100) / 100).toFixed(2)}</span>
           </div>
         )}
