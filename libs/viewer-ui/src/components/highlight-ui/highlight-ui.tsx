@@ -21,46 +21,58 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
     feature.focusHighlight(entry.id);
   };
 
-  useEffect(() => {
-    const subscription = new Subscription();
+  useEffect(
+    () => {
+      const subscription = new Subscription();
 
-    subscription.add(
-      feature.getHighlights().subscribe((highlights) => {
-        setEntries(
-          highlights.map(
-            (highlight) =>
-              ({
-                id: highlight.id,
+      subscription.add(
+        feature.getHighlights().subscribe((highlights) => {
+          setEntries(
+            highlights.map(
+              (highlight) =>
+                ({
+                  id: highlight.id,
+                  label: highlight.i18n[currentLanguage]?.headline || highlight.id,
+                } as SelectBoxEntry)
+            )
+          );
+          if (currentEntry) {
+            const highlight = highlights.find((h) => h.id === currentEntry.id);
+            if (highlight) {
+              setCurrentEntry({
+                id: currentEntry.id,
                 label: highlight.i18n[currentLanguage]?.headline || highlight.id,
-              } as SelectBoxEntry)
-          )
-        );
-        if (highlights.length > 0) {
-          setCurrentEntry({
-            id: highlights[0].id,
-            label: highlights[0].i18n[currentLanguage]?.headline || highlights[0].id,
-          });
-        }
-      })
-    );
+              });
+            }
+          } else if (highlights.length > 0) {
+            setCurrentEntry({
+              id: highlights[0].id,
+              label: highlights[0].i18n[currentLanguage]?.headline || highlights[0].id,
+            });
+          }
+        })
+      );
 
-    subscription.add(
-      feature.getFocusedHighlight().subscribe((highlight) => {
-        setCurrentHighlight(highlight);
+      subscription.add(
+        feature.getFocusedHighlight().subscribe((highlight) => {
+          setCurrentHighlight(highlight);
 
-        if (highlight) {
-          setCurrentEntry({
-            id: highlight.id,
-            label: highlight.i18n[currentLanguage]?.headline || highlight.id,
-          });
-        }
-      })
-    );
+          if (highlight) {
+            setCurrentEntry({
+              id: highlight.id,
+              label: highlight.i18n[currentLanguage]?.headline || highlight.id,
+            });
+          }
+        })
+      );
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [currentLanguage, feature]);
+      return () => {
+        subscription.unsubscribe();
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentLanguage, feature]
+  );
 
   return (
     <>
