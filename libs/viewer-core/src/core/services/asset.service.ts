@@ -32,6 +32,7 @@ import type { ConfigService } from './config.service';
 export class AssetService implements IAssetService {
   public readonly hookObjectLoaded$: Observable<Object3D>;
   private basePath = '';
+  private assetMap: Record<string, Promise<unknown>> = {};
   private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
@@ -71,10 +72,14 @@ export class AssetService implements IAssetService {
   }
 
   public loadCubeTexture(path: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<CubeTexture>;
+    }
+
     this.isLoading$.next(true);
     const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
 
-    return new Promise((resolve, reject) => {
+    this.assetMap[path] = new Promise((resolve, reject) => {
       this.cubeTextureLoader.setPath(`${this.basePath}${path}/`).load(
         directions.map((direction) => direction + imageSuffix),
         (texture) => {
@@ -86,6 +91,8 @@ export class AssetService implements IAssetService {
         }
       );
     });
+
+    return this.assetMap[path] as Promise<CubeTexture>;
   }
 
   public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {
@@ -97,25 +104,38 @@ export class AssetService implements IAssetService {
   }
 
   public loadObject(path: string): Promise<Object3D> {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<Object3D>;
+    }
+
     this.isLoading$.next(true);
     const [type] = path.split('.').slice(-1);
+
     switch (type) {
       case 'gltf':
-        return this.loadGLTF(path).then((gltf) => {
+        this.assetMap[path] = this.loadGLTF(path).then((gltf) => {
           gltf.scene.animations = gltf.animations;
           this.objectLoaded$.next(gltf.scene);
           return gltf.scene;
         });
+        break;
       default:
-        return new Promise((resolve, reject) => {
+        this.assetMap[path] = new Promise((resolve, reject) => {
           reject(`Object type unknown: ${type}`);
         });
+        break;
     }
+
+    return this.assetMap[path] as Promise<Object3D>;
   }
 
   public loadTexture(path: string): Promise<Texture> {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<Texture>;
+    }
+
     this.isLoading$.next(true);
-    return new Promise((resolve, reject) => {
+    this.assetMap[path] = new Promise((resolve, reject) => {
       this.textureLoader.load(
         `${this.basePath}${path}`,
         (texture) => {
@@ -127,6 +147,8 @@ export class AssetService implements IAssetService {
         }
       );
     });
+
+    return this.assetMap[path] as Promise<Texture>;
   }
 
   private loadGLTF(path: string): Promise<GLTF> {
@@ -158,5 +180,9 @@ export class AssetService implements IAssetService {
       this.isLoading$.next(false);
     }
     this.logger.debug(`Finished file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
+  }
+
+  private isAssetRegistered(path: string): boolean {
+    return this.assetMap[path] !== undefined;
   }
 }
