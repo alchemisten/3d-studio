@@ -16,6 +16,7 @@ export class SceneService implements ISceneService {
   public readonly scene: Scene;
   private readonly group: Object3D;
   private readonly logger: ILogger;
+  private objectMap: Record<string, Object3D> = {};
   private objects$: BehaviorSubject<Object3D[]>;
   private lastObjectAdded$: ReplaySubject<Object3D>;
 
@@ -31,9 +32,13 @@ export class SceneService implements ISceneService {
   }
 
   public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {
+    if (this.objectMap[object.name]) {
+      return;
+    }
     if (objectSetup) {
       this.applyObjectSetup(object, objectSetup);
     }
+    this.objectMap[object.name] = object;
     this.group.add(object);
     this.logger.debug('Object added', { objects: object });
     this.lastObjectAdded$.next(object);
@@ -45,17 +50,13 @@ export class SceneService implements ISceneService {
   }
 
   public removeObjectFromScene(objectName: string): void {
-    if (!this.group) {
+    if (!this.group || !this.objectMap[objectName]) {
       return;
     }
-    let remove: Object3D | undefined;
-    this.group.traverse((object) => {
-      if (object.name === objectName && object.parent) {
-        remove = object;
-      }
-    });
+    const remove = this.objectMap[objectName];
     if (remove && remove.parent) {
       remove.parent.remove(remove);
+      delete this.objectMap[objectName];
       this.objects$.next(this.group.children);
     }
   }
