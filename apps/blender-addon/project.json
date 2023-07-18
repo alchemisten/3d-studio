@@ -4,6 +4,25 @@
   "projectType": "application",
   "sourceRoot": "apps/blender-addon/src",
   "tags": [],
-  "targets": {}
+  "targets": {
+    "prepare-blender-dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/blender-addon",
+        "envFile": "apps/blender-addon/.env",
+        "commands": [
+          "echo Installing Blender Addon Dependencies...",
+          "\"{args.blenderPythonPath}\" -m pip install -r {args.cwd}/requirements-dev.txt"
+        ]
+      },
+      "configurations": {
+        "unix": {
+          "args": "--blenderPythonPath=$(BLENDER_PYTHON_PATH) --cwd=$(pwd)"
+        },
+        "windows-powershell": {
+          "args": "--blenderPythonPath=%BLENDER_PYTHON_PATH% --cwd=%cd%"
+        }
+      }
+    }
+  }
 }
-  
