@@ -93,7 +93,8 @@ export class HighlightFeature implements IHighlightFeature {
     if (config.groupScale) {
       this.highlightGroup.scale.setScalar(config.groupScale);
     }
-    this.createHighlights(config.highlightSetup).then(() => {
+    this.loadHighlightTextures().then((textures) => {
+      this.createHighlights(config.highlightSetup, textures);
       this.highlights$.next(this.highlights);
     });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
@@ -147,63 +148,6 @@ export class HighlightFeature implements IHighlightFeature {
 
   public getHighlights(): Observable<Highlight[]> {
     return this.highlights$.asObservable();
-  }
-
-  private async createHighlights(setups: HighlightSetupModel[]) {
-    const textures: HighlightTextureMap = {
-      actionTransTex: null,
-      actionTransHoverTex: null,
-      simpleTransTex: null,
-      simpleTransHoverTex: null,
-    };
-    await Promise.all(
-      Object.entries({
-        actionTransTex: 'assets/textures/highlights/action_trans.png',
-        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
-        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
-        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
-      }).map(([key, value]) =>
-        this.assetService.loadTexture(value).then((texture) => {
-          textures[key] = texture;
-        })
-      )
-    ).then(() => {
-      this.logger.debug('All highlight textures loaded', { objects: textures });
-    });
-
-    setups.forEach((setup) => {
-      const highlight = new Highlight(setup, this.logger, this.highlightGroup, textures);
-      this.highlights.push(highlight);
-
-      // // animation hooks
-      // if (hl.animation && !hl.isTrigger) {
-      //   this.animMan.addTimelineHook("highlight", hl.animation.targetTime, hl.animation.timeUnit, hl);
-      // }
-
-      // visibility
-      if (highlight.visibility) {
-        this.visibility.push(highlight);
-      }
-      this.clickable.push(highlight.glow);
-    });
-    this.setClickzonesVisible(this.highlightsVisible);
-  }
-
-  private setClickzonesVisible(value?: boolean): void {
-    this.highlightsVisible = value ?? !this.highlightsVisible;
-    this.highlights.forEach((highlight) => {
-      highlight.clickzone.visible = this.highlightsVisible;
-      highlight.glow.traverse((node) => {
-        const materials = (node as Mesh).material;
-        if (Array.isArray(materials)) {
-          materials.forEach((material) => {
-            material.opacity = this.highlightsVisible ? 1 : 0;
-          });
-        } else {
-          materials.opacity = this.highlightsVisible ? 1 : 0;
-        }
-      });
-    });
   }
 
   private addListeners(key: string) {
@@ -275,6 +219,29 @@ export class HighlightFeature implements IHighlightFeature {
 
   private clamp(val: number, min: number, max: number): number {
     return val >= min && val <= max ? val : val > max ? max : min;
+  }
+
+  private createHighlights(setups: HighlightSetupModel[], textures: HighlightTextureMap) {
+    setups.forEach((setup) => {
+      if (this.getHighlightByID(setup.id)) {
+        return;
+      }
+
+      const highlight = new Highlight(setup, this.logger, this.highlightGroup, textures);
+      this.highlights.push(highlight);
+
+      // // animation hooks
+      // if (hl.animation && !hl.isTrigger) {
+      //   this.animMan.addTimelineHook("highlight", hl.animation.targetTime, hl.animation.timeUnit, hl);
+      // }
+
+      // visibility
+      if (highlight.visibility) {
+        this.visibility.push(highlight);
+      }
+      this.clickable.push(highlight.glow);
+    });
+    this.setClickzonesVisible(this.highlightsVisible);
   }
 
   private dispatchHighlightClick(hl: Highlight, immediate = false, fromStart = false) {
@@ -386,6 +353,30 @@ export class HighlightFeature implements IHighlightFeature {
     return current + deltaMove;
   }
 
+  private loadHighlightTextures(): Promise<HighlightTextureMap> {
+    const textures: HighlightTextureMap = {
+      actionTransTex: null,
+      actionTransHoverTex: null,
+      simpleTransTex: null,
+      simpleTransHoverTex: null,
+    };
+    return Promise.all(
+      Object.entries({
+        actionTransTex: 'assets/textures/highlights/action_trans.png',
+        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
+        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
+        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
+      }).map(([key, value]) =>
+        this.assetService.loadTexture(value).then((texture) => {
+          textures[key] = texture;
+        })
+      )
+    ).then(() => {
+      this.logger.debug('All highlight textures loaded', { objects: textures });
+      return textures;
+    });
+  }
+
   private onDocumentMouseDown(event: Event): void {
     this.checkHighLightClickIntersect(event as MouseEvent);
   }
@@ -462,6 +453,23 @@ export class HighlightFeature implements IHighlightFeature {
         this.mouseWheelEventEnabled = false;
         break;
     }
+  }
+
+  private setClickzonesVisible(value?: boolean): void {
+    this.highlightsVisible = value ?? !this.highlightsVisible;
+    this.highlights.forEach((highlight) => {
+      highlight.clickzone.visible = this.highlightsVisible;
+      highlight.glow.traverse((node) => {
+        const materials = (node as Mesh).material;
+        if (Array.isArray(materials)) {
+          materials.forEach((material) => {
+            material.opacity = this.highlightsVisible ? 1 : 0;
+          });
+        } else {
+          materials.opacity = this.highlightsVisible ? 1 : 0;
+        }
+      });
+    });
   }
 
   private setPOI(highlight: Highlight): void {
