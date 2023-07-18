@@ -1,0 +1,78 @@
+{
+  "name": "3d-studio-studio",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/3d-studio/studio"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "3d-studio-studio:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "3d-studio-studio:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "3d-studio-studio:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "3d-studio-studio:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "3d-studio-studio:build:development"
+        },
+        "production": {
+          "buildTarget": "3d-studio-studio:build:production"
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["coverage/apps/3d-studio/studio"],
+      "options": {
+        "passWithNoTests": true,
+        "reportsDirectory": "../../../coverage/apps/3d-studio/studio"
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/3d-studio/studio/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "3d-studio-studio:build"
+      }
+    }
+  },
+  "tags": []
+}
