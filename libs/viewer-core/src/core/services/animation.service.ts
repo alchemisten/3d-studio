@@ -97,8 +97,8 @@ export class AnimationService implements IAnimationService {
       this.activeActions$.next(this.activeActions);
       this.setAnimationEnabled(true);
       return action;
-    } catch (exception) {
-      this.logger.warn(`Can't play animation ${animId}`, { error: exception });
+    } catch (error) {
+      this.logger.warn(`Can't play animation ${animId}`, { error });
       return false;
     }
   }

@@ -3,6 +3,7 @@ import { AnimationAction, AnimationClip } from 'three';
 import { timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import { getTrackBackground, Range } from 'react-range';
+import { useLogger } from '@schablone/logging-react';
 
 import { Button } from '../button/button';
 import { useViewerContext } from '../../provider';
@@ -16,19 +17,20 @@ interface AnimationData {
 }
 
 export const AnimationBar: FC = () => {
+  const { logger } = useLogger();
+  const viewer = useViewerContext();
   const [animation, setAnimation] = useState<AnimationClip | null>(null);
   const [animationData, setAnimationData] = useState<AnimationData | null>(null);
   const [animations, setAnimations] = useState<AnimationClip[]>([]);
-  const viewer = useViewerContext();
 
   useEffect(() => {
     if (!viewer) {
       return;
     }
-    const subscription = viewer.assetService.hookObjectLoaded$.subscribe((object) => {
-      if (object.animations.length > 0) {
-        const mixer = viewer.animationService.addMixerForObject(object);
-        if (mixer) {
+    const subscription = viewer.sceneService.objectAddedToScene$.subscribe((object) => {
+      if (object && object.animations.length > 0) {
+        try {
+          viewer.animationService.getMixerForObject(object.name);
           setAnimations(object.animations);
           setAnimation(object.animations[0]);
 
@@ -45,6 +47,8 @@ export const AnimationBar: FC = () => {
               time: action.time,
             });
           }
+        } catch (error) {
+          logger.warn('Could not initialize animation bar\n', { error });
         }
       }
     });
@@ -52,7 +56,7 @@ export const AnimationBar: FC = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [viewer]);
+  }, [logger, viewer]);
 
   useEffect(() => {
     if (!viewer) {
