@@ -1,4 +1,4 @@
 
 [submodule "libs/gltf-extension/glTF-spec"]
 	path = libs/gltf-extension/glTF-spec
-	url = https://github.com/alchemistenag/glTF
+	url = git@github.com:alchemisten/glTF.git
