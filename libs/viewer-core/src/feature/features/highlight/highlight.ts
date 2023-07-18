@@ -10,7 +10,7 @@ import {
   SpriteMaterial,
   Vector3,
 } from 'three';
-import { ILogger } from '@schablone/logging';
+import type { ILogger } from '@schablone/logging';
 import type {
   HighlightAnimation,
   HighlightModel,

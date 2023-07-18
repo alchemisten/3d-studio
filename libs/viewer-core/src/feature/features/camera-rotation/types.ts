@@ -1,4 +1,4 @@
-import { FeatureConfig, IFeature } from '../../../types';
+import type { FeatureConfig, IFeature } from '../../types';
 
 export interface CameraRotationFeatureConfig extends FeatureConfig {
   rotationSpeed?: number;

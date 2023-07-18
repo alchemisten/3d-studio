@@ -1,3 +1,3 @@
-import type { IFeature } from '../../../types';
+import type { IFeature } from '../../types';
 
 export type IWireframeFeature = IFeature;

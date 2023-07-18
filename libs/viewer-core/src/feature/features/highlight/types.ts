@@ -1,6 +1,7 @@
-import { Object3D, Texture, Vector2, Vector3 } from 'three';
-import { Observable } from 'rxjs';
-import { FeatureConfig, I18nLanguageMap, IFeature } from '../../../types';
+import type { Object3D, Texture, Vector2, Vector3 } from 'three';
+import type { Observable } from 'rxjs';
+import type { I18nLanguageMap } from '../../../types';
+import type { FeatureConfig, IFeature } from '../../types';
 import type Highlight from './highlight';
 
 export enum HighlightMode {

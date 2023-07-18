@@ -2,7 +2,8 @@ import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import type { FeatureConfig, IMaterialService } from '../../../types';
+import type { IMaterialService } from '../../../types';
+import type { FeatureConfig } from '../../types';
 import type { IWireframeFeature } from './types';
 import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
 

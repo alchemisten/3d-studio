@@ -6,7 +6,6 @@ import type {
   IAssetService,
   IConfigService,
   IControlService,
-  IFeatureService,
   ILightService,
   IMaterialService,
   IRenderService,
@@ -15,6 +14,7 @@ import type {
   SizeModel,
   ViewerConfigModel,
 } from '../types';
+import type { IFeatureService } from '../feature';
 import {
   AnimationServiceToken,
   AssetServiceToken,

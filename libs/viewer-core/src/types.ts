@@ -1,7 +1,6 @@
 import type {
   AnimationAction,
   AnimationMixer,
-  Color,
   ColorSpace,
   CubeTexture,
   Light,
@@ -18,11 +17,10 @@ import type {
 import type { Observable } from 'rxjs';
 import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import type { Container, interfaces } from 'inversify';
 import type { ILogger } from '@schablone/logging';
+import type { FeatureSetup, IFeatureService } from './feature';
 import { LightType, MaterialType } from './enums';
 
-export type FeatureSetup = Record<string, FeatureConfig>;
 export interface ViewerConfigModel {
   camera?: Partial<CameraConfigModel>;
   features?: FeatureSetup;
@@ -93,26 +91,6 @@ export interface CameraConfigModel {
 
 export interface IControllable {
   getControls(): UIControlModel[];
-}
-
-export type FeatureId = symbol;
-export interface FeatureConfig {
-  enabled: boolean;
-  [key: string]: string | number | boolean | object | undefined;
-}
-export interface IFeature {
-  id: FeatureId;
-  getEnabled(): Observable<boolean>;
-  init(config: FeatureConfig): void;
-  setEnabled(enabled: boolean): void;
-}
-
-export interface IMaterialChangeFeature extends IFeature {
-  addNewMaterial(material: Material): void;
-  assignMaterialToSlot(slotName: string, material: Material): void;
-  changeMaterialColor(materialName: string, color: Color): void;
-  getColorOptionsForMaterial(materialName: string): Color[];
-  getMaterials(): Observable<Material[]>;
 }
 
 export interface IViewer {
@@ -231,19 +209,6 @@ export interface IAssetService {
   loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;
   loadTexture(path: string): Promise<Texture>;
-}
-
-export interface IFeatureService {
-  addFeature(feature: IFeature): void;
-  getFeatures(): Observable<IFeature[]>;
-  removeFeature(featureId: symbol): void;
-  setFeatureEnabled(featureId: symbol, enabled: boolean): void;
-}
-
-export interface IFeatureRegistryService {
-  getFeatureInstance(id: string): IFeature;
-  registerFeature(id: string, feature: interfaces.ServiceIdentifier<IFeature>): void;
-  setDIContainer(containerDI: Container): void;
 }
 
 export interface MaterialSetupModel {
