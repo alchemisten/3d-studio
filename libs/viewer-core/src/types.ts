@@ -309,6 +309,7 @@ export interface IRenderService {
 }
 
 export interface ISceneService {
+  readonly objectAddedToScene$: Observable<Object3D>;
   readonly scene: Scene;
   addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void;
   getObjects(): Observable<Object3D[]>;

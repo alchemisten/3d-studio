@@ -72,11 +72,13 @@ export class Viewer implements IViewer {
       fromEvent(window, 'resize').pipe(debounceTime(300)).subscribe(this.onWindowResize.bind(this));
     }
 
-    config.objects.forEach((object) => {
-      this.assetService.loadObject(object.path).then((loaded) => {
-        this.sceneService.addObjectToScene(loaded, object);
+    this.sceneService.objectAddedToScene$.subscribe((object) => {
+      this.animationService.addMixerForObject(object);
+    });
+    config.objects.forEach((objectSetup) => {
+      this.assetService.loadObject(objectSetup.path).then((object) => {
+        this.sceneService.addObjectToScene(object, objectSetup);
         this.renderService.renderSingleFrame();
-        this.animationService.addMixerForObject(loaded);
       });
     });
   }
