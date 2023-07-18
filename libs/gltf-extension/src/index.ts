@@ -1,2 +1,2 @@
-export * from './extension';
-export * from './GLTF2';
+export { ALCMInteractivityGlTFExtension } from './generated';
+export * from './constants';

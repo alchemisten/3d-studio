@@ -4,6 +4,15 @@
   "sourceRoot": "libs/gltf-extension/src",
   "projectType": "library",
   "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/gltf-extension",
+        "commands": [
+          "npx ts-node --project ./tsconfig.scripts.json ./scripts/generate-typescript-from-schema.ts"
+        ]
+      }
+    },
     "build": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
@@ -14,18 +23,6 @@
         "assets": ["libs/gltf-extension/*.md"],
         "updateBuildableProjectDepsInPackageJson": true
       }
-    },
-    "publish": {
-      "executor": "@nx/workspace:run-commands",
-      "options": {
-        "command": "ts-node tools/scripts/publish.ts gltf-extension {args.ver} {args.tag}"
-      },
-      "dependsOn": [
-        {
-          "projects": "self",
-          "target": "build"
-        }
-      ]
     },
     "lint": {
       "executor": "@nx/linter:eslint",

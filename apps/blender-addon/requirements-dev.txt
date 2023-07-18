@@ -1,0 +1,7 @@
+debugpy
+click
+flask
+Jinja2
+Werkzeug
+blinker
+colorama
