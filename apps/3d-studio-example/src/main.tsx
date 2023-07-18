@@ -1,4 +1,8 @@
 import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
+
+import { StrictMode } from 'react';
+import * as ReactDOM from 'react-dom/client';
 
 (function () {
   const container = document.getElementById('viewer-container');
@@ -6,8 +10,7 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
     return;
   }
 
-  const launcher = new ViewerLauncher();
-  launcher.createHTMLViewer(container, {
+  const config = {
     features: {
       CameraRotationFeature: { enabled: false },
       HighlightFeature: {
@@ -23,8 +26,12 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             i18n: {
               de: {
-                content: '',
-                headline: 'rundum geschlossen',
+                content: 'Hat zwei Achsen und vier Räder',
+                headline: 'Unterboden',
+              },
+              en: {
+                content: 'Has two axles and four wheels',
+                headline: 'Undercarriage',
               },
             },
             id: 2071,
@@ -48,9 +55,12 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             i18n: {
               de: {
-                content:
-                  'erleichtert die Reinigung und ist dank der Herstellung aus unbedenklichen Materialien geeignet für den Kontakt mit Lebensmitteln.',
-                headline: 'porenlose Oberfläche mit gerundeten Ecken',
+                content: 'Drehen 90% effektiver als die eckigen Reifen der Konkurrenz',
+                headline: 'Runde Reifen',
+              },
+              en: {
+                content: 'Rotating 90% more effective than the square tires of the competition',
+                headline: 'Round tires',
               },
             },
             id: 2072,
@@ -74,8 +84,12 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             i18n: {
               de: {
-                content: 'hält die Kühlkette beim Transport aufrecht und kühlt während 12h',
-                headline: 'Innenisolation',
+                content: 'Hier gibts nichts Neues zu sehen, aber sechs Ansichten sind besser als fünf',
+                headline: 'Noch eine Ansicht',
+              },
+              en: {
+                content: 'Nothing new to see here, but six views are better than five',
+                headline: 'Another view',
               },
             },
             id: 2073,
@@ -99,8 +113,12 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             i18n: {
               de: {
-                content: 'kompatibel mit allen ISO und SGL Normen',
-                headline: 'Stülpdeckel - stapelbar',
+                content: 'Personengroße Tür für einfaches Be- und Entladen',
+                headline: 'Große Seitentür',
+              },
+              en: {
+                content: 'Person-sized door for easy loading and unloading',
+                headline: 'Large side door',
               },
             },
             id: 2074,
@@ -124,8 +142,12 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
             },
             i18n: {
               de: {
-                content: '',
-                headline: '2 Muschelgriffe',
+                content: 'Damit der Kunde nicht noch danach fragen muss',
+                headline: 'Maximal großes Logo',
+              },
+              en: {
+                content: 'So that the customer does not have to ask for it',
+                headline: 'Maximum sized Logo',
               },
             },
             id: 2075,
@@ -144,20 +166,24 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
           {
             cam: {
               x: 0.10648,
-              y: -0.0680558,
+              y: 0.5,
               z: 3.41046,
             },
             i18n: {
               de: {
-                content: '',
-                headline: 'Beschriftungs- und Identifikationsfläche',
+                content: 'Schlimmer als ein SVU. Lässt keine Change zum Abrollen.',
+                headline: 'Fahrzeugfront',
+              },
+              en: {
+                content: 'Worse than an SVU. Leaves no chance to roll over.',
+                headline: 'Vehicle front',
               },
             },
             id: 2076,
             pos: {
               x: 0,
               y: 0,
-              z: 0.24555,
+              z: 0.4,
             },
             scale: 0.04,
             target: {
@@ -234,15 +260,30 @@ import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
       folder: 'test123',
       introText: {
         de: {
-          intro: 'Stuff',
+          intro:
+            'Halten Sie die linke Maustaste gedrückt und bewegen Sie den Cursor, um das Modell im Raum zu drehen. Halten Sie die rechte Maustaste gedrückt und bewegen Sie den Cursor, um das Modell im Raum zu verschieben. Mit Hilfe des Mausrads können Sie das Modell näher heranholen oder aus weiterer Entfernung betrachten.Klicken Sie einmalig an beliebiger Stelle um dieses Infofenster zu schließen',
+        },
+        en: {
+          intro:
+            'Hold down the left mouse button and move the cursor to rotate the model in space. Hold down the right mouse button and move the cursor to move the model in space. Using the mouse wheel, you can zoom in and out. Click anywhere to close this information.',
         },
       },
-      languages: ['de'],
+      languages: ['de', 'en'],
       name: 'A test project',
       projectID: 'TEST123',
     },
     render: {
       continuousRendering: true,
     },
-  });
+  };
+
+  const launcher = new ViewerLauncher();
+  const viewer = launcher.createHTMLViewer(container, config);
+
+  const root = ReactDOM.createRoot(document.getElementById('studio-ui') as HTMLElement);
+  root.render(
+    <StrictMode>
+      <ViewerUI viewer={viewer} />
+    </StrictMode>
+  );
 })();

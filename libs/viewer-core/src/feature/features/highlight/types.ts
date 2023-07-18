@@ -1,6 +1,7 @@
-import { Object3D, Texture, Vector2, Vector3 } from 'three';
-import { Observable } from 'rxjs';
-import { FeatureConfig, I18nLanguageMap, IFeature } from '../../../types';
+import type { Object3D, Texture, Vector2, Vector3 } from 'three';
+import type { Observable } from 'rxjs';
+import type { I18nLanguageMap } from '../../../types';
+import type { FeatureConfig, IFeature } from '../../types';
 import type Highlight from './highlight';
 
 export enum HighlightMode {
@@ -22,12 +23,9 @@ export type HighlightModelId = string;
 export type HighlightModel = {
   cameraPosition: Vector3;
   cameraTarget: Vector3;
-  description: string;
   i18n: I18nLanguageMap;
   id: HighlightModelId;
-  name: string;
-  object: Object3D;
-} & (HighlightWorldPosition | HighlightScreenPosition);
+};
 
 export interface HighlightSetupModel {
   animation?: HighlightAnimation;
@@ -101,5 +99,5 @@ export interface HighlightFeatureConfig extends FeatureConfig {
 export interface IHighlightFeature extends IFeature {
   focusHighlight(id: HighlightModelId): void;
   getFocusedHighlight(): Observable<Highlight | null>;
-  getHighlights(): Highlight[];
+  getHighlights(): Observable<Highlight[]>;
 }

@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { Observable, Subject } from 'rxjs';
+import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Vector2, Vector3 } from 'three';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ILogger } from '@schablone/logging';
 
@@ -11,7 +13,7 @@ import {
   RenderServiceToken,
   SceneServiceToken,
 } from '../../../util';
-import { IAssetService, IControlService, IRenderService, ISceneService } from '../../../types';
+import type { IAssetService, IControlService, IRenderService, ISceneService } from '../../../types';
 import {
   HighlightFeatureConfig,
   HighlightMode,
@@ -21,8 +23,6 @@ import {
   IHighlightFeature,
 } from './types';
 import Highlight from './highlight';
-import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Vector2, Vector3 } from 'three';
-import { withLatestFrom } from 'rxjs/operators';
 
 @injectable()
 export class HighlightFeature implements IHighlightFeature {
@@ -34,11 +34,12 @@ export class HighlightFeature implements IHighlightFeature {
   private debugHighlight: Highlight | null = null;
   private dragThreshold = 0.01;
   private enabled!: boolean;
-  private readonly enabled$!: Subject<boolean>;
+  private readonly enabled$!: BehaviorSubject<boolean>;
   private readonly EPS = 0.000001;
   private focusedHighlight$!: Subject<Highlight | null>;
   private FOVAnimateSpeed = 6;
   private fovTarget = 90;
+  private highlights$!: BehaviorSubject<Highlight[]>;
   private highlights: Highlight[] = [];
   private highlightsVisible!: boolean;
   private readonly highlightGroup: Group = new Group();
@@ -72,8 +73,9 @@ export class HighlightFeature implements IHighlightFeature {
       return;
     }
 
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
     this.focusedHighlight$ = new Subject<Highlight | null>();
+    this.highlights$ = new BehaviorSubject<Highlight[]>(this.highlights);
     this.controlService.getControls().subscribe((controls) => {
       this.controls = controls;
     });
@@ -91,7 +93,10 @@ export class HighlightFeature implements IHighlightFeature {
     if (config.groupScale) {
       this.highlightGroup.scale.setScalar(config.groupScale);
     }
-    this.createHighlights(config.highlightSetup).then();
+    this.loadHighlightTextures().then((textures) => {
+      this.createHighlights(config.highlightSetup, textures);
+      this.highlights$.next(this.highlights);
+    });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
       if (enabled) {
         this.update();
@@ -128,7 +133,6 @@ export class HighlightFeature implements IHighlightFeature {
     const highlight = this.highlights.find((h) => h.id === id);
     if (highlight) {
       this.dispatchHighlightClick(highlight);
-      this.focusedHighlight$.next(highlight);
     } else {
       this.logger.warn(`Couldn't focus highlight with id ${id}.`);
     }
@@ -142,65 +146,8 @@ export class HighlightFeature implements IHighlightFeature {
     return this.focusedHighlight$.asObservable();
   }
 
-  public getHighlights(): Highlight[] {
-    return this.highlights;
-  }
-
-  private async createHighlights(setups: HighlightSetupModel[]) {
-    const textures: HighlightTextureMap = {
-      actionTransTex: null,
-      actionTransHoverTex: null,
-      simpleTransTex: null,
-      simpleTransHoverTex: null,
-    };
-    await Promise.all(
-      Object.entries({
-        actionTransTex: 'assets/textures/highlights/action_trans.png',
-        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
-        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
-        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
-      }).map(([key, value]) =>
-        this.assetService.loadTexture(value).then((texture) => {
-          textures[key] = texture;
-        })
-      )
-    ).then(() => {
-      this.logger.debug('All highlight textures loaded', { objects: textures });
-    });
-
-    setups.forEach((setup) => {
-      const highlight = new Highlight(setup, this.logger, this.highlightGroup, textures);
-      this.highlights.push(highlight);
-
-      // // animation hooks
-      // if (hl.animation && !hl.isTrigger) {
-      //   this.animMan.addTimelineHook("highlight", hl.animation.targetTime, hl.animation.timeUnit, hl);
-      // }
-
-      // visibility
-      if (highlight.visibility) {
-        this.visibility.push(highlight);
-      }
-      this.clickable.push(highlight.glow);
-    });
-    this.setClickzonesVisible(this.highlightsVisible);
-  }
-
-  private setClickzonesVisible(value?: boolean): void {
-    this.highlightsVisible = value ?? !this.highlightsVisible;
-    this.highlights.forEach((highlight) => {
-      highlight.clickzone.visible = this.highlightsVisible;
-      highlight.glow.traverse((node) => {
-        const materials = (node as Mesh).material;
-        if (Array.isArray(materials)) {
-          materials.forEach((material) => {
-            material.opacity = this.highlightsVisible ? 1 : 0;
-          });
-        } else {
-          materials.opacity = this.highlightsVisible ? 1 : 0;
-        }
-      });
-    });
+  public getHighlights(): Observable<Highlight[]> {
+    return this.highlights$.asObservable();
   }
 
   private addListeners(key: string) {
@@ -274,6 +221,29 @@ export class HighlightFeature implements IHighlightFeature {
     return val >= min && val <= max ? val : val > max ? max : min;
   }
 
+  private createHighlights(setups: HighlightSetupModel[], textures: HighlightTextureMap) {
+    setups.forEach((setup) => {
+      if (this.getHighlightByID(setup.id)) {
+        return;
+      }
+
+      const highlight = new Highlight(setup, this.logger, this.highlightGroup, textures);
+      this.highlights.push(highlight);
+
+      // // animation hooks
+      // if (hl.animation && !hl.isTrigger) {
+      //   this.animMan.addTimelineHook("highlight", hl.animation.targetTime, hl.animation.timeUnit, hl);
+      // }
+
+      // visibility
+      if (highlight.visibility) {
+        this.visibility.push(highlight);
+      }
+      this.clickable.push(highlight.glow);
+    });
+    this.setClickzonesVisible(this.highlightsVisible);
+  }
+
   private dispatchHighlightClick(hl: Highlight, immediate = false, fromStart = false) {
     // TODO: Highlight animations not yet implemented in AnimationsManager
     // check if highlight is trigger
@@ -328,6 +298,7 @@ export class HighlightFeature implements IHighlightFeature {
   private handleMove = (newPos: Vector2): void => {
     if (this.startPos.distanceTo(newPos) > this.dragThreshold && this.state !== HighlightMode.TO_ORBIT) {
       this.state = HighlightMode.TO_ORBIT;
+      this.focusedHighlight$.next(null);
       // this.dispatcher.dispatch("onstate", this.state);
       this.addListeners('wheel');
       this.controls.position0 = this.camera.position.clone();
@@ -380,6 +351,30 @@ export class HighlightFeature implements IHighlightFeature {
 
     const deltaMove = dist * this.clamp((deltaTime / 1000) * speed, 0, 1);
     return current + deltaMove;
+  }
+
+  private loadHighlightTextures(): Promise<HighlightTextureMap> {
+    const textures: HighlightTextureMap = {
+      actionTransTex: null,
+      actionTransHoverTex: null,
+      simpleTransTex: null,
+      simpleTransHoverTex: null,
+    };
+    return Promise.all(
+      Object.entries({
+        actionTransTex: 'assets/textures/highlights/action_trans.png',
+        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
+        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
+        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
+      }).map(([key, value]) =>
+        this.assetService.loadTexture(value).then((texture) => {
+          textures[key] = texture;
+        })
+      )
+    ).then(() => {
+      this.logger.debug('All highlight textures loaded', { objects: textures });
+      return textures;
+    });
   }
 
   private onDocumentMouseDown(event: Event): void {
@@ -460,8 +455,26 @@ export class HighlightFeature implements IHighlightFeature {
     }
   }
 
+  private setClickzonesVisible(value?: boolean): void {
+    this.highlightsVisible = value ?? !this.highlightsVisible;
+    this.highlights.forEach((highlight) => {
+      highlight.clickzone.visible = this.highlightsVisible;
+      highlight.glow.traverse((node) => {
+        const materials = (node as Mesh).material;
+        if (Array.isArray(materials)) {
+          materials.forEach((material) => {
+            material.opacity = this.highlightsVisible ? 1 : 0;
+          });
+        } else {
+          materials.opacity = this.highlightsVisible ? 1 : 0;
+        }
+      });
+    });
+  }
+
   private setPOI(highlight: Highlight): void {
     this.logger.debug('Going to highlight', { objects: highlight.id });
+    this.focusedHighlight$.next(highlight);
 
     this.state = HighlightMode.TO_HIGHLIGHT;
     // this.dispatcher.dispatch("onstate", scope.state);

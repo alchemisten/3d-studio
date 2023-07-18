@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { Group, Mesh, Object3D, Scene } from 'three';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
 import { LoggerServiceToken } from '../../util';
@@ -12,10 +12,13 @@ import { LoggerServiceToken } from '../../util';
  */
 @injectable()
 export class SceneService implements ISceneService {
+  public objectAddedToScene$: Observable<Object3D>;
   public readonly scene: Scene;
   private readonly group: Object3D;
   private readonly logger: ILogger;
+  private objectMap: Record<string, Object3D> = {};
   private objects$: BehaviorSubject<Object3D[]>;
+  private lastObjectAdded$: ReplaySubject<Object3D>;
 
   public constructor(@inject(LoggerServiceToken) logger: ILoggerService) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Scene' } } });
@@ -24,14 +27,21 @@ export class SceneService implements ISceneService {
     this.group.name = 'objects';
     this.scene.add(this.group);
     this.objects$ = new BehaviorSubject<Object3D[]>(this.group.children);
+    this.lastObjectAdded$ = new ReplaySubject<Object3D>(1);
+    this.objectAddedToScene$ = this.lastObjectAdded$.asObservable();
   }
 
   public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {
+    if (this.objectMap[object.name]) {
+      return;
+    }
     if (objectSetup) {
       this.applyObjectSetup(object, objectSetup);
     }
+    this.objectMap[object.name] = object;
     this.group.add(object);
     this.logger.debug('Object added', { objects: object });
+    this.lastObjectAdded$.next(object);
     this.objects$.next(this.group.children);
   }
 
@@ -40,12 +50,15 @@ export class SceneService implements ISceneService {
   }
 
   public removeObjectFromScene(objectName: string): void {
-    this.group.traverse((object) => {
-      if (object.name === objectName && object.parent) {
-        object.parent.remove(object);
-      }
-    });
-    this.objects$.next(this.group.children);
+    if (!this.group || !this.objectMap[objectName]) {
+      return;
+    }
+    const remove = this.objectMap[objectName];
+    if (remove && remove.parent) {
+      remove.parent.remove(remove);
+      delete this.objectMap[objectName];
+      this.objects$.next(this.group.children);
+    }
   }
 
   private applyObjectSetup(object: Object3D, objectSetup: ObjectSetupModel): void {

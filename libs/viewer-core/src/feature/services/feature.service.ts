@@ -1,14 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type {
-  FeatureSetup,
-  IConfigService,
-  IFeature,
-  IFeatureRegistryService,
-  IFeatureService,
-  ILoggerService,
-} from '../../types';
 import type { ILogger } from '@schablone/logging';
+import type { IConfigService, ILoggerService } from '../../types';
+import type { FeatureSetup, IFeature, IFeatureRegistryService, IFeatureService } from '../types';
 import { ConfigServiceToken, FeatureRegistryServiceToken, LoggerServiceToken } from '../../util';
 
 /**

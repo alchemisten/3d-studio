@@ -1,8 +1,10 @@
 import { inject, injectable } from 'inversify';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import type { Material, MeshStandardMaterial, Texture } from 'three';
 import type { ILogger } from '@schablone/logging';
-import type { IAssetService, IFeature, ILoggerService, IMaterialService, ISceneService } from '../../../types';
+import type { IAssetService, ILoggerService, IMaterialService, ISceneService } from '../../../types';
+import type { ISkyboxFeature, SkyboxFeatureConfig, SkyboxType } from './types';
 import {
   AssetServiceToken,
   LoggerServiceToken,
@@ -10,14 +12,12 @@ import {
   SceneServiceToken,
   SkyboxFeatureToken,
 } from '../../../util';
-import type { SkyboxFeatureConfig, SkyboxType } from './types';
-import { withLatestFrom } from 'rxjs/operators';
 
 @injectable()
-export class SkyboxFeature implements IFeature {
+export class SkyboxFeature implements ISkyboxFeature {
   public readonly id = SkyboxFeatureToken;
   private enabled!: boolean;
-  private readonly enabled$: Subject<boolean>;
+  private readonly enabled$: BehaviorSubject<boolean>;
   private logger: ILogger;
   private skybox!: Texture;
   private skyboxPath!: string;
@@ -31,7 +31,7 @@ export class SkyboxFeature implements IFeature {
     @inject(SceneServiceToken) private sceneService: ISceneService
   ) {
     this.logger = loggerService.withOptions({ globalLogOptions: { tags: { Feature: 'Skybox' } } });
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
   public init(config: SkyboxFeatureConfig): void {

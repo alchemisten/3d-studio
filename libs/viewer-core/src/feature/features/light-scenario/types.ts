@@ -1,6 +1,7 @@
-import { Observable } from 'rxjs';
-import { FeatureConfig, I18nLanguageMap, IFeature, LightSetupModel } from '../../../types';
-import { Light, WebGLCubeRenderTarget } from 'three';
+import type { Observable } from 'rxjs';
+import type { Light, WebGLCubeRenderTarget } from 'three';
+import type { I18nLanguageMap, LightSetupModel } from '../../../types';
+import type { FeatureConfig, IFeature } from '../../types';
 
 export type LightScenarioId = string;
 export interface LightScenarioModel {

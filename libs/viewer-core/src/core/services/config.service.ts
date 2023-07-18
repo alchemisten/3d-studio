@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { PCFSoftShadowMap, SRGBColorSpace, Vector3 } from 'three';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
 
 export const defaultRenderConfig = <RenderConfigModel>{
@@ -37,10 +37,10 @@ export const defaultCameraConfig = <CameraConfigModel>{
 @injectable()
 export class ConfigService implements IConfigService {
   private config!: ViewerConfigModel;
-  private config$: Subject<ViewerConfigModel>;
+  private config$: BehaviorSubject<ViewerConfigModel>;
 
   public constructor() {
-    this.config$ = new Subject<ViewerConfigModel>();
+    this.config$ = new BehaviorSubject<ViewerConfigModel>({ objects: [] });
   }
 
   public getConfig(): Observable<ViewerConfigModel> {

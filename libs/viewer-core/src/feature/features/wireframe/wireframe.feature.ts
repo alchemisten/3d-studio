@@ -1,9 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
-import { Observable, Subject } from 'rxjs';
-import type { FeatureConfig, IMaterialService } from '../../../types';
-import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+import type { IMaterialService } from '../../../types';
+import type { FeatureConfig } from '../../types';
 import type { IWireframeFeature } from './types';
+import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
 
 /**
  * When enabled all materials of all objects in the scene will be set to
@@ -13,11 +15,11 @@ import type { IWireframeFeature } from './types';
 export class WireframeFeature implements IWireframeFeature {
   public readonly id = WireframeFeatureToken;
   private enabled!: boolean;
-  private readonly enabled$: Subject<boolean>;
+  private readonly enabled$: BehaviorSubject<boolean>;
   private materials!: Material[];
 
   public constructor(@inject(MaterialServiceToken) private materialService: IMaterialService) {
-    this.enabled$ = new Subject<boolean>();
+    this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
   public getEnabled(): Observable<boolean> {
@@ -36,9 +38,10 @@ export class WireframeFeature implements IWireframeFeature {
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     this.enabled$.next(this.enabled);
+    this.setWireframeEnabled(this.enabled);
   }
 
-  public setWireframeEnabled(enabled: boolean): void {
+  private setWireframeEnabled(enabled: boolean): void {
     this.materials.forEach((material) => {
       if ((material as MeshStandardMaterial).wireframe !== undefined) {
         (material as MeshStandardMaterial).wireframe = enabled;

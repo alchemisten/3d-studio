@@ -12,7 +12,7 @@ import {
 } from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { IAssetService, ILoggerService, IRenderService } from '../../types';
 import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
@@ -32,9 +32,11 @@ import type { ConfigService } from './config.service';
 export class AssetService implements IAssetService {
   public readonly hookObjectLoaded$: Observable<Object3D>;
   private basePath = '';
+  private assetMap: Record<string, Promise<unknown>> = {};
   private readonly cubeTextureLoader: CubeTextureLoader;
   private readonly dracoLoader: DRACOLoader;
   private readonly gltfLoader: GLTFLoader;
+  private readonly isLoading$: BehaviorSubject<boolean>;
   private readonly objectLoaded$: Subject<Object3D>;
   private readonly loadingManager: LoadingManager;
   private readonly logger: ILogger;
@@ -59,15 +61,25 @@ export class AssetService implements IAssetService {
     this.textureLoader = new TextureLoader(this.loadingManager);
     this.objectLoaded$ = new Subject();
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
+    this.isLoading$ = new BehaviorSubject(false);
     this.configService.getConfig().subscribe((config) => {
       this.basePath = config.project?.basedir ? `${config.project.basedir}/` : '';
     });
   }
 
+  public getIsLoading(): Observable<boolean> {
+    return this.isLoading$.asObservable();
+  }
+
   public loadCubeTexture(path: string, imageSuffix = '.jpg'): Promise<CubeTexture> {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<CubeTexture>;
+    }
+
+    this.isLoading$.next(true);
     const directions = ['pos-x', 'neg-x', 'pos-y', 'neg-y', 'pos-z', 'neg-z'];
 
-    return new Promise((resolve, reject) => {
+    this.assetMap[path] = new Promise((resolve, reject) => {
       this.cubeTextureLoader.setPath(`${this.basePath}${path}/`).load(
         directions.map((direction) => direction + imageSuffix),
         (texture) => {
@@ -79,6 +91,8 @@ export class AssetService implements IAssetService {
         }
       );
     });
+
+    return this.assetMap[path] as Promise<CubeTexture>;
   }
 
   public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {
@@ -90,23 +104,38 @@ export class AssetService implements IAssetService {
   }
 
   public loadObject(path: string): Promise<Object3D> {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<Object3D>;
+    }
+
+    this.isLoading$.next(true);
     const [type] = path.split('.').slice(-1);
+
     switch (type) {
       case 'gltf':
-        return this.loadGLTF(path).then((gltf) => {
+        this.assetMap[path] = this.loadGLTF(path).then((gltf) => {
           gltf.scene.animations = gltf.animations;
           this.objectLoaded$.next(gltf.scene);
           return gltf.scene;
         });
+        break;
       default:
-        return new Promise((resolve, reject) => {
+        this.assetMap[path] = new Promise((resolve, reject) => {
           reject(`Object type unknown: ${type}`);
         });
+        break;
     }
+
+    return this.assetMap[path] as Promise<Object3D>;
   }
 
   public loadTexture(path: string): Promise<Texture> {
-    return new Promise((resolve, reject) => {
+    if (this.isAssetRegistered(path)) {
+      return this.assetMap[path] as Promise<Texture>;
+    }
+
+    this.isLoading$.next(true);
+    this.assetMap[path] = new Promise((resolve, reject) => {
       this.textureLoader.load(
         `${this.basePath}${path}`,
         (texture) => {
@@ -118,6 +147,8 @@ export class AssetService implements IAssetService {
         }
       );
     });
+
+    return this.assetMap[path] as Promise<Texture>;
   }
 
   private loadGLTF(path: string): Promise<GLTF> {
@@ -145,6 +176,13 @@ export class AssetService implements IAssetService {
   }
 
   private onLoadingProgress(url: string, itemsLoaded: number, itemsTotal: number): void {
+    if (itemsLoaded === itemsTotal) {
+      this.isLoading$.next(false);
+    }
     this.logger.debug(`Finished file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
+  }
+
+  private isAssetRegistered(path: string): boolean {
+    return this.assetMap[path] !== undefined;
   }
 }

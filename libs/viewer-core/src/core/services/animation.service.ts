@@ -5,16 +5,9 @@ import type { ILogger } from '@schablone/logging';
 import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
 import { LoggerServiceToken, RenderServiceToken } from '../../util';
+import { AnimationTimeMap } from '../../types';
+import { map } from 'rxjs/operators';
 
-/**
- * The animation service handles animations for all objects loaded in the
- * viewer. It provides access to the animations and object mixers for each
- * object and keeps track of the animation clock. To play any animations for an
- * object, a mixer has to be registered for it with animation service.
- *
- * Currently running animations are updated before each render call
- * automatically.
- */
 @injectable()
 export class AnimationService implements IAnimationService {
   private activeActions: AnimationAction[];
@@ -47,7 +40,7 @@ export class AnimationService implements IAnimationService {
     });
   }
 
-  public addMixerForObject(object: Object3D): boolean {
+  public addMixerForObject(object: Object3D): AnimationMixer | false {
     if (!object.name || !object.animations || object.animations.length < 1) {
       return false;
     }
@@ -59,11 +52,25 @@ export class AnimationService implements IAnimationService {
     }
 
     this.mixers$.next(this.mixers);
-    return true;
+    return this.mixers[object.name];
   }
 
   public getActiveAnimations(): Observable<AnimationAction[]> {
     return this.activeActions$.asObservable();
+  }
+
+  public getActiveAnimationTime(): Observable<AnimationTimeMap> {
+    return this.renderService.hookBeforeRender$.pipe(
+      map(() =>
+        this.activeActions.reduce((acc, action) => {
+          acc[action.getClip().name] = {
+            duration: action.getClip().duration,
+            time: action.time,
+          };
+          return acc;
+        }, {} as AnimationTimeMap)
+      )
+    );
   }
 
   public getMixerForObject(objectName: string): AnimationMixer {
@@ -78,18 +85,21 @@ export class AnimationService implements IAnimationService {
     return this.mixers$.asObservable();
   }
 
-  public playObjectAnimation(animId: AnimationIdModel): void {
+  public playObjectAnimation(animId: AnimationIdModel): AnimationAction | false {
     try {
       const animation = this.getAnimation(animId);
       const mixer = this.getMixerForObject(animId.objectName);
 
       this.setAnimationEnabled(false);
       this.activeActions = [];
-      this.activeActions.push(mixer.clipAction(animation));
+      const action = mixer.clipAction(animation);
+      this.activeActions.push(action);
       this.activeActions$.next(this.activeActions);
       this.setAnimationEnabled(true);
-    } catch (exception) {
-      this.logger.warn(`Can't play animation ${animId}`, { error: exception });
+      return action;
+    } catch (error) {
+      this.logger.warn(`Can't play animation ${animId}`, { error });
+      return false;
     }
   }
 

@@ -1,0 +1,33 @@
+.label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  line-height: var(--ui-size-label-line-height);
+  gap: var(--ui-size-element-gap);
+  pointer-events: all;
+
+  &:after {
+    background: var(--ui-color-inactive);
+    border: 4px solid var(--ui-color-inactive);
+    border-radius: 50%;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.3);
+    content: '';
+    display: block;
+    flex: 0 0 auto;
+    height: var(--ui-size-checkbox);
+    width: var(--ui-size-checkbox);
+  }
+
+  &:hover,
+  &.active {
+    &:after {
+      border-color: var(--ui-color-interaction);
+      background-color: var(--ui-color-font);
+    }
+  }
+}
+
+.input {
+  display: none;
+}

@@ -1,0 +1,77 @@
+@import '../../style/scss-variables.scss';
+
+.selectBox {
+  bottom: var(--ui-size-element-margin);
+  display: flex;
+  justify-content: stretch;
+  left: 50%;
+  max-width: var(--ui-size-select-list-width);
+  pointer-events: all;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 100%;
+
+  .current {
+    height: var(--ui-size-button);
+    flex: 1 1 auto;
+    font-size: var(--ui-font-size);
+    overflow: hidden;
+    padding: 0 10px;
+    width: 100%;
+  }
+}
+
+.prev,
+.next {
+  flex: 0 0 auto;
+  height: var(--ui-size-button);
+  width: var(--ui-size-select-step-button-width);
+}
+
+.prev {
+  border-radius: var(--ui-size-border-radius) 0 0 var(--ui-size-border-radius);
+}
+
+.next {
+  border-radius: 0 var(--ui-size-border-radius) var(--ui-size-border-radius) 0;
+}
+
+.list {
+  background-color: var(--ui-color-element-background);
+  border-radius: var(--ui-size-border-radius);
+  bottom: var(--ui-size-select-list-bottom);
+  display: flex;
+  flex-direction: column;
+  left: 50%;
+  max-height: calc(100vh - var(--ui-size-menu-bottom) - var(--ui-size-element-margin));
+  max-width: calc(100vw - var(--ui-size-element-margin) * 2);
+  overflow-y: auto;
+  padding: var(--ui-size-border-radius) 0;
+  position: absolute;
+  transform: translateX(-50%);
+  width: var(--ui-size-select-list-width);
+
+  .listEntry {
+    background-color: transparent;
+    flex: 0 0 auto;
+    font-size: var(--ui-font-size);
+    height: var(--ui-size-button);
+  }
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-md) {
+  .selectBox {
+    width: auto;
+
+    .current {
+      display: none;
+    }
+  }
+
+  .list {
+    display: none;
+  }
+}

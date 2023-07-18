@@ -1,0 +1,90 @@
+@import '../style/scss-variables.scss';
+
+.viewerUi {
+  --ui-animation-time: 0.2s ease-in-out;
+  --ui-color-element-background: rgba(0,0,0,0.8);
+  --ui-color-font: #fff;
+  --ui-color-inactive: #757575;
+  --ui-color-interaction: #00c2ff;
+  --ui-color-loading-background: #000;
+  --ui-color-loading-indicator: #005cb1;
+  --ui-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  --ui-font-size: 16px;
+  --ui-size-animation-bar-bottom: 80px;
+  --ui-size-animation-bar-handle: 24px;
+  --ui-size-animation-bar-height: 4px;
+  --ui-size-border-radius: 10px;
+  --ui-size-box-padding: 22px;
+  --ui-size-button: 40px;
+  --ui-size-button-toggle: 20px;
+  --ui-size-checkbox: 12px;
+  --ui-size-element-gap: 20px;
+  --ui-size-element-margin: 25px;
+  --ui-size-highlight-bottom: 300px;
+  --ui-size-highlight-width: 350px;
+  --ui-size-intro-width: 390px;
+  --ui-size-label-line-height: 50px;
+  --ui-size-loading-bar-height: 4px;
+  --ui-size-menu-bottom: 120px;
+  --ui-size-menu-width: 270px;
+  --ui-size-select-list-bottom: 95px;
+  --ui-size-select-list-width: 310px;
+  --ui-size-select-step-button-width: 25px;
+
+  box-sizing: border-box;
+  color: var(--ui-color-font);
+  font-family: var(--ui-font-family);
+  font-size: var(--ui-font-size);
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  button {
+    align-items: center;
+    appearance: none;
+    background: var(--ui-color-element-background);
+    border: none;
+    color: var(--ui-color-font);
+    cursor: pointer;
+    display: flex;
+    font-family: var(--ui-font-family);
+    font-size: 14px;
+    justify-content: center;
+    padding: 0;
+    pointer-events: all;
+    transition: background-color var(--ui-animation-time);
+
+
+    &:hover {
+      background: var(--ui-color-interaction);
+    }
+  }
+
+  &.clicked {
+    pointer-events: none;
+  }
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-md) {
+  .viewerUi {
+    --ui-size-button: 50px;
+    --ui-size-animation-bar-bottom: 70px;
+    --ui-size-animation-bar-handle: 30px;
+    --ui-size-element-gap: 10px;
+    --ui-size-element-margin: 15px;
+    --ui-size-highlight-bottom: 115px;
+    --ui-size-menu-bottom: 115px;
+    --ui-size-select-step-button-width: var(--ui-size-button);
+  }
+}
