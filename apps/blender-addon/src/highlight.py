@@ -1,8 +1,10 @@
 import bpy
 
+from . import BlIdName
+
 
 class AddHighlightOperator(bpy.types.Operator):
-    bl_idname = "alcm.cv_highlight_add_operator"
+    bl_idname = BlIdName.AddHighlightOperator.value
     bl_label = "Add Highlight"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -40,7 +42,7 @@ class AddHighlightOperator(bpy.types.Operator):
 
 
 class AddHighlightPanel(bpy.types.Panel):
-    bl_idname = "ALCM_CV_PT_highlight_add"
+    bl_idname = BlIdName.AddHighlightPanel.value
     bl_label = "Add Highlight"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -48,11 +50,11 @@ class AddHighlightPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("alcm.cv_highlight_add_operator")
+        layout.operator(BlIdName.AddHighlightOperator.value)
 
 
 class ContentViewerMenu(bpy.types.Menu):
-    bl_idname = "ALCM_CV_MT_menu"
+    bl_idname = BlIdName.ContentViewerMenu.value
     bl_label = "Content Viewer"
 
     def draw(self, context):
@@ -62,7 +64,7 @@ class ContentViewerMenu(bpy.types.Menu):
 
 def draw_func(self, context):
     layout = self.layout
-    layout.menu(ContentViewerMenu.bl_idname)
+    layout.menu(BlIdName.ContentViewerMenu.value)
 
 
 def register():

@@ -13,6 +13,7 @@
   "dependencies": {
     "@gltf-transform/core": "^3.4.8",
     "@schablone/logging": "^1.1.2",
+    "@schablone/logging-react": "^1.1.2",
     "camelcase": "^7.0.1",
     "core-js": "^3.30.1",
     "inversify": "^6.0.1",

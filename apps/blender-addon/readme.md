@@ -1,1 +1,0 @@
-# Blender Content Viewer Addon

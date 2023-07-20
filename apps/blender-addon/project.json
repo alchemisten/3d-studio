@@ -5,12 +5,34 @@
   "sourceRoot": "apps/blender-addon/src",
   "tags": [],
   "targets": {
+    "vscode": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "open",
+      "options": {
+        "cwd": "apps/blender-addon"
+      },
+      "configurations": {
+        "open": {
+          "commands": [
+            "code ."
+          ]
+        },
+        "prepare": {
+          "commands": [
+            "code --install-extension ms-python.python",
+            "code --install-extension JacquesLucke.blender-development"
+          ]
+        }
+      }
+    },
     "prepare-blender-dev": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/blender-addon",
         "envFile": "apps/blender-addon/.env",
         "commands": [
+          "echo Updating Blender Python Pip...",
+          "\"{args.blenderPythonPath}\" -m pip install --upgrade pip",
           "echo Installing Blender Addon Dependencies...",
           "\"{args.blenderPythonPath}\" -m pip install -r {args.cwd}/requirements-dev.txt"
         ]

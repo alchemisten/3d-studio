@@ -1,5 +1,7 @@
 # 3d-studio - Home of the monorepo for webgl library development
 
+[[toc]]
+
 The 3d studio provides a WebGL rendering environment for product visualization
 based on [Three JS](https://threejs.org).
 

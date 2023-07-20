@@ -5,3 +5,4 @@ Jinja2
 Werkzeug
 blinker
 colorama
+fake-bpy-module-latest

@@ -3049,7 +3049,16 @@
     colors "~1.2.1"
     string-argv "~0.3.1"
 
-"@schablone/logging@^1.1.2":
+"@schablone/logging-react@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@schablone/logging-react/-/logging-react-1.1.2.tgz#3154e30e69ea808f78dac3396cc2558f42063cb1"
+  integrity sha512-wuZIEANd888qoao5NOaq/eJZFVPy0rWSwaEOmXqBX9dK3fQ0NJk/38pDZvpZ3xorwTM7Tk/JI299jTLIZMIA4g==
+  dependencies:
+    "@schablone/logging" "^1.1.0"
+    react "^18.2.0"
+    tslib "^2.5.0"
+
+"@schablone/logging@^1.1.0", "@schablone/logging@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@schablone/logging/-/logging-1.1.2.tgz#880aec0b0a9e4f8ba7da64d11ffa83a4db2d6ef1"
   integrity sha512-PPCJxgLd2ZjRGHIdZ7V3nktxQmy3KxxNhvZERpMMcGJfnq8QXW/fwWDN8V0cI8jOuyKcbm0iOtd1OSeFZrC7Xg==
@@ -7830,7 +7839,7 @@ react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react@18.2.0:
+react@18.2.0, react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
