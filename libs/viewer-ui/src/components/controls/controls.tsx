@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslations } from 'react-intl-provider';
 
 import type { FeatureMap } from '../../types';
@@ -27,6 +27,8 @@ export const Controls: FC<ControlsProps> = ({ features }) => {
     setLanguageMenuOpen(!languageMenuOpen);
   };
 
+  const hasFeatures = useMemo(() => Object.values(features).length > 0, [features]);
+
   return (
     <div className={styles.controls}>
       <Button onClick={languageMenuClicked}>{currentLanguage}</Button>
@@ -42,7 +44,7 @@ export const Controls: FC<ControlsProps> = ({ features }) => {
         </TextBox>
       )}
 
-      {features && (
+      {hasFeatures && (
         <>
           <Button onClick={featureMenuClicked}>
             <svg fill="currentColor" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
