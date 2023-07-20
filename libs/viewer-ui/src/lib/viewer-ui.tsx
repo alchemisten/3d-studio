@@ -1,5 +1,5 @@
 import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { Subscription } from 'rxjs';
 
@@ -54,7 +54,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, viewer }) => {
       <ViewerProvider viewer={viewer}>
         <div className={`${styles.viewerUi} ${introClosed ? styles.clicked : ''}`} onClick={handleUIClick}>
           <Controls features={features} />
-          {!introClosed && <Intro isLoading={isLoading} viewer={viewer} />}
+          {!introClosed && <Intro isLoading={isLoading} viewer={viewer} setIntroClosed={setIntroClosed} />}
           <AnimationBar />
           {features[String(HighlightFeatureToken)] && (
             <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
