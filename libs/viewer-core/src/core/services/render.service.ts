@@ -2,13 +2,13 @@ import { inject, injectable } from 'inversify';
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { Observable, Subject } from 'rxjs';
-import type { CameraConfigModel, IRenderService, ISceneService, RenderConfigModel } from '../../types';
+import type { CameraConfigModel, IConfigService, IRenderService, ISceneService, RenderConfigModel } from '../../types';
 import { defaultCameraConfig, defaultRenderConfig } from './config.service';
-import { SceneServiceToken } from '../../util';
+import { ConfigServiceToken, SceneServiceToken } from '../../util';
 
 /**
  * The render service renders the current scene to its internal canvas. By
- * default a single image will be rendered on demand, but the renderer can be
+ * default, a single image will be rendered on demand, but the renderer can be
  * configured to continuously render a new image every frame.
  */
 @injectable()
@@ -26,7 +26,10 @@ export class RenderService implements IRenderService {
   private renderConfig: RenderConfigModel;
   private renderConfig$: Subject<RenderConfigModel>;
 
-  public constructor(@inject(SceneServiceToken) private sceneService: ISceneService) {
+  public constructor(
+    @inject(ConfigServiceToken) private configService: IConfigService,
+    @inject(SceneServiceToken) private sceneService: ISceneService
+  ) {
     this.afterRender$ = new Subject<boolean>();
     this.hookAfterRender$ = this.afterRender$.asObservable();
     this.beforeRender$ = new Subject<boolean>();
@@ -41,6 +44,14 @@ export class RenderService implements IRenderService {
     this.renderConfig = defaultRenderConfig;
     this.renderConfig$ = new Subject<RenderConfigModel>();
     this.setRenderConfig(this.renderConfig);
+    this.configService.getConfig().subscribe((config) => {
+      if (config.render) {
+        this.setRenderConfig(config.render);
+      }
+      if (config.camera) {
+        this.setCameraConfig(config.camera);
+      }
+    });
   }
 
   public getCamera(): Observable<PerspectiveCamera> {

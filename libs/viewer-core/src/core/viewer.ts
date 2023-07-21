@@ -65,22 +65,20 @@ export class Viewer implements IViewer {
         config.render
       )
     );
-    if (node && window) {
-      this.node = node;
-      this.node.appendChild(this.renderService.renderer.domElement);
 
-      fromEvent(window, 'resize').pipe(debounceTime(300)).subscribe(this.onWindowResize.bind(this));
-    }
-
-    this.sceneService.objectAddedToScene$.subscribe((object) => {
-      this.animationService.addMixerForObject(object);
-    });
     config.objects.forEach((objectSetup) => {
       this.assetService.loadObject(objectSetup.path).then((object) => {
         this.sceneService.addObjectToScene(object, objectSetup);
         this.renderService.renderSingleFrame();
       });
     });
+
+    if (node && window) {
+      this.node = node;
+
+      this.node.appendChild(this.renderService.renderer.domElement);
+      fromEvent(window, 'resize').pipe(debounceTime(300)).subscribe(this.onWindowResize.bind(this));
+    }
   }
 
   private onWindowResize() {
