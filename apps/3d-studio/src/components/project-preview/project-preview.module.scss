@@ -1,0 +1,79 @@
+.projectPreview {
+  --project-preview-title-color: #fff;
+
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: -1px 4px 50px 0 rgba(0,0,0,.5);
+  overflow: hidden;
+  position: relative;
+}
+
+.image {
+  background-color: var(--color-gray);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+
+  &:before {
+    content: '';
+    display: block;
+    padding-top: 56.25%;
+  }
+
+  img {
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  }
+}
+
+.title {
+  bottom: 10px;
+  color: #fff;
+  font-size: 19px;
+  left: 20px;
+  pointer-events: none;
+  position: absolute;
+  right: 20px;
+  z-index: 2;
+}
+
+.controls {
+  background-color: #fff;
+  display: flex;
+  height: 80px;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.selectButton {
+  background: var(--color-gray-light);
+  border: 8px solid var(--color-gray);
+  border-radius: 25px;
+  height: var(--interaction-height);
+  outline: none;
+  padding: 0;
+  transition: background var(--animation-time) opacity var(--animation-time);
+  width: var(--interaction-height);
+
+  &.selected {
+    background: var(--color-interaction-active);
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.button {
+  border-radius: 2px;
+  color: var(--color-button);
+
+  &:hover {
+    background-color: var(--color-interaction-active);
+    color: var(--color-button);
+  }
+}

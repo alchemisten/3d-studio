@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "@fontsource/open-sans": "^5.0.5",
     "@schablone/logging": "^1.1.2",
     "@schablone/logging-react": "^1.1.2",
     "@swc/helpers": "~0.5.0",

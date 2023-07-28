@@ -1,0 +1,53 @@
+@import '../../styles/scss-variables.scss';
+
+.pageHeader {
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 3px 15px rgba(0,0,0,.2);
+  box-sizing: border-box;
+  display: flex;
+  height: var(--header-height);
+  justify-content: space-between;
+  left: 0;
+  padding: 10px;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  top: 0;
+  z-index: 20;
+}
+
+.button {
+  flex: 0 0 auto;
+  height: var(--interaction-height);
+  padding: 0;
+  width: var(--interaction-height);
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.logo {
+  height: 100%;
+  flex: 0 0 auto;
+
+  img {
+    height: 100%;
+    width: auto;
+  }
+}
+
+.headline {
+  font-size: 30px;
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-md) {
+  .headline {
+    font-size: 24px;
+  }
+}

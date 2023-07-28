@@ -1,0 +1,36 @@
+@import '../../styles/scss-variables.scss';
+
+.pageContent {
+  padding-left: 0;
+  padding-top: var(--header-height);
+  transition: padding-left var(--animation-time);
+
+  .page.sidebarOpen & {
+    padding-left: var(--sidebar-width);
+  }
+}
+
+.projects {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  margin: auto;
+  max-width: 1600px;
+  padding: 20px;
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-md) {
+  .page {
+    &.sidebarOpen {
+      height: 100vh;
+      overflow: hidden;
+
+      .pageContent {
+        padding-left: 0;
+      }
+    }
+  }
+}

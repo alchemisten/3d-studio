@@ -284,10 +284,6 @@ export const Project: FC = () => {
     setViewer(launcher.createHTMLViewer(viewerCanvas.current, config));
   }, [id]);
 
-  useEffect(() => {
-    console.log('Viewer changed', viewer);
-  }, [viewer]);
-
   return (
     <>
       <div ref={viewerCanvas} className={styles.viewerCanvas} />
