@@ -59,15 +59,6 @@ export interface SizeModel {
 export type I18nTranslations = Record<string, string>;
 export type I18nLanguageMap = Record<string, I18nTranslations>;
 
-export type UIControlId = string;
-export interface UIControlModel {
-  controls?: UIControlModel[];
-  i18n: I18nLanguageMap;
-  id: UIControlId;
-  type: unknown;
-  value: unknown;
-}
-
 export type ClearColor = {
   alpha?: number;
   color: string;
@@ -93,10 +84,6 @@ export interface CameraConfigModel {
   target: Vector3;
 
   [key: string]: unknown;
-}
-
-export interface IControllable {
-  getControls(): UIControlModel[];
 }
 
 export interface IViewer {

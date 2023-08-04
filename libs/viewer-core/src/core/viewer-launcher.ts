@@ -8,9 +8,6 @@ import type {
   IAssetService,
   IConfigService,
   IControlService,
-  IFeature,
-  IFeatureRegistryService,
-  IFeatureService,
   ILightService,
   ILoggerService,
   IMaterialService,
@@ -33,7 +30,7 @@ import {
   RenderService,
   SceneService,
 } from './services';
-import { FeatureRegistryService, FeatureService } from '../feature';
+import { FeatureRegistryService, FeatureService, IFeature, IFeatureRegistryService, IFeatureService } from '../feature';
 import {
   AnimationServiceToken,
   AssetServiceToken,
