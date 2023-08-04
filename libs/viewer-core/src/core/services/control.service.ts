@@ -3,8 +3,8 @@ import { PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
-import type { IControlService, IRenderService, RenderConfigModel } from '../../types';
-import { RenderServiceToken } from '../../util';
+import type { IConfigService, IControlService, IRenderService, RenderConfigModel } from '../../types';
+import { ConfigServiceToken, RenderServiceToken } from '../../util';
 
 /**
  * The control service provides access to orbit controls.
@@ -19,7 +19,10 @@ export class ControlService implements IControlService {
   private controls$: Subject<OrbitControls>;
   private changeSub!: Subscription;
 
-  public constructor(@inject(RenderServiceToken) private renderService: IRenderService) {
+  public constructor(
+    @inject(ConfigServiceToken) private configService: IConfigService,
+    @inject(RenderServiceToken) private renderService: IRenderService
+  ) {
     this.controls$ = new Subject<OrbitControls>();
     this.renderService.getCamera().pipe(take(1)).subscribe(this.createControls.bind(this));
     this.renderService.hookAfterRender$
@@ -29,6 +32,12 @@ export class ControlService implements IControlService {
           this.controls.update();
         }
       });
+    this.configService.getConfig().subscribe((config) => {
+      if (config.controls && this.controls) {
+        this.controls.enableZoom = config.controls.allowZoom ?? true;
+        this.controls.update();
+      }
+    });
   }
 
   public getControls(): Observable<OrbitControls> {

@@ -23,11 +23,17 @@ import { LightType, MaterialType } from './enums';
 
 export interface ViewerConfigModel {
   camera?: Partial<CameraConfigModel>;
+  controls?: Partial<ControlConfigModel>;
   features?: FeatureSetup;
   objects: ObjectSetupModel[];
   project?: ProjectConfigModel;
   render?: Partial<RenderConfigModel>;
 }
+
+export interface ControlConfigModel {
+  allowZoom?: boolean;
+}
+
 export interface ObjectSetupModel {
   castShadow?: boolean;
   name?: string;
