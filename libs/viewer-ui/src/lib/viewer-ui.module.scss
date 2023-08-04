@@ -73,6 +73,30 @@
   }
 }
 
+.clickzone {
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 20;
+}
+
+.logo {
+  max-height: 100px;
+  max-width: 200px;
+  position: fixed;
+  right: var(--ui-size-element-margin);
+  top: var(--ui-size-element-margin);
+  z-index: 10;
+
+  img {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+  }
+}
+
 
 
 // ===== MEDIA QUERIES =====
