@@ -4,6 +4,7 @@ import type { interfaces } from 'inversify';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import type {
+  CustomManagerMap,
   IAnimationService,
   IAssetService,
   IConfigService,
@@ -55,21 +56,51 @@ export class ViewerLauncher implements IViewerLauncher {
   private readonly featureRegistry: IFeatureRegistryService;
   private readonly logger: ILoggerService;
 
-  public constructor() {
+  public constructor(customManager?: CustomManagerMap) {
     this.containerDI = new Container();
-    this.containerDI.bind<IAnimationService>(AnimationServiceToken).to(AnimationService).inSingletonScope();
-    this.containerDI.bind<IAssetService>(AssetServiceToken).to(AssetService).inSingletonScope();
-    this.containerDI.bind<IConfigService>(ConfigServiceToken).to(ConfigService).inSingletonScope();
-    this.containerDI.bind<IControlService>(ControlServiceToken).to(ControlService).inSingletonScope();
-    this.containerDI.bind<ILightService>(LightServiceToken).to(LightService).inSingletonScope();
-    this.containerDI.bind<ILoggerService>(LoggerServiceToken).to(LoggerService).inSingletonScope();
-    this.containerDI.bind<IMaterialService>(MaterialServiceToken).to(MaterialService).inSingletonScope();
-    this.containerDI.bind<IRenderService>(RenderServiceToken).to(RenderService).inSingletonScope();
-    this.containerDI.bind<ISceneService>(SceneServiceToken).to(SceneService).inSingletonScope();
-    this.containerDI.bind<IFeatureService>(FeatureServiceToken).to(FeatureService).inSingletonScope();
+    this.containerDI
+      .bind<IAnimationService>(AnimationServiceToken)
+      .to(customManager?.animation ?? AnimationService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IAssetService>(AssetServiceToken)
+      .to(customManager?.asset ?? AssetService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IConfigService>(ConfigServiceToken)
+      .to(customManager?.config ?? ConfigService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IControlService>(ControlServiceToken)
+      .to(customManager?.control ?? ControlService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<ILightService>(LightServiceToken)
+      .to(customManager?.light ?? LightService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<ILoggerService>(LoggerServiceToken)
+      .to(customManager?.logger ?? LoggerService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IMaterialService>(MaterialServiceToken)
+      .to(customManager?.material ?? MaterialService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IRenderService>(RenderServiceToken)
+      .to(customManager?.render ?? RenderService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<ISceneService>(SceneServiceToken)
+      .to(customManager?.scene ?? SceneService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IFeatureService>(FeatureServiceToken)
+      .to(customManager?.feature ?? FeatureService)
+      .inSingletonScope();
     this.containerDI
       .bind<IFeatureRegistryService>(FeatureRegistryServiceToken)
-      .to(FeatureRegistryService)
+      .to(customManager?.featureRegistry ?? FeatureRegistryService)
       .inSingletonScope();
     this.containerDI.bind<IViewer>(ViewerToken).to(Viewer);
 
