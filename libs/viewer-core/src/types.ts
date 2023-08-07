@@ -18,8 +18,9 @@ import type { Observable } from 'rxjs';
 import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { ILogger } from '@schablone/logging';
-import type { FeatureSetup, IFeatureService } from './feature';
+import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
 import { LightType, MaterialType } from './enums';
+import type { interfaces } from 'inversify';
 
 export interface ViewerConfigModel {
   camera?: Partial<CameraConfigModel>;
@@ -328,3 +329,17 @@ export interface IConfigService {
 }
 
 export type ILoggerService = ILogger;
+
+export interface CustomManagerMap {
+  animation?: interfaces.Newable<IAnimationService>;
+  asset?: interfaces.Newable<IAssetService>;
+  config?: interfaces.Newable<IConfigService>;
+  control?: interfaces.Newable<IControlService>;
+  feature?: interfaces.Newable<IFeatureService>;
+  featureRegistry?: interfaces.Newable<IFeatureRegistryService>;
+  light?: interfaces.Newable<ILightService>;
+  logger?: interfaces.Newable<ILoggerService>;
+  material?: interfaces.Newable<IMaterialService>;
+  render?: interfaces.Newable<IRenderService>;
+  scene?: interfaces.Newable<ISceneService>;
+}
