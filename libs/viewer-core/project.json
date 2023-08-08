@@ -36,7 +36,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/libs/viewer-core"],
+      "outputs": ["{workspaceRoot}/coverage/libs/viewer-core"],
       "options": {
         "jestConfig": "libs/viewer-core/jest.config.ts",
         "passWithNoTests": true

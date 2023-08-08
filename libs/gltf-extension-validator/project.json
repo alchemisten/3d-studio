@@ -36,7 +36,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/libs/gltf-extension-validator"],
+      "outputs": ["{workspaceRoot}/coverage/libs/gltf-extension-validator"],
       "options": {
         "jestConfig": "libs/gltf-extension-validator/jest.config.ts",
         "passWithNoTests": true
