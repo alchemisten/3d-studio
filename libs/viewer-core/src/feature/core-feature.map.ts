@@ -1,5 +1,5 @@
 import type { interfaces } from 'inversify';
-import type { IFeature } from '../types';
+import type { IFeature } from './types';
 import {
   CameraRotationFeature,
   HighlightFeature,

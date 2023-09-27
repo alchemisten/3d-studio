@@ -2,8 +2,8 @@ import { inject, injectable } from 'inversify';
 import { Group, Intersection, Mesh, PerspectiveCamera, Raycaster, Sprite, Vector2, Vector3 } from 'three';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ILogger } from '@schablone/logging';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import type { ILogger } from '@schablone/logging';
 
 import {
   AssetServiceToken,

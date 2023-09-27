@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import type { IControlService } from '../../../types';

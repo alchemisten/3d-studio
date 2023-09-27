@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { PerspectiveCamera } from 'three';
+import type { PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
