@@ -8,5 +8,6 @@
     "viewer"
   ],
   "author": "Alchemisten AG",
-  "license": "ISC"
+  "license": "ISC",
+  "main": "src/index.ts"
 }
