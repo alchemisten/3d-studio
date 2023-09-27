@@ -15,7 +15,6 @@ import type {
   WebGLRenderer,
 } from 'three';
 import type { Observable } from 'rxjs';
-import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { ILogger } from '@schablone/logging';
 import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
@@ -100,7 +99,7 @@ export interface IViewer {
   configService: IConfigService;
   controlService: IControlService;
   featureService: IFeatureService;
-  init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement): void;
+  init(config: ViewerConfigModel, context?: HTMLElement | WebGL2RenderingContext): void;
   lightService: ILightService;
   materialService: IMaterialService;
   renderService: IRenderService;
@@ -108,8 +107,8 @@ export interface IViewer {
 }
 
 export interface IViewerLauncher {
-  createHTMLViewer(node: HTMLElement, config: ViewerConfigModel): void;
-  createImageViewer(renderSize: SizeModel, config: ViewerConfigModel): Observable<string>;
+  createCanvasViewer(config: ViewerConfigModel, context: HTMLElement | WebGL2RenderingContext): void;
+  createImageViewer(config: ViewerConfigModel): Observable<string>;
 }
 
 /**
@@ -262,12 +261,12 @@ export interface IMaterialService {
 }
 
 export interface IRenderService {
-  readonly composer: EffectComposer;
   readonly hookAfterRender$: Observable<boolean>;
   readonly hookBeforeRender$: Observable<boolean>;
   readonly renderer: WebGLRenderer;
   getCamera(): Observable<PerspectiveCamera>;
   getRenderConfig(): Observable<RenderConfigModel>;
+  init(config: ViewerConfigModel, context?: HTMLElement | WebGL2RenderingContext): void;
   renderSingleFrame(): void;
   setCameraConfig(config: Partial<CameraConfigModel>): void;
   setPostProcessingEnabled(enabled: boolean): void;

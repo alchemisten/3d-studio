@@ -114,16 +114,15 @@ export class ViewerLauncher implements IViewerLauncher {
    * Initializes a viewer that renders to a canvas element that is added to
    * the provided container.
    *
-   * @param container The renderer's canvas element will be appended as a
-   * child of this HTMLElement
    * @param config ViewerConfigModel containing at least one object that
    * should be loaded
+   * @param context The renderer's canvas element will be appended as a
+   * child of this HTMLElement
    * @returns The created viewer instance
    */
-  public createHTMLViewer(container: HTMLElement, config: ViewerConfigModel): IViewer {
+  public createCanvasViewer(config: ViewerConfigModel, context: HTMLElement | WebGL2RenderingContext): IViewer {
     const viewer = this.containerDI.get<IViewer>(ViewerToken);
-    const screenSize = container.getBoundingClientRect() as SizeModel;
-    viewer.init(screenSize, config, container);
+    viewer.init(config, context);
 
     return viewer;
   }
@@ -132,15 +131,13 @@ export class ViewerLauncher implements IViewerLauncher {
    * Initializes a viewer that renders images at the provided size and
    * returns them as an Observable.
    *
-   * @param renderSize SizeModel with the width and height of the desired
-   * rendering
    * @param config ViewerConfigModel containing at least one object that
    * should be loaded
    * @returns An Observable of base64 encoded image source strings
    */
-  public createImageViewer(renderSize: SizeModel, config: ViewerConfigModel): Observable<string> {
+  public createImageViewer(config: ViewerConfigModel): Observable<string> {
     const viewer = this.containerDI.get<IViewer>(ViewerToken);
-    viewer.init(renderSize, config);
+    viewer.init(config);
     const renderService = this.containerDI.get<IRenderService>(RenderServiceToken);
 
     return renderService.hookAfterRender$.pipe(map(() => renderService.renderer.domElement.toDataURL()));

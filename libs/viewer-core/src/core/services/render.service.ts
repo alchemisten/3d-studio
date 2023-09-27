@@ -1,10 +1,19 @@
 import { inject, injectable } from 'inversify';
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { Observable, Subject } from 'rxjs';
-import type { CameraConfigModel, IRenderService, ISceneService, RenderConfigModel } from '../../types';
+import { fromEvent, Observable, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import type {
+  CameraConfigModel,
+  ILoggerService,
+  IRenderService,
+  ISceneService,
+  RenderConfigModel,
+  SizeModel,
+  ViewerConfigModel,
+} from '../../types';
 import { defaultCameraConfig, defaultRenderConfig } from './config.service';
-import { SceneServiceToken } from '../../util';
+import { LoggerServiceToken, SceneServiceToken } from '../../util';
 
 /**
  * The render service renders the current scene to its internal canvas. By
@@ -13,34 +22,35 @@ import { SceneServiceToken } from '../../util';
  */
 @injectable()
 export class RenderService implements IRenderService {
-  public readonly composer: EffectComposer;
+  public composer!: EffectComposer;
   public readonly hookAfterRender$: Observable<boolean>;
   public readonly hookBeforeRender$: Observable<boolean>;
-  public readonly renderer: WebGLRenderer;
-  private readonly afterRender$: Subject<boolean>;
-  private readonly beforeRender$: Subject<boolean>;
-  private readonly camera: PerspectiveCamera;
-  private readonly camera$: Subject<PerspectiveCamera>;
-  private continuousRenderEnabled: boolean;
-  private postProcessingEnabled: boolean;
-  private renderConfig: RenderConfigModel;
-  private renderConfig$: Subject<RenderConfigModel>;
+  public renderer!: WebGLRenderer;
+  protected readonly afterRender$: Subject<boolean>;
+  protected readonly beforeRender$: Subject<boolean>;
+  protected readonly camera: PerspectiveCamera;
+  protected readonly camera$: Subject<PerspectiveCamera>;
+  protected continuousRenderEnabled: boolean;
+  protected logger: ILoggerService;
+  protected node!: HTMLElement;
+  protected postProcessingEnabled: boolean;
+  protected renderConfig!: RenderConfigModel;
+  protected renderConfig$: Subject<RenderConfigModel>;
 
-  public constructor(@inject(SceneServiceToken) private sceneService: ISceneService) {
+  public constructor(
+    @inject(LoggerServiceToken) logger: ILoggerService,
+    @inject(SceneServiceToken) private sceneService: ISceneService
+  ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { service: 'RenderService' } } });
     this.afterRender$ = new Subject<boolean>();
     this.hookAfterRender$ = this.afterRender$.asObservable();
     this.beforeRender$ = new Subject<boolean>();
     this.hookBeforeRender$ = this.beforeRender$.asObservable();
-    this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.postProcessingEnabled = false;
-    this.composer = new EffectComposer(this.renderer);
     this.camera = new PerspectiveCamera();
     this.camera$ = new Subject<PerspectiveCamera>();
-    this.setCameraConfig(defaultCameraConfig);
     this.continuousRenderEnabled = false;
-    this.renderConfig = defaultRenderConfig;
     this.renderConfig$ = new Subject<RenderConfigModel>();
-    this.setRenderConfig(this.renderConfig);
   }
 
   public getCamera(): Observable<PerspectiveCamera> {
@@ -49,6 +59,48 @@ export class RenderService implements IRenderService {
 
   public getRenderConfig(): Observable<RenderConfigModel> {
     return this.renderConfig$.asObservable();
+  }
+
+  public init(config: ViewerConfigModel, context?: HTMLElement | WebGL2RenderingContext): void {
+    this.logger.debug(Object.prototype.toString.call(context));
+    if (context && !(context instanceof HTMLElement)) {
+      this.logger.fatal('This renderer needs an HTMLElement to render into.');
+      return;
+    }
+
+    const renderSize: SizeModel = context
+      ? (context.getBoundingClientRect() as SizeModel)
+      : config.render?.renderSize ?? defaultRenderConfig.renderSize;
+    this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
+    this.composer = new EffectComposer(this.renderer);
+
+    this.setCameraConfig(
+      Object.assign(
+        defaultCameraConfig,
+        {
+          aspect: renderSize.width / renderSize.height,
+        },
+        config.camera
+      )
+    );
+
+    this.setRenderConfig(
+      Object.assign(
+        defaultRenderConfig,
+        {
+          pixelRatio: window ? window.devicePixelRatio : 1,
+          renderSize,
+        },
+        config.render
+      )
+    );
+
+    if (context && window) {
+      this.node = context as HTMLElement;
+      this.node.appendChild(this.renderer.domElement);
+
+      fromEvent(window, 'resize').pipe(debounceTime(300)).subscribe(this.onWindowResize.bind(this));
+    }
   }
 
   public renderSingleFrame(): void {
@@ -141,7 +193,22 @@ export class RenderService implements IRenderService {
     this.renderConfig$.next(this.renderConfig);
   }
 
-  private setContinuousRenderingEnabled(enabled: boolean): void {
+  private onWindowResize() {
+    if (!this.node) {
+      return;
+    }
+
+    const screenSize = this.node.getBoundingClientRect() as SizeModel;
+    this.setRenderConfig({
+      renderSize: screenSize,
+    });
+    this.setCameraConfig({
+      aspect: screenSize.width / screenSize.height,
+    });
+    this.renderSingleFrame();
+  }
+
+  protected setContinuousRenderingEnabled(enabled: boolean): void {
     this.continuousRenderEnabled = enabled;
     if (this.continuousRenderEnabled) {
       this.renderer.setAnimationLoop(this.renderSingleFrame.bind(this));

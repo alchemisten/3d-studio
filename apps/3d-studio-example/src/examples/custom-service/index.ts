@@ -8,18 +8,21 @@ import { AlternativeLoggerService } from './logger';
   }
 
   const launcher = new ViewerLauncher({ logger: AlternativeLoggerService });
-  launcher.createHTMLViewer(container, {
-    objects: [
-      {
-        name: 'Milk-Truck',
-        path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+  launcher.createCanvasViewer(
+    {
+      objects: [
+        {
+          name: 'Milk-Truck',
+          path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        },
+      ],
+      render: {
+        continuousRendering: true,
       },
-    ],
-    render: {
-      continuousRendering: true,
+      project: {
+        basedir: 'http://127.0.0.1:4200',
+      },
     },
-    project: {
-      basedir: 'http://127.0.0.1:4200',
-    },
-  });
+    container
+  );
 })();
