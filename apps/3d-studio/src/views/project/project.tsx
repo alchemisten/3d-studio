@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { LoadingScreen } from '../../components';
 import { translations } from '../../i18n';
 import styles from './project.module.scss';
+import { useConfigContext } from '../../provider';
 
 const launcher = new ViewerLauncher();
 const config = {
@@ -279,6 +280,7 @@ const config = {
 
 export const Project: FC = () => {
   const { id } = useParams();
+  const { projectLoader } = useConfigContext();
   const viewerCanvas = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const [alcmLogo] = useState(searchParams.get('l') === 'true');
@@ -293,13 +295,24 @@ export const Project: FC = () => {
   const startLanguage = initialLanguage && availableLanguages.includes(initialLanguage) ? initialLanguage : 'de';
 
   useEffect(() => {
-    if (!viewerCanvas.current) {
+    if (!viewerCanvas.current || !id) {
       return;
     }
 
     const allowZoom = searchParams.get('s') !== 'false';
-    setViewer(launcher.createHTMLViewer(viewerCanvas.current, { ...config, controls: { allowZoom } }));
-  }, [id, searchParams]);
+    setIsLoading(true);
+
+    projectLoader(id, config.project.basedir)
+      .then((project) => {
+        if (viewerCanvas.current) {
+          setViewer(launcher.createHTMLViewer(viewerCanvas.current, { ...project, controls: { allowZoom } }));
+        }
+      })
+      .catch((error) => {
+        // TODO handle error
+        setIsLoading(false);
+      });
+  }, [id, projectLoader, searchParams]);
 
   useEffect(() => {
     if (!viewer) {
