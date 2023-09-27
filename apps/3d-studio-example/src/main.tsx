@@ -171,7 +171,7 @@ import * as ReactDOM from 'react-dom/client';
             },
             i18n: {
               de: {
-                content: 'Schlimmer als ein SVU. Lässt keine Change zum Abrollen.',
+                content: 'Schlimmer als ein SVU. Lässt keine Chance zum Abrollen.',
                 headline: 'Fahrzeugfront',
               },
               en: {
@@ -278,7 +278,7 @@ import * as ReactDOM from 'react-dom/client';
   };
 
   const launcher = new ViewerLauncher();
-  const viewer = launcher.createHTMLViewer(container, config);
+  const viewer = launcher.createCanvasViewer(config, container);
 
   const root = ReactDOM.createRoot(document.getElementById('studio-ui') as HTMLElement);
   root.render(

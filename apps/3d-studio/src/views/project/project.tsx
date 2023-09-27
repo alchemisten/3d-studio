@@ -41,7 +41,7 @@ export const Project: FC = () => {
     projectLoader(id, baseUrl)
       .then((project) => {
         if (viewerCanvas.current) {
-          setViewer(launcher.createHTMLViewer(viewerCanvas.current, { ...project, controls: { allowZoom } }));
+          setViewer(launcher.createCanvasViewer({ ...project, controls: { allowZoom } }, viewerCanvas.current));
         }
       })
       .catch((error) => {
