@@ -3,16 +3,23 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@expo/metro-config": "*",
+    "@nx/expo": "*",
+    "@schablone/logging": "*",
     "@testing-library/jest-native": "*",
     "@testing-library/react-native": "*",
-    "metro-config": "*",
-    "react-native": "*",
     "expo": "*",
+    "expo-gl": "*",
+    "expo-three": "*",
+    "inversify": "*",
+    "metro-config": "*",
+    "react": "*",
+    "react-native": "*",
     "react-native-svg": "*",
     "react-native-web": "*",
-    "@nx/expo": "*",
-    "@expo/metro-config": "*",
-    "react": "*"
+    "reflect-metadata": "*",
+    "rxjs": "*",
+    "three": "*"
   },
   "scripts": {
     "eas-build-pre-install": "cd ../../ && node tools/scripts/eas-build-pre-install.mjs . apps/react-native-app-example && cp yarn.lock apps/react-native-app-example",

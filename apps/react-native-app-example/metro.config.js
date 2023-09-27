@@ -14,11 +14,17 @@ const { assetExts, sourceExts } = defaultConfig.resolver;
  */
 const customConfig = {
   transformer: {
-    babelTransformerPath: require.resolve('react-native-svg-transformer'),
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
+    babelTransformerPath: require.resolve('react-native-typescript-transformer'),
   },
   resolver: {
-    assetExts: assetExts.filter((ext) => ext !== 'svg'),
-    sourceExts: [...sourceExts, 'svg'],
+    assetExts: [...assetExts.filter((ext) => ext !== 'svg'), 'gltf', 'glb', 'png', 'jpg'],
+    sourceExts: [...sourceExts, 'svg', 'ts', 'tsx', 'js'],
     blockList: exclusionList([/^(?!.*node_modules).*\/dist\/.*/]),
     unstable_enableSymlinks: true,
     unstable_enablePackageExports: true,
