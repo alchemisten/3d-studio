@@ -14,9 +14,8 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
-import type { IAssetService, ILoggerService, IRenderService } from '../../types';
+import type { IAssetService, IConfigService, ILoggerService, IRenderService } from '../../types';
 import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
-import type { ConfigService } from './config.service';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -43,7 +42,7 @@ export class AssetService implements IAssetService {
   private readonly textureLoader: TextureLoader;
 
   public constructor(
-    @inject(ConfigServiceToken) private configService: ConfigService,
+    @inject(ConfigServiceToken) private configService: IConfigService,
     @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
@@ -63,7 +62,7 @@ export class AssetService implements IAssetService {
     this.hookObjectLoaded$ = this.objectLoaded$.asObservable();
     this.isLoading$ = new BehaviorSubject(false);
     this.configService.getConfig().subscribe((config) => {
-      this.basePath = config.project?.basedir ? `${config.project.basedir}/` : '';
+      this.basePath = config.project?.basedir ? `${config.project.basedir.replace(/\/+$/, '')}/` : '';
     });
   }
 
