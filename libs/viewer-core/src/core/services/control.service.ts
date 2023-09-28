@@ -4,7 +4,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
 import type { IConfigService, IControlService, IRenderService, RenderConfigModel } from '../../types';
-import { ConfigServiceToken, RenderServiceToken } from '../../util';
+import { ConfigServiceToken, LoggerServiceToken, RenderServiceToken } from '../../util';
+import { ILogger } from '@schablone/logging';
+import { ILoggerService } from '../../types';
 
 /**
  * The control service provides access to orbit controls.
@@ -18,11 +20,14 @@ export class ControlService implements IControlService {
   private controls!: OrbitControls;
   private controls$: Subject<OrbitControls>;
   private changeSub!: Subscription;
+  private readonly logger: ILogger;
 
   public constructor(
     @inject(ConfigServiceToken) private configService: IConfigService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(RenderServiceToken) private renderService: IRenderService
   ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Control' } } });
     this.controls$ = new Subject<OrbitControls>();
     this.renderService.getCamera().pipe(take(1)).subscribe(this.createControls.bind(this));
     this.renderService.hookAfterRender$
@@ -62,6 +67,7 @@ export class ControlService implements IControlService {
         }
       });
 
+    this.logger.debug('Controls initialized', { objects: this.controls });
     this.controls$.next(this.controls);
   }
 }
