@@ -27,6 +27,7 @@ import Highlight from './highlight';
 @injectable()
 export class HighlightFeature implements IHighlightFeature {
   public readonly id = HighlightFeatureToken;
+  private assetPath!: string;
   private baseFov!: number;
   private camera!: PerspectiveCamera;
   private clickable: Sprite[] = [];
@@ -89,6 +90,7 @@ export class HighlightFeature implements IHighlightFeature {
   public init(config: HighlightFeatureConfig) {
     this.logger.debug('Initializing with config', { objects: config });
     this.enabled = config.enabled;
+    this.assetPath = config.assetPath ?? 'assets/textures/highlights/';
     this.highlightsVisible = config.highlightsVisible ?? true;
     if (config.groupScale) {
       this.highlightGroup.scale.setScalar(config.groupScale);
@@ -362,10 +364,10 @@ export class HighlightFeature implements IHighlightFeature {
     };
     return Promise.all(
       Object.entries({
-        actionTransTex: 'assets/textures/highlights/action_trans.png',
-        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
-        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
-        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
+        actionTransTex: `${this.assetPath}action_trans.png`,
+        actionTransHoverTex: `${this.assetPath}action_trans_hover.png`,
+        simpleTransTex: `${this.assetPath}simple_trans.png`,
+        simpleTransHoverTex: `${this.assetPath}simple_trans_hover.png`,
       }).map(([key, value]) =>
         this.assetService.loadTexture(value).then((texture) => {
           textures[key] = texture;

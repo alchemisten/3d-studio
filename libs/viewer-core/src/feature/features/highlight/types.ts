@@ -91,6 +91,7 @@ export interface HighlightMount {
 }
 
 export interface HighlightFeatureConfig extends FeatureConfig {
+  assetPath?: string;
   groupScale?: number;
   highlightSetup: HighlightSetupModel[];
   highlightsVisible?: boolean;
