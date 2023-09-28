@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useTranslations } from 'react-intl-provider';
 import type { IViewer, ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
 
+import { cleanHTML } from '../../util';
 import { LoadingIndicator } from '../loading-indictator/loading-indicator';
 import { TextBox } from '../text-box/text-box';
 
@@ -31,7 +32,7 @@ export const Intro: FC<IntroProps> = ({ isLoading, setIntroClosed, viewer }) => 
   return (
     <TextBox position="intro">
       {isLoading && <LoadingIndicator />}
-      {config?.project?.introText?.[currentLanguage].intro}
+      {cleanHTML(config?.project?.introText?.[currentLanguage].intro)}
     </TextBox>
   );
 };

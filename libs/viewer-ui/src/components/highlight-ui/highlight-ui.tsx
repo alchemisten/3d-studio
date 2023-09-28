@@ -3,6 +3,7 @@ import { HighlightModel, IHighlightFeature } from '@alchemisten/3d-studio-viewer
 import { useTranslations } from 'react-intl-provider';
 import { Subscription } from 'rxjs';
 
+import { cleanHTML } from '../../util';
 import { SelectBox, SelectBoxEntry } from '../select-box/select-box';
 import { TextBox } from '../text-box/text-box';
 import styles from './highlight-ui.module.scss';
@@ -78,9 +79,9 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
     <>
       {currentHighlight && (
         <TextBox position="highlight">
-          <div className={styles.highlightHeadline}>{currentHighlight.i18n[currentLanguage]?.headline || ''}</div>
+          <div className={styles.highlightHeadline}>{cleanHTML(currentHighlight.i18n[currentLanguage]?.headline)}</div>
           {currentHighlight.i18n[currentLanguage]?.content && (
-            <div className={styles.highlightContent}>{currentHighlight.i18n[currentLanguage].content}</div>
+            <div className={styles.highlightContent}>{cleanHTML(currentHighlight.i18n[currentLanguage].content)}</div>
           )}
         </TextBox>
       )}
