@@ -19,7 +19,7 @@ import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectCom
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { ILogger } from '@schablone/logging';
 import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
-import { LightType, MaterialType } from './enums';
+import { LightType } from './enums';
 import type { interfaces } from 'inversify';
 
 export interface ViewerConfigModel {
@@ -203,46 +203,6 @@ export interface IAssetService {
   loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;
   loadTexture(path: string): Promise<Texture>;
-}
-
-export interface MaterialSetupModel {
-  alphaMap?: string;
-  aoMap?: string;
-  aoMapIntensity?: number;
-  bumpMap?: string;
-  bumpScale?: number;
-  changeable: boolean;
-  clearCoat?: number;
-  clearCoatRoughness?: number;
-  color: string;
-  combine: number;
-  displacementMap: string;
-  displacementScale: number;
-  displacementBias: number;
-  emissive: string;
-  emissiveMap?: string;
-  emissiveIntensity?: number;
-  envID: number;
-  global: boolean;
-  id: number;
-  illum: number;
-  lights: boolean;
-  map?: string;
-  metalness?: number;
-  metalnessMap?: string;
-  name: string;
-  normalMap?: string;
-  normalMapScale?: number;
-  opacity: number;
-  reflectivity: number;
-  refractionRatio: number;
-  roughness?: number;
-  roughnessMap?: string;
-  side: number;
-  shininess: number;
-  specular: string;
-  specularMap?: string;
-  type: MaterialType;
 }
 
 // TODO: Rethink concept for material assignment, material slots and identifying materials
