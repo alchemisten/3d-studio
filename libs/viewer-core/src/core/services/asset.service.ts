@@ -119,9 +119,7 @@ export class AssetService implements IAssetService {
         });
         break;
       default:
-        this.assetMap[path] = new Promise((resolve, reject) => {
-          reject(`Object type unknown: ${type}`);
-        });
+        this.assetMap[path] = Promise.reject(`Asset service can't handle object type: ${type}`);
         break;
     }
 

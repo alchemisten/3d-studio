@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useLogger } from '@schablone/logging-react';
 
 import type { LegacyConfig, LegacyProject } from '../../types';
 import { EmbedBuilder, PageHeader, ProjectPreview } from '../../components';
@@ -7,6 +8,7 @@ import styles from './overview.module.scss';
 
 export const Overview: FC = () => {
   const { baseUrl } = useConfigContext();
+  const { logger } = useLogger();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<LegacyProject>();
@@ -27,7 +29,14 @@ export const Overview: FC = () => {
       if (!isLoading) {
         setIsLoading(true);
         fetch(`${baseUrl}/api/customer/projects/`)
-          .then((response) => response.json())
+          .then(
+            (response) => response.json(),
+            (error) => {
+              logger.error('Error while loading projects. Check if the baseURL and projects path are correct.', {
+                error,
+              });
+            }
+          )
           .then((data) => setConfig(data))
           .finally(() => setIsLoading(false));
       }

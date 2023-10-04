@@ -1,12 +1,14 @@
 import { inject, injectable } from 'inversify';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import type { ILogger } from '@schablone/logging';
 import type {
   IAnimationService,
   IAssetService,
   IConfigService,
   IControlService,
   ILightService,
+  ILoggerService,
   IMaterialService,
   IRenderService,
   ISceneService,
@@ -22,6 +24,7 @@ import {
   ControlServiceToken,
   FeatureServiceToken,
   LightServiceToken,
+  LoggerServiceToken,
   MaterialServiceToken,
   RenderServiceToken,
   SceneServiceToken,
@@ -32,6 +35,7 @@ import {
  */
 @injectable()
 export class Viewer implements IViewer {
+  private readonly logger!: ILogger;
   private node!: HTMLElement;
 
   public constructor(
@@ -41,10 +45,13 @@ export class Viewer implements IViewer {
     @inject(ControlServiceToken) public controlService: IControlService,
     @inject(FeatureServiceToken) public featureService: IFeatureService,
     @inject(LightServiceToken) public lightService: ILightService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
     @inject(MaterialServiceToken) public materialService: IMaterialService,
     @inject(RenderServiceToken) public renderService: IRenderService,
     @inject(SceneServiceToken) public sceneService: ISceneService
-  ) {}
+  ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Viewer' } } });
+  }
 
   public init(screenSize: SizeModel, config: ViewerConfigModel, node?: HTMLElement) {
     this.configService.loadConfig(config);
@@ -67,10 +74,15 @@ export class Viewer implements IViewer {
     );
 
     config.objects.forEach((objectSetup) => {
-      this.assetService.loadObject(objectSetup.path).then((object) => {
-        this.sceneService.addObjectToScene(object, objectSetup);
-        this.renderService.renderSingleFrame();
-      });
+      this.assetService
+        .loadObject(objectSetup.path)
+        .then((object) => {
+          this.sceneService.addObjectToScene(object, objectSetup);
+          this.renderService.renderSingleFrame();
+        })
+        .catch((error) => {
+          this.logger.error('Could not load object', { objects: objectSetup, error });
+        });
     });
 
     if (node && window) {

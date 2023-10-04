@@ -53,7 +53,7 @@ export class SkyboxFeature implements ISkyboxFeature {
 
     // Set scene background
     this.enabled$.subscribe((enabled) => {
-      this.logger.debug('SkyboxFeature.enabled$', { objects: String(enabled) });
+      this.logger.debug('SkyboxFeature enabled:', { objects: String(enabled) });
       if (enabled) {
         this.sceneService.scene.background = this.skybox;
       } else {
