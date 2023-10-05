@@ -9,13 +9,14 @@ import {
   Texture,
   TextureLoader,
   WebGLCubeRenderTarget,
+  WebGLRenderer,
 } from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
-import type { IAssetService, IConfigService, ILoggerService, IRenderService } from '../../types';
-import { ConfigServiceToken, Constants, LoggerServiceToken, RenderServiceToken } from '../../util';
+import type { IAssetService, IConfigService, ILoggerService } from '../../types';
+import { ConfigServiceToken, Constants, LoggerServiceToken } from '../../util';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -43,8 +44,7 @@ export class AssetService implements IAssetService {
 
   public constructor(
     @inject(ConfigServiceToken) private configService: IConfigService,
-    @inject(LoggerServiceToken) logger: ILoggerService,
-    @inject(RenderServiceToken) private renderService: IRenderService
+    @inject(LoggerServiceToken) logger: ILoggerService
   ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Asset' } } });
     this.loadingManager = new LoadingManager(
@@ -94,11 +94,11 @@ export class AssetService implements IAssetService {
     return this.assetMap[path] as Promise<CubeTexture>;
   }
 
-  public loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget> {
+  public loadEnvironmentMap(path: string, resolution: number, renderer: WebGLRenderer): Promise<WebGLCubeRenderTarget> {
     return this.loadTexture(path).then((envTex: Texture) => {
       envTex.mapping = EquirectangularReflectionMapping; // SphericalReflectionMapping
       envTex.colorSpace = SRGBColorSpace;
-      return new WebGLCubeRenderTarget(resolution).fromEquirectangularTexture(this.renderService.renderer, envTex);
+      return new WebGLCubeRenderTarget(resolution).fromEquirectangularTexture(renderer, envTex);
     });
   }
 

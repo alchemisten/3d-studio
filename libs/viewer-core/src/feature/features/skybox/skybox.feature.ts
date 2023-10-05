@@ -2,12 +2,13 @@ import { inject, injectable } from 'inversify';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import type { Material, MeshStandardMaterial, Texture } from 'three';
 import type { ILogger } from '@schablone/logging';
-import type { IAssetService, ILoggerService, IMaterialService, ISceneService } from '../../../types';
+import type { IAssetService, ILoggerService, IMaterialService, IRenderService, ISceneService } from '../../../types';
 import type { ISkyboxFeature, SkyboxFeatureConfig, SkyboxType } from './types';
 import {
   AssetServiceToken,
   LoggerServiceToken,
   MaterialServiceToken,
+  RenderServiceToken,
   SceneServiceToken,
   SkyboxFeatureToken,
 } from '../../../util';
@@ -25,6 +26,7 @@ export class SkyboxFeature implements ISkyboxFeature {
     @inject(AssetServiceToken) private assetService: IAssetService,
     @inject(LoggerServiceToken) loggerService: ILoggerService,
     @inject(MaterialServiceToken) private materialService: IMaterialService,
+    @inject(RenderServiceToken) private renderService: IRenderService,
     @inject(SceneServiceToken) private sceneService: ISceneService
   ) {
     this.logger = loggerService.withOptions({ globalLogOptions: { tags: { Feature: 'Skybox' } } });
@@ -90,7 +92,7 @@ export class SkyboxFeature implements ISkyboxFeature {
           break;
         case 'equirectangular':
           this.assetService
-            .loadEnvironmentMap(skyboxPath, 1024)
+            .loadEnvironmentMap(skyboxPath, 1024, this.renderService.renderer)
             .then((texture) => {
               this.skybox = texture.texture;
               if (this.enabled) {

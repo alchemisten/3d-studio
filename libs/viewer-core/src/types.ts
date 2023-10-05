@@ -200,7 +200,7 @@ export interface IAssetService {
   readonly hookObjectLoaded$: Observable<Object3D>;
   getIsLoading(): Observable<boolean>;
   loadCubeTexture(envName: string, imageSuffix?: string): Promise<CubeTexture>;
-  loadEnvironmentMap(path: string, resolution: number): Promise<WebGLCubeRenderTarget>;
+  loadEnvironmentMap(path: string, resolution: number, renderer: WebGLRenderer): Promise<WebGLCubeRenderTarget>;
   loadObject(path: string): Promise<Object3D>;
   loadTexture(path: string): Promise<Texture>;
 }

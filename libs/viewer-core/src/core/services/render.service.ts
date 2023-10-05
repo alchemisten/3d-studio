@@ -44,6 +44,7 @@ export class RenderService implements IRenderService {
     this.renderConfig = defaultRenderConfig;
     this.renderConfig$ = new Subject<RenderConfigModel>();
     this.setRenderConfig(this.renderConfig);
+
     this.configService.getConfig().subscribe((config) => {
       if (config.render) {
         this.setRenderConfig(config.render);
@@ -51,6 +52,10 @@ export class RenderService implements IRenderService {
       if (config.camera) {
         this.setCameraConfig(config.camera);
       }
+    });
+
+    this.sceneService.objectAddedToScene$.subscribe(() => {
+      this.renderSingleFrame();
     });
   }
 

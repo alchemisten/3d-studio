@@ -73,18 +73,6 @@ export class Viewer implements IViewer {
       )
     );
 
-    config.objects.forEach((objectSetup) => {
-      this.assetService
-        .loadObject(objectSetup.path)
-        .then((object) => {
-          this.sceneService.addObjectToScene(object, objectSetup);
-          this.renderService.renderSingleFrame();
-        })
-        .catch((error) => {
-          this.logger.error('Could not load object', { objects: objectSetup, error });
-        });
-    });
-
     if (node && window) {
       this.node = node;
 
