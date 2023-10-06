@@ -11,8 +11,6 @@ import { translations } from '../../i18n';
 import { useConfigContext } from '../../provider';
 import styles from './project.module.scss';
 
-const launcher = new ViewerLauncher();
-
 export const Project: FC = () => {
   const { baseUrl, projectLoader } = useConfigContext();
   const { id } = useParams();
@@ -24,6 +22,7 @@ export const Project: FC = () => {
   const [playClicked, setPlayClicked] = useState(searchParams.get('e') !== 'true');
   const [title, setTitle] = useState<string>();
   const [viewer, setViewer] = useState<IViewer>();
+  const [launcher] = useState(new ViewerLauncher());
 
   const transparent = searchParams.get('t') === 'true';
   const initialLanguage = searchParams.get('lng');
@@ -48,7 +47,7 @@ export const Project: FC = () => {
         logger.error('Error while loading project with id:', { objects: id, error });
         setIsLoading(false);
       });
-  }, [baseUrl, id, logger, projectLoader, searchParams]);
+  }, [baseUrl, id, launcher, logger, projectLoader, searchParams]);
 
   useEffect(() => {
     if (!viewer) {
