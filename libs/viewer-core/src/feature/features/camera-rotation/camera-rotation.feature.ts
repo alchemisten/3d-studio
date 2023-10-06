@@ -35,10 +35,12 @@ export class CameraRotationFeature implements ICameraRotationFeature {
     this.logger.debug('Initialized with config', { objects: config });
     this.enabled$.next(this.enabled);
     this.controlService.getControls().subscribe((controls) => {
-      this.controls = controls;
-      this.setRotationEnabled(this.enabled);
-      if (config.rotationSpeed) {
-        this.setRotationSpeed(config.rotationSpeed);
+      if (controls) {
+        this.controls = controls;
+        this.setRotationEnabled(this.enabled);
+        if (config.rotationSpeed) {
+          this.setRotationSpeed(config.rotationSpeed);
+        }
       }
     });
 

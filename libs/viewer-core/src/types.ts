@@ -272,7 +272,7 @@ export interface ILightService {
 }
 
 export interface IControlService {
-  getControls(): Observable<OrbitControls>;
+  getControls(): Observable<OrbitControls | null>;
 }
 
 export interface IConfigService {

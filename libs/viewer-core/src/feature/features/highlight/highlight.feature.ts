@@ -78,7 +78,9 @@ export class HighlightFeature implements IHighlightFeature {
     this.focusedHighlight$ = new Subject<Highlight | null>();
     this.highlights$ = new BehaviorSubject<Highlight[]>(this.highlights);
     this.controlService.getControls().subscribe((controls) => {
-      this.controls = controls;
+      if (controls) {
+        this.controls = controls;
+      }
     });
     this.renderService.getCamera().subscribe((camera) => {
       this.camera = camera;
@@ -100,7 +102,7 @@ export class HighlightFeature implements IHighlightFeature {
       this.highlights$.next(this.highlights);
     });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
-      if (enabled) {
+      if (enabled && this.controls) {
         this.update();
       }
     });
@@ -214,8 +216,12 @@ export class HighlightFeature implements IHighlightFeature {
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
     );
-    this.rayCaster.setFromCamera(vector, this.camera);
 
+    if (!this.camera) {
+      return [];
+    }
+
+    this.rayCaster.setFromCamera(vector, this.camera);
     return this.rayCaster.intersectObjects(this.clickable);
   }
 
