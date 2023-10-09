@@ -1,6 +1,5 @@
 import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
 import { Vector3 } from 'three';
-import { Logger } from '@schablone/logging';
 
 (function () {
   const containerOne = document.getElementById('viewer-container-one');
@@ -10,9 +9,9 @@ import { Logger } from '@schablone/logging';
   }
 
   const launcherOne = new ViewerLauncher({
-    logger: new Logger({
+    loggerOptions: {
       environment: 'local',
-    }),
+    },
   });
   launcherOne.createCanvasViewer(
     {
@@ -30,9 +29,9 @@ import { Logger } from '@schablone/logging';
   );
 
   const launcherTwo = new ViewerLauncher({
-    logger: new Logger({
+    loggerOptions: {
       environment: 'local',
-    }),
+    },
   });
   launcherTwo.createCanvasViewer(
     {

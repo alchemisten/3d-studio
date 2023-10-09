@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { ILogger, Logger, LoggerOptions, LogOptions } from '@schablone/logging';
+import { ILogger, LoggerFactory, LoggerOptions, LogOptions } from '@schablone/logging';
 import type { ILoggerService } from '../../types';
 
 @injectable()
@@ -7,7 +7,7 @@ export class LoggerService implements ILoggerService {
   private logger!: ILogger;
 
   public init(options?: LoggerOptions, logger?: ILogger): void {
-    this.logger = logger || new Logger(options);
+    this.logger = logger || LoggerFactory(options);
   }
 
   public debug(message: string, options?: LogOptions): void {

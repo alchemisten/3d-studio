@@ -1,5 +1,4 @@
 import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
-import { Logger } from '@schablone/logging';
 
 (function () {
   const container = document.getElementById('viewer-container');
@@ -8,9 +7,9 @@ import { Logger } from '@schablone/logging';
   }
 
   const launcher = new ViewerLauncher({
-    logger: new Logger({
+    loggerOptions: {
       environment: 'local',
-    }),
+    },
   });
   const renderSize = { width: 1024, height: 768 }; // Defines size of rendering
   const images$ = launcher.createImageViewer({

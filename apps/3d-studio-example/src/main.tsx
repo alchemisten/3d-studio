@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { Logger } from '@schablone/logging';
 import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
 import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
 
@@ -278,9 +277,9 @@ import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
   };
 
   const launcher = new ViewerLauncher({
-    logger: new Logger({
+    loggerOptions: {
       environment: 'local',
-    }),
+    },
   });
   const viewer = launcher.createCanvasViewer(config, container);
 
