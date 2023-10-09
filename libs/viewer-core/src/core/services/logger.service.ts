@@ -1,16 +1,13 @@
 import { injectable } from 'inversify';
 import { ILogger, Logger, LoggerOptions, LogOptions } from '@schablone/logging';
-import { ILoggerService } from '../../types';
+import type { ILoggerService } from '../../types';
 
 @injectable()
 export class LoggerService implements ILoggerService {
-  private logger: ILogger;
+  private logger!: ILogger;
 
-  public constructor() {
-    this.logger = new Logger({
-      // TODO: Set environment via config
-      environment: 'local',
-    });
+  public init(options?: LoggerOptions, logger?: ILogger): void {
+    this.logger = logger || new Logger(options);
   }
 
   public debug(message: string, options?: LogOptions): void {

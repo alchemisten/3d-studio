@@ -4,7 +4,6 @@ import type { interfaces } from 'inversify';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import type {
-  CustomManagerMap,
   IAnimationService,
   IAssetService,
   IConfigService,
@@ -16,8 +15,8 @@ import type {
   ISceneService,
   IViewer,
   IViewerLauncher,
-  SizeModel,
   ViewerConfigModel,
+  ViewerLauncherConfig,
 } from '../types';
 import { Viewer } from './viewer';
 import {
@@ -56,8 +55,16 @@ export class ViewerLauncher implements IViewerLauncher {
   private readonly featureRegistry: IFeatureRegistryService;
   private readonly logger: ILoggerService;
 
-  public constructor(customManager?: CustomManagerMap) {
+  public constructor(config?: ViewerLauncherConfig) {
+    const customManager = config?.customManager || {};
     this.containerDI = new Container();
+    this.containerDI
+      .bind<ILoggerService>(LoggerServiceToken)
+      .to(customManager?.logger ?? LoggerService)
+      .inSingletonScope();
+    this.logger = this.containerDI.get<ILoggerService>(LoggerServiceToken);
+    this.logger.init(config?.loggerOptions, config?.logger);
+
     this.containerDI
       .bind<IAnimationService>(AnimationServiceToken)
       .to(customManager?.animation ?? AnimationService)
@@ -77,10 +84,6 @@ export class ViewerLauncher implements IViewerLauncher {
     this.containerDI
       .bind<ILightService>(LightServiceToken)
       .to(customManager?.light ?? LightService)
-      .inSingletonScope();
-    this.containerDI
-      .bind<ILoggerService>(LoggerServiceToken)
-      .to(customManager?.logger ?? LoggerService)
       .inSingletonScope();
     this.containerDI
       .bind<IMaterialService>(MaterialServiceToken)
@@ -106,8 +109,6 @@ export class ViewerLauncher implements IViewerLauncher {
 
     this.featureRegistry = this.containerDI.get<IFeatureRegistryService>(FeatureRegistryServiceToken);
     this.featureRegistry.setDIContainer(this.containerDI);
-
-    this.logger = this.containerDI.get<ILoggerService>(LoggerServiceToken);
   }
 
   /**

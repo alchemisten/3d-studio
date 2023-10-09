@@ -16,7 +16,7 @@ import type {
 } from 'three';
 import type { Observable } from 'rxjs';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import type { ILogger } from '@schablone/logging';
+import type { ILogger, LoggerOptions } from '@schablone/logging';
 import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
 import { LightType } from './enums';
 import type { interfaces } from 'inversify';
@@ -97,6 +97,12 @@ export interface IViewer {
   materialService: IMaterialService;
   renderService: IRenderService;
   sceneService: ISceneService;
+}
+
+export interface ViewerLauncherConfig {
+  customManager?: CustomManagerMap;
+  logger?: ILogger;
+  loggerOptions?: LoggerOptions;
 }
 
 export interface IViewerLauncher {
@@ -280,7 +286,9 @@ export interface IConfigService {
   loadConfig(config: ViewerConfigModel): void;
 }
 
-export type ILoggerService = ILogger;
+export type ILoggerService = {
+  init(loggerOptions?: LoggerOptions, logger?: ILogger): void;
+} & ILogger;
 
 export interface CustomManagerMap {
   animation?: interfaces.Newable<IAnimationService>;

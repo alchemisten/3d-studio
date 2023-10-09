@@ -1,8 +1,8 @@
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
-
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
+import { Logger } from '@schablone/logging';
+import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
 
 (function () {
   const container = document.getElementById('viewer-container');
@@ -277,7 +277,11 @@ import * as ReactDOM from 'react-dom/client';
     },
   };
 
-  const launcher = new ViewerLauncher();
+  const launcher = new ViewerLauncher({
+    logger: new Logger({
+      environment: 'local',
+    }),
+  });
   const viewer = launcher.createCanvasViewer(config, container);
 
   const root = ReactDOM.createRoot(document.getElementById('studio-ui') as HTMLElement);

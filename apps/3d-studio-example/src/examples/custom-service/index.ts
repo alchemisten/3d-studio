@@ -7,7 +7,14 @@ import { AlternativeLoggerService } from './logger';
     return;
   }
 
-  const launcher = new ViewerLauncher({ logger: AlternativeLoggerService });
+  const launcher = new ViewerLauncher({
+    customManager: {
+      logger: AlternativeLoggerService,
+    },
+    loggerOptions: {
+      environment: 'develop',
+    },
+  });
   launcher.createCanvasViewer(
     {
       objects: [
