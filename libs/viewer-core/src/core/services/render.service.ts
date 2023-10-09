@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import type { ILogger } from '@schablone/logging';
 import type {
   CameraConfigModel,
   IConfigService,
@@ -29,10 +30,10 @@ export class RenderService implements IRenderService {
   protected readonly afterRender$: Subject<boolean>;
   protected readonly beforeRender$: Subject<boolean>;
   protected readonly camera: PerspectiveCamera;
-  protected readonly camera$: Subject<PerspectiveCamera>;
+  protected readonly camera$: BehaviorSubject<PerspectiveCamera>;
   protected context: HTMLElement | WebGL2RenderingContext | undefined;
   protected continuousRenderEnabled: boolean;
-  protected logger: ILoggerService;
+  protected logger: ILogger;
   protected node!: HTMLElement;
   protected postProcessingEnabled: boolean;
   protected renderConfig!: RenderConfigModel;
@@ -50,7 +51,7 @@ export class RenderService implements IRenderService {
     this.hookBeforeRender$ = this.beforeRender$.asObservable();
     this.postProcessingEnabled = false;
     this.camera = new PerspectiveCamera();
-    this.camera$ = new Subject<PerspectiveCamera>();
+    this.camera$ = new BehaviorSubject<PerspectiveCamera>(this.camera);
     this.continuousRenderEnabled = false;
     this.renderConfig$ = new Subject<RenderConfigModel>();
 
