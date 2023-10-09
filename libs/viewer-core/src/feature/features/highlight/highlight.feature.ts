@@ -102,7 +102,7 @@ export class HighlightFeature implements IHighlightFeature {
       this.highlights$.next(this.highlights);
     });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
-      if (enabled && this.controls) {
+      if (enabled && this.controls && this.camera) {
         this.update();
       }
     });
