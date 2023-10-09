@@ -27,7 +27,7 @@ export const PageHeader: FC<PageHeaderProps> = ({ alt, logo, onSidebarToggle }) 
         </svg>
       </button>
       <h1 className={styles.headline}>3D Dashboard</h1>
-      <div className={styles.logo}>{logo && <img src={`${baseUrl}/${logo}`} alt={alt} />}</div>
+      <div className={styles.logo}>{logo && <img src={`${baseUrl}${logo}`} alt={alt} />}</div>
     </header>
   );
 };
