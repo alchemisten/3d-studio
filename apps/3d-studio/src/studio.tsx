@@ -1,20 +1,34 @@
-import { ILogger } from '@schablone/logging';
-import { ConfigProvider, StudioConfig } from './provider';
 import { FC } from 'react';
-import { RouterBase } from './components';
+import { ILogger, LoggerFactory } from '@schablone/logging';
 import { LoggingProvider } from '@schablone/logging-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import { ConfigProvider, StudioConfig } from './provider';
+import { RouterBase } from './components';
+import './styles/main.scss';
 
 export interface StudioProps {
-  logger?: ILogger;
   config: StudioConfig;
+  logger?: ILogger;
+  queryClient?: QueryClient;
 }
 
-export const Studio: FC<StudioProps> = ({ logger, config }) => {
+export const Studio: FC<StudioProps> = ({ config, logger, queryClient }) => {
   return (
-    <LoggingProvider logger={logger} options={{}}>
-      <ConfigProvider config={config}>
-        <RouterBase />
-      </ConfigProvider>
+    <LoggingProvider
+      logger={
+        logger ||
+        LoggerFactory({
+          environment: 'production',
+        })
+      }
+      options={{}}
+    >
+      <QueryClientProvider client={queryClient || new QueryClient()}>
+        <ConfigProvider config={config}>
+          <RouterBase />
+        </ConfigProvider>
+      </QueryClientProvider>
     </LoggingProvider>
   );
 };

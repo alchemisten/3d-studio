@@ -3,12 +3,16 @@ import { ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
 
 export interface StudioConfig {
   baseUrl: string;
-  projectLoader: (projectId: string, baseUrl: string) => Promise<ViewerConfigModel>;
+  pathAllProjects?: string;
+  pathSingleProject?: string;
+  projectParser?: (id: string, data: any) => ViewerConfigModel;
 }
 
 export const defaultConfig: StudioConfig = {
   baseUrl: 'http://localhost:3000',
-  projectLoader: async () => Promise.reject('No project loader defined'),
+  pathAllProjects: '/api/customer/projects/',
+  pathSingleProject: '/api/projects/',
+  projectParser: (id, data) => data as ViewerConfigModel,
 };
 
 export const ConfigContext = createContext<StudioConfig>(defaultConfig);
@@ -22,5 +26,5 @@ export interface ConfigProviderProps extends PropsWithChildren {
 }
 
 export const ConfigProvider: FC<ConfigProviderProps> = ({ children, config }) => {
-  return <ConfigContext.Provider value={config}>{children}</ConfigContext.Provider>;
+  return <ConfigContext.Provider value={Object.assign({}, defaultConfig, config)}>{children}</ConfigContext.Provider>;
 };

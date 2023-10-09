@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
 import { ISkyboxFeature, IViewer, SkyboxFeatureToken, ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
 import { Subscription } from 'rxjs';
+import { useQuery } from '@tanstack/react-query';
 import { useLogger } from '@schablone/logging-react';
 
 import { LoadingScreen } from '../../components';
@@ -12,17 +13,21 @@ import { useConfigContext } from '../../provider';
 import styles from './project.module.scss';
 
 export const Project: FC = () => {
-  const { baseUrl, projectLoader } = useConfigContext();
-  const { id } = useParams();
   const { logger } = useLogger();
+  const { baseUrl, projectParser, pathSingleProject } = useConfigContext();
+  const { id } = useParams();
+  const { data, error, isError, isLoading, isSuccess } = useQuery({
+    queryKey: ['project', id],
+    queryFn: () => fetch(`${baseUrl}${pathSingleProject}${id}`).then((res) => res.json()),
+  });
   const viewerCanvas = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const [alcmLogo] = useState(searchParams.get('l') === 'true');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const [playClicked, setPlayClicked] = useState(searchParams.get('e') !== 'true');
   const [title, setTitle] = useState<string>();
   const [viewer, setViewer] = useState<IViewer>();
-  const [launcher] = useState(new ViewerLauncher());
+  const [launcher] = useState(new ViewerLauncher({ logger }));
 
   const transparent = searchParams.get('t') === 'true';
   const initialLanguage = searchParams.get('lng');
@@ -30,24 +35,24 @@ export const Project: FC = () => {
   const startLanguage = initialLanguage && availableLanguages.includes(initialLanguage) ? initialLanguage : 'de';
 
   useEffect(() => {
+    if (isError) {
+      logger.error('Error loading project', { objects: { baseUrl, singleProjectPath: pathSingleProject }, error });
+    }
+  }, [baseUrl, error, isError, logger, pathSingleProject]);
+
+  useEffect(() => {
     if (!viewerCanvas.current || !id) {
       return;
     }
 
     const allowZoom = searchParams.get('s') !== 'false';
-    setIsLoading(true);
 
-    projectLoader(id, baseUrl)
-      .then((project) => {
-        if (viewerCanvas.current) {
-          setViewer(launcher.createCanvasViewer({ ...project, controls: { allowZoom } }, viewerCanvas.current));
-        }
-      })
-      .catch((error) => {
-        logger.error('Error while loading project with id:', { objects: id, error });
-        setIsLoading(false);
-      });
-  }, [baseUrl, id, launcher, logger, projectLoader, searchParams]);
+    if (isSuccess) {
+      const projectData = projectParser ? projectParser(id, data) : data;
+      setViewer(launcher.createCanvasViewer({ ...projectData, controls: { allowZoom } }, viewerCanvas.current));
+      setIsLoadingAssets(true);
+    }
+  }, [data, id, isSuccess, launcher, projectParser, searchParams]);
 
   useEffect(() => {
     if (!viewer) {
@@ -58,7 +63,7 @@ export const Project: FC = () => {
 
     subscription.add(
       viewer.assetService.getIsLoading().subscribe((loading) => {
-        setIsLoading(loading);
+        setIsLoadingAssets(loading);
       })
     );
 
@@ -89,7 +94,7 @@ export const Project: FC = () => {
         // TranslationsProvider is currently only used here because nesting it above the ViewerUI causes a rendering loop
         <TranslationsProvider initialLanguage={startLanguage} initialTranslations={translations}>
           <LoadingScreen
-            isLoading={isLoading}
+            isLoading={isLoadingAssets || isLoading}
             onPlayClicked={() => setPlayClicked(true)}
             title={title}
             transparent={transparent}

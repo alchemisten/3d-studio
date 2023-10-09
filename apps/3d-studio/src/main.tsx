@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { LoggerFactory } from '@schablone/logging';
 import type { ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
-import './styles/main.scss';
+
 import { Studio } from './studio';
 
 const logger = LoggerFactory({
