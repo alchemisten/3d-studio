@@ -102,7 +102,7 @@ export class HighlightFeature implements IHighlightFeature {
       this.highlights$.next(this.highlights);
     });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
-      if (enabled && this.controls && this.camera) {
+      if ((enabled || this.state === HighlightMode.TO_ORBIT) && this.controls && this.camera) {
         this.update();
       }
     });
@@ -127,6 +127,9 @@ export class HighlightFeature implements IHighlightFeature {
       this.sceneService.addObjectToScene(this.highlightGroup);
       document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
     } else {
+      if (this.state === HighlightMode.HIGHLIGHT || this.state === HighlightMode.TO_HIGHLIGHT) {
+        this.leaveHighlight();
+      }
       this.sceneService.removeObjectFromScene('highlights');
       document.removeEventListener('mousemove', this.onDocumentMouseMove);
     }
@@ -305,18 +308,7 @@ export class HighlightFeature implements IHighlightFeature {
 
   private handleMove = (newPos: Vector2): void => {
     if (this.startPos.distanceTo(newPos) > this.dragThreshold && this.state !== HighlightMode.TO_ORBIT) {
-      this.state = HighlightMode.TO_ORBIT;
-      this.focusedHighlight$.next(null);
-      // this.dispatcher.dispatch("onstate", this.state);
-      this.addListeners('wheel');
-      this.controls.position0 = this.camera.position.clone();
-      this.controls.target0 = this.viewCurrent.clone();
-      this.controls.target = this.viewCurrent.clone();
-      this.controls.reset();
-      this.controls.enabled = true;
-      // if (this.animMan.animationPlaying) {
-      //   this.mediator.dispatch("toggleState", { key: 'animatedHighlights', value: false });
-      // }
+      this.leaveHighlight();
     }
   };
 
@@ -359,6 +351,22 @@ export class HighlightFeature implements IHighlightFeature {
 
     const deltaMove = dist * this.clamp((deltaTime / 1000) * speed, 0, 1);
     return current + deltaMove;
+  }
+
+  private leaveHighlight(): void {
+    this.logger.debug('Leaving highlight');
+    this.state = HighlightMode.TO_ORBIT;
+    this.focusedHighlight$.next(null);
+    // this.dispatcher.dispatch("onstate", this.state);
+    this.addListeners('wheel');
+    this.controls.position0 = this.camera.position.clone();
+    this.controls.target0 = this.viewCurrent.clone();
+    this.controls.target = this.viewCurrent.clone();
+    this.controls.reset();
+    this.controls.enabled = true;
+    // if (this.animMan.animationPlaying) {
+    //   this.mediator.dispatch("toggleState", { key: 'animatedHighlights', value: false });
+    // }
   }
 
   private loadHighlightTextures(): Promise<HighlightTextureMap> {
