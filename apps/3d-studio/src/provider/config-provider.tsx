@@ -3,6 +3,9 @@ import { ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
 
 export interface StudioConfig {
   baseUrl: string;
+  customStyles?: {
+    viewerUI?: string;
+  };
   pathAllProjects?: string;
   pathSingleProject?: string;
   projectParser?: (id: string, data: any) => ViewerConfigModel;

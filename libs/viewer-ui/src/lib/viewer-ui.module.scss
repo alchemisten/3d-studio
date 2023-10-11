@@ -2,6 +2,7 @@
 
 .viewerUi {
   --ui-animation-time: 0.2s ease-in-out;
+  --ui-color-bar: var(--ui-color-font);
   --ui-color-element-background: rgba(0,0,0,0.8);
   --ui-color-font: #fff;
   --ui-color-inactive: #757575;
@@ -16,8 +17,10 @@
   --ui-size-border-radius: 10px;
   --ui-size-box-padding: 22px;
   --ui-size-button: 40px;
+  --ui-size-button-font: 14px;
   --ui-size-button-toggle: 20px;
-  --ui-size-checkbox: 12px;
+  --ui-size-button-radius: calc(var(--ui-size-button) / 2);
+  --ui-size-checkbox: 20px;
   --ui-size-element-gap: 20px;
   --ui-size-element-margin: 25px;
   --ui-size-highlight-bottom: 300px;
@@ -25,6 +28,8 @@
   --ui-size-intro-width: 390px;
   --ui-size-label-line-height: 50px;
   --ui-size-loading-bar-height: 4px;
+  --ui-size-logo-height: 100px;
+  --ui-size-logo-width: 200px;
   --ui-size-menu-bottom: 120px;
   --ui-size-menu-width: 270px;
   --ui-size-select-list-bottom: 95px;
@@ -56,7 +61,7 @@
     cursor: pointer;
     display: flex;
     font-family: var(--ui-font-family);
-    font-size: 14px;
+    font-size: var(--ui-size-button-font);
     justify-content: center;
     padding: 0;
     pointer-events: all;
@@ -83,17 +88,19 @@
 }
 
 .logo {
-  max-height: 100px;
-  max-width: 200px;
+  display: flex;
+  height: var(--ui-size-logo-height);
+  justify-content: flex-end;
   position: fixed;
   right: var(--ui-size-element-margin);
   top: var(--ui-size-element-margin);
+  width: var(--ui-size-logo-width);
   z-index: 10;
 
   img {
+    max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
-    height: 100%;
-    width: 100%;
   }
 }
 

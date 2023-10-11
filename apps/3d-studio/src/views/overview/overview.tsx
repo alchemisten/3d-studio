@@ -30,7 +30,7 @@ export const Overview: FC = () => {
   useEffect(() => {
     if (isError) {
       logger.error('Error loading list of all projects', {
-        objects: { baseUrl, pathAllProjects: projectListPath },
+        objects: { baseUrl, pathAllProjects },
         error,
       });
     }

@@ -10,12 +10,13 @@ import { ViewerProvider } from '../provider';
 import styles from './viewer-ui.module.scss';
 
 export interface ViewerUIProps extends PropsWithChildren {
+  className?: string;
   initialLanguage?: string | null;
   logo?: ReactNode;
   viewer: IViewer;
 }
 
-export const ViewerUI: FC<ViewerUIProps> = ({ children, initialLanguage = 'de', logo, viewer }) => {
+export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLanguage = 'de', logo, viewer }) => {
   const [features, setFeatures] = useState<FeatureMap>({});
   const [introClosed, setIntroClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, initialLanguage = 'de', 
       initialTranslations={translations}
     >
       <ViewerProvider viewer={viewer}>
-        <div className={`${styles.viewerUi} ${introClosed ? styles.clicked : ''}`}>
+        <div className={`${styles.viewerUi} ${className || ''} ${introClosed ? styles.clicked : ''}`}>
           {logo && <div className={styles.logo}>{logo}</div>}
           {!introClosed && (
             <div className={styles.clickzone} onClick={handleUIClick}>
