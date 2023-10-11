@@ -14,15 +14,19 @@ import styles from './project.module.scss';
 
 export const Project: FC = () => {
   const { logger } = useLogger();
-  const { baseUrl, projectParser, pathSingleProject } = useConfigContext();
+  const { baseUrl, customStyles, pathAllProjects, pathSingleProject, projectParser } = useConfigContext();
   const { id } = useParams();
   const { data, error, isError, isLoading, isSuccess } = useQuery({
     queryKey: ['project', id],
     queryFn: () => fetch(`${baseUrl}${pathSingleProject}${id}`).then((res) => res.json()),
   });
+  const { data: customer } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => fetch(`${baseUrl}${pathAllProjects}`).then((res) => res.json()),
+  });
   const viewerCanvas = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
-  const [alcmLogo] = useState(searchParams.get('l') === 'true');
+  const [logo] = useState(searchParams.get('l') === 'true');
   const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const [playClicked, setPlayClicked] = useState(searchParams.get('e') !== 'true');
   const [title, setTitle] = useState<string>();
@@ -36,7 +40,7 @@ export const Project: FC = () => {
 
   useEffect(() => {
     if (isError) {
-      logger.error('Error loading project', { objects: { baseUrl, singleProjectPath: pathSingleProject }, error });
+      logger.error('Error loading project', { objects: { baseUrl, pathSingleProject }, error });
     }
   }, [baseUrl, error, isError, logger, pathSingleProject]);
 
@@ -103,20 +107,10 @@ export const Project: FC = () => {
       ) : (
         viewer && (
           <ViewerUI
-            viewer={viewer}
+            className={customStyles?.viewerUI}
             initialLanguage={initialLanguage}
-            logo={
-              alcmLogo ? (
-                <a
-                  href="https://alchemisten.ag"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ pointerEvents: 'all' }}
-                >
-                  <img src="assets/alchemisten-logo.svg" alt="Alchemisten AG Logo" />
-                </a>
-              ) : undefined
-            }
+            logo={logo && customer?.logo ? <img src={`${baseUrl}${customer?.logo}`} alt={customer.name} /> : undefined}
+            viewer={viewer}
           />
         )
       )}
