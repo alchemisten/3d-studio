@@ -580,19 +580,15 @@ export class HighlightFeature implements IHighlightFeature {
           this.controls.target.copy(orgTarget);
         }
         this.camera.lookAt(this.controls.target);
-        this.controls.update();
         break;
       }
       case HighlightMode.HIGHLIGHT:
+        this.controls.autoRotate = false;
         this.controls.position0 = this.camera.position.clone();
         this.controls.target0 = this.viewTarget.clone();
         this.controls.target = this.viewTarget.clone();
         break;
-      case HighlightMode.ORBIT:
-        this.controls.update();
-        break;
       default:
-        this.controls.update();
         break;
     }
 
