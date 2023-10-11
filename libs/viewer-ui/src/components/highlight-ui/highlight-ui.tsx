@@ -17,6 +17,7 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
   const [entries, setEntries] = useState<SelectBoxEntry[]>([]);
   const [currentHighlight, setCurrentHighlight] = useState<HighlightModel | null>(null);
   const [currentEntry, setCurrentEntry] = useState<SelectBoxEntry | null>(null);
+  const [featureActive, setFeatureActive] = useState(false);
 
   const onEntrySelected = (entry: SelectBoxEntry) => {
     feature.focusHighlight(entry.id);
@@ -67,6 +68,12 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
         })
       );
 
+      subscription.add(
+        feature.getEnabled().subscribe((active) => {
+          setFeatureActive(active);
+        })
+      );
+
       return () => {
         subscription.unsubscribe();
       };
@@ -74,6 +81,10 @@ export const HighlightUi: FC<HighlightUiProps> = ({ feature }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentLanguage, feature]
   );
+
+  if (!featureActive) {
+    return null;
+  }
 
   return (
     <>
