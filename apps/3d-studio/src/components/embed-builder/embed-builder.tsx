@@ -10,7 +10,7 @@ export interface EmbedBuilderProps {
 }
 
 const codeMap = {
-  alcmLogo: 'l',
+  logo: 'l',
   allowZoom: 's',
   language: 'lng',
   togglePlay: 'e',
@@ -20,10 +20,10 @@ const codeMap = {
 export const EmbedBuilder: FC<EmbedBuilderProps> = ({ open, selectedProject }) => {
   const { baseUrl } = useConfigContext();
   const [codeParams, setCodeParams] = useState<CodeParams>({
-    alcmLogo: false,
     height: '450px',
     iframe: true,
     language: 'none',
+    logo: false,
     togglePlay: true,
     width: '750px',
   });
@@ -102,11 +102,11 @@ export const EmbedBuilder: FC<EmbedBuilderProps> = ({ open, selectedProject }) =
         />
       </div>
       <div className="form-group">
-        <label>Alchemisten Logo</label>
+        <label>Logo</label>
         <SettingsButton
           canBeUndefined
-          setValue={(value) => onCodeParamChanged('alcmLogo', value)}
-          setting={codeParams.alcmLogo}
+          setValue={(value) => onCodeParamChanged('logo', value)}
+          setting={codeParams.logo}
         />
       </div>
       <div className="form-group">

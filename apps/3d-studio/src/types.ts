@@ -1,9 +1,9 @@
 export interface CodeParams {
-  alcmLogo?: boolean;
   allowZoom?: boolean;
   height: string;
   iframe: boolean;
   language: string;
+  logo?: boolean;
   togglePlay?: boolean;
   transparent?: boolean;
   width: string;
