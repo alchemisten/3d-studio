@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { LoggerFactory } from '@schablone/logging';
-import type { ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
 
 import { Studio } from './studio';
 
@@ -15,13 +14,7 @@ root.render(
     <Studio
       logger={logger}
       config={{
-        baseUrl: '',
-        projectLoader: async (id, baseUrl) => {
-          const projectData = await fetch(`${baseUrl}/api/projects/${id}`).then((response) => response.json());
-
-          // TODO Mapping
-          return projectData;
-        },
+        baseUrl: 'http://127.0.0.1:4200/',
       }}
     />
   </StrictMode>
