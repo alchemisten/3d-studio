@@ -22,32 +22,104 @@ import { LightType } from './enums';
 import type { interfaces } from 'inversify';
 
 export interface ViewerConfigModel {
+  /**
+   * The configuration for the camera. If not provided, the default camera
+   * configuration is used. See the config service source for the default
+   * configuration.
+   */
   camera?: Partial<CameraConfigModel>;
+  /**
+   * The configuration for the controls. If not provided, the default controls
+   * configuration is used.
+   */
   controls?: Partial<ControlConfigModel>;
+  /**
+   * The configuration for the features determines which features are loaded
+   * and how they should be configured. By default, no features are loaded.
+   */
   features?: FeatureSetup;
+  /**
+   * The configuration for the objects to load. At least one object has to be
+   * provided.
+   */
   objects: ObjectSetupModel[];
+  /**
+   * The configuration for the project.
+   */
   project?: ProjectConfigModel;
+  /**
+   * The configuration for the renderer. If not provided, the default renderer
+   * configuration is used. See the config service source for the default
+   * configuration.
+   */
   render?: Partial<RenderConfigModel>;
 }
 
 export interface ControlConfigModel {
+  /**
+   * Whether the user can zoom in and out of the scene with the mouse wheel.
+   * Enabled by default.
+   */
   allowZoom?: boolean;
 }
 
 export interface ObjectSetupModel {
+  /**
+   * Whether this object should cast shadows when hit by a shadow casting light
+   */
   castShadow?: boolean;
+  /**
+   * The name of the object. If provided, this will overwrite the name in the
+   * GLTF file before adding the object to the scene.
+   */
   name?: string;
+  /**
+   * The path to the object. Currently only GTLF files are supported.
+   * Note that relative paths are relative to the project basedir as
+   * specified in the project config of the viewer config.
+   */
   path: string;
+  /**
+   * Optional scaling of the object if it is too big or too small in the scene
+   */
   scale?: number;
+  /**
+   * Whether this object should be shadowed by other shadow casting objects (including itself)
+   */
   receiveShadow?: boolean;
 }
 
 export interface ProjectConfigModel {
+  /**
+   * Base directory all assets are loaded from. This is used to resolve relative
+   * paths in the object setup and for other resources.
+   */
   basedir?: string;
+  /**
+   * @deprecated The folder to load the object from. Legacy feature, currently not used and
+   * might be removed in the future.
+   */
   folder?: string;
+  /**
+   * A language map containing the translations for the intro texts. The key is
+   * the language code and the value is the desired translation for that
+   * language. This is a legacy feature and might be replaced in the future.
+   */
   introText?: I18nLanguageMap;
+  /**
+   * A list of languages supported by the project. Pass all languages you want
+   * to support here. The first language in the list is used as the default.
+   */
   languages?: string[];
+  /**
+   * The name of the project. This is used to identify the project in the
+   * project registry and for logging.
+   */
   name?: string;
+  /**
+   * @deprecated The ID of the project. Legacy feature, currently not used anywhere and
+   * might be removed in the future.
+   */
   projectID?: string;
 }
 
@@ -65,22 +137,72 @@ export type ClearColor = {
 };
 
 export interface RenderConfigModel {
+  /**
+   * Whether the renderer should automatically clear the canvas before each
+   * render call. Defaults to true.
+   */
   autoClear: boolean;
+  /**
+   * The color to clear the canvas with. Defaults to black with an alpha of 0.
+   */
   clearColor: ClearColor;
+  /**
+   * Whether the renderer should continuously render the scene. Defaults to
+   * false, which only renders a single frame. If set to false, the controls
+   * will cause a rerender when clicking and dragging the mouse, thus only
+   * rendering when necessary. Animations require this to be true to work.
+   */
   continuousRendering: boolean;
+  /**
+   * The color space to use for rendering. Defaults to SRGBColorSpace.
+   */
   outputColorSpace: ColorSpace;
+  /**
+   * The pixel ratio to use for rendering. Defaults to 1. Might be interesting
+   * for high resolution displays.
+   */
   pixelRatio: number;
+  /**
+   * The size to render the scene at. Defaults to 1024x768. If using the canvas
+   * viewer, this will be automatically set to the size of the canvas with a
+   * window resize listener.
+   */
   renderSize: SizeModel;
+  /**
+   * Whether to enable shadow maps. Defaults to true.
+   */
   shadowMapEnabled: boolean;
+  /**
+   * The type of shadow map to use. Defaults to PCFSoftShadowMap.
+   */
   shadowMapType: ShadowMapType;
 }
 
 export interface CameraConfigModel {
+  /**
+   * Aspect ratio of the camera, should match the render size aspect ratio.
+   * Defaults to 1024 / 768.
+   */
   aspect: number;
+  /**
+   * The far clipping plane of the camera. Defaults to 20000.
+   */
   far: number;
+  /**
+   * The field of view of the camera in degrees. Defaults to 37.
+   */
   fov: number;
+  /**
+   * The near clipping plane of the camera. Defaults to 0.1.
+   */
   near: number;
+  /**
+   * The position of the camera. Defaults to (10, 10, 5).
+   */
   position: Vector3;
+  /**
+   * The target of the camera. Defaults to (0, 0, 0).
+   */
   target: Vector3;
 
   [key: string]: unknown;
@@ -100,13 +222,44 @@ export interface IViewer {
 }
 
 export interface ViewerLauncherConfig {
+  /**
+   * A map of custom services to use instead of the default ones. Services must
+   * fulfill the interface to the service they are replacing
+   */
   customManager?: CustomManagerMap;
+  /**
+   * Logger to use in the services and features. If not provided, a default
+   * logger is used that will behave as if it was in a production environment.
+   */
   logger?: ILogger;
+  /**
+   * Options to configure the internal logger in the viewer. Can be supplied
+   * instead of a logger instance if the logger needs to be configured, but not
+   * used outside the viewer.
+   */
   loggerOptions?: LoggerOptions;
 }
 
 export interface IViewerLauncher {
+  /**
+   * Creates a new canvas viewer instance. If the context is an HTML element,
+   * the viewer will append its canvas object to the provided context. If the
+   * context is a WebGL2RenderingContext, the viewer will use the provided
+   * context to render to.
+   *
+   * @param config Configuration object for the viewer
+   * @param context The context to render to
+   */
   createCanvasViewer(config: ViewerConfigModel, context: HTMLElement | WebGL2RenderingContext): void;
+
+  /**
+   * Creates a new image viewer instance. Rendered images will be emitted as
+   * base64 encoded image source strings.
+   *
+   * @param config Configuration object for the viewer
+   * @returns An observable emitting each rendered image as a base64 encoded
+   * image source string
+   */
   createImageViewer(config: ViewerConfigModel): Observable<string>;
 }
 
