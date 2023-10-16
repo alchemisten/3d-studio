@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  cacheDir: '../../../node_modules/.vite/3d-studio-studio',
+  cacheDir: '../../../node_modules/.vite/3d-studio-react-website',
 
   server: {
     port: 4200,
