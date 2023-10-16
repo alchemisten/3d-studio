@@ -1,5 +1,5 @@
 {
-  "name": "3d-studio-studio",
+  "name": "3d-studio-react-website",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "src",
   "projectType": "application",
@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/3d-studio/studio"
+        "outputPath": "dist/apps/3d-studio/react-website"
       },
       "configurations": {
         "development": {
@@ -24,15 +24,15 @@
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "3d-studio-studio:build"
+        "buildTarget": "3d-studio-react-website:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "3d-studio-studio:build:development",
+          "buildTarget": "3d-studio-react-website:build:development",
           "hmr": true
         },
         "production": {
-          "buildTarget": "3d-studio-studio:build:production",
+          "buildTarget": "3d-studio-react-website:build:production",
           "hmr": false
         }
       }
@@ -41,36 +41,36 @@
       "executor": "@nx/vite:preview-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "3d-studio-studio:build"
+        "buildTarget": "3d-studio-react-website:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "3d-studio-studio:build:development"
+          "buildTarget": "3d-studio-react-website:build:development"
         },
         "production": {
-          "buildTarget": "3d-studio-studio:build:production"
+          "buildTarget": "3d-studio-react-website:build:production"
         }
       }
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["coverage/apps/3d-studio/studio"],
+      "outputs": ["coverage/apps/3d-studio/react-website"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../../coverage/apps/3d-studio/studio"
+        "reportsDirectory": "../../../coverage/apps/3d-studio/react-website"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/3d-studio/studio/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/3d-studio/react-website/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "3d-studio-studio:build"
+        "buildTarget": "3d-studio-react-website:build"
       }
     }
   },
