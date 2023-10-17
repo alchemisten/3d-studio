@@ -1,4 +1,4 @@
-# Viewer Core
+# 3D Studio Viewer Core
 
 The viewer core provides a 3D product visualization and render application that
 can be run standalone or integrated into other applications. The viewer can 
@@ -8,7 +8,7 @@ base64 encoded image source strings if usage without a browser is desired.
 ## Architecture
 
 ### Modules
-* `core`: All services basic functionality, the viewer and the viewer launcher.
+* `core`: All basic functionality services, the viewer and the viewer launcher.
 * `feature`: Core features as available in the legacy viewer. Also contains the
   feature service and the feature registry, which is responsible for registering
   additional features via the viewer launcher.
@@ -24,23 +24,53 @@ access to the core services.
 
 ## Usage
 
-Create an instance of the viewer launcher via the exported global
+Create an instance of the viewer launcher (with optional config) after 
+importing the launcher into the desired application 
+
 ```javascript
-const launcher = alcm.studio();
+import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+
+const launcher = new ViewerLauncher();
 ```
-or after importing the launcher into the desired application and create one of
-the available viewers via the launcher. A config object has to be provided,
-containing at least the objects which should be loaded. Further configuration
-of the viewer is optionally possible via the config. See the corresponding 
-[ViewerConfigModel interface](src/types.ts#L21) and examples for now.
 
+and create one of the available viewers via the launcher.
+
+```javascript
+// Get a reference to an HTML element, that will contain the viewer canvas
+const container = document.getElementById('viewer-container');
+
+// Canvas viewer with contonuous rendering
+const canvasViewer = launcher.createCanvasViewer({
+  objects: [
+    {
+      path: 'path/to/object.gtlf'
+    }
+  ],
+  render: {
+    continuousRendering: true,
+  }
+}, container);
+
+// Image viewer
+const images$ = launcher.createImageViewer({
+  objects: [
+    {
+      path: 'path/to/object.gtlf'
+    }
+  ],
+});
+images$.subscribe((image) => {
+  // Do something with the image
+});
+```
+
+A config object has to be provided, containing at least the objects which 
+should be loaded. Currently, the viewer only support GTLF files. Further 
+configuration of the viewer is optionally possible via the config. See 
+the corresponding [ViewerConfigModel interface](src/types.ts#L24) and examples for now.
+
+For further usage, see the [examples in the repository](https://github.com/alchemisten/3d-studio/tree/develop/apps/3d-studio-example/src/examples).
+
+## Planed features
 Later on viewer configuration can be supplied entirely within the object file
-if it is an *.alcm file.
-
-## Development
-
-Running `yarn start` will serve a live reload development server on `localhost:4200`,
-serving the files from the `3d-studio-example` app. The base files can be used for development,
-further examples for specific functionality should receive their own subfolder in 
-`apps/3d-studio-example/src/examples`. To run any of these examples open the corresponding
-index.html file in the browser, e.g. `localhost:4200/src/examples/multiple-viewers/index.html`.
+if it is a *.alcm file.

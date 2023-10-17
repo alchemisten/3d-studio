@@ -1,5 +1,5 @@
 .button {
-  border-radius: calc(var(--ui-size-button) / 2);
+  border-radius: var(--ui-size-button-radius);
   height: var(--ui-size-button);
   text-transform: uppercase;
   width: var(--ui-size-button);

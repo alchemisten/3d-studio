@@ -7,10 +7,17 @@ based on [Three JS](https://threejs.org).
 
 This mono repo contains the following packages. See their individual READMEs 
 for more details:
-* GLTF Extension: Contains the definition for the *.alcm file object which 
+* [Viewer Core](libs/viewer-core/README.md): 
+  Contains the actual viewer and the core features.
+* [Viewer UI](libs/viewer-ui/README.md): 
+  Contains a UI for the viewer and the core features.
+* [React Website](apps/3d-studio/README.md): 
+  Contains a React Website which can be used with a single component with
+  minimal configuration.
+* [Example](apps/3d-studio-example/README.md): 
+  Contains an example application which is used mainly for development, but
+  also contains examples for the usage of the viewer and the viewer UI.
+* GLTF Extension: Contains the definition for the *.alcm file object which
   extends the default *.gltf file definition with all configuration options
   necessary for the viewer.
 * GLTF Extension Validator: TODO
-* [Viewer Core](libs/viewer-core/README.md): 
-  Contains the actual viewer and the core features. Examples for the most 
-  common use cases are available.

@@ -1,10 +1,12 @@
 import { inject, injectable } from 'inversify';
 import { PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { take, withLatestFrom } from 'rxjs/operators';
-import type { IControlService, IRenderService, RenderConfigModel } from '../../types';
-import { RenderServiceToken } from '../../util';
+import type { IConfigService, IControlService, IRenderService, RenderConfigModel } from '../../types';
+import { ConfigServiceToken, LoggerServiceToken, RenderServiceToken } from '../../util';
+import { ILogger } from '@schablone/logging';
+import { ILoggerService } from '../../types';
 
 /**
  * The control service provides access to orbit controls.
@@ -16,11 +18,17 @@ import { RenderServiceToken } from '../../util';
 @injectable()
 export class ControlService implements IControlService {
   private controls!: OrbitControls;
-  private controls$: Subject<OrbitControls>;
+  private controls$: BehaviorSubject<OrbitControls | null>;
   private changeSub!: Subscription;
+  private readonly logger: ILogger;
 
-  public constructor(@inject(RenderServiceToken) private renderService: IRenderService) {
-    this.controls$ = new Subject<OrbitControls>();
+  public constructor(
+    @inject(ConfigServiceToken) private configService: IConfigService,
+    @inject(LoggerServiceToken) logger: ILoggerService,
+    @inject(RenderServiceToken) private renderService: IRenderService
+  ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Control' } } });
+    this.controls$ = new BehaviorSubject<OrbitControls | null>(null);
     this.renderService.getCamera().pipe(take(1)).subscribe(this.createControls.bind(this));
     this.renderService.hookAfterRender$
       .pipe(withLatestFrom(this.renderService.getRenderConfig()))
@@ -29,9 +37,15 @@ export class ControlService implements IControlService {
           this.controls.update();
         }
       });
+    this.configService.getConfig().subscribe((config) => {
+      if (config.controls && this.controls) {
+        this.controls.enableZoom = config.controls.allowZoom ?? true;
+        this.controls.update();
+      }
+    });
   }
 
-  public getControls(): Observable<OrbitControls> {
+  public getControls(): Observable<OrbitControls | null> {
     return this.controls$.asObservable();
   }
 
@@ -53,6 +67,7 @@ export class ControlService implements IControlService {
         }
       });
 
+    this.logger.debug('Controls initialized', { objects: this.controls });
     this.controls$.next(this.controls);
   }
 }

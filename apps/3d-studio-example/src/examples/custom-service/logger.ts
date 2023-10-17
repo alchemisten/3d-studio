@@ -4,6 +4,15 @@ import { ILogger, LoggerOptions } from '@schablone/logging';
 
 @injectable()
 export class AlternativeLoggerService implements ILoggerService {
+  public init(options?: LoggerOptions, logger?: ILogger): void {
+    // eslint-disable-next-line no-console
+    console.log(
+      "[CUSTOM LOGGER] This is a custom logger service. It does nothing but log to the console, so we won't be needing these: ",
+      options,
+      logger
+    );
+  }
+
   public debug(message: string) {
     // eslint-disable-next-line no-console
     console.log(`[CUSTOM LOGGER] ${message}`);

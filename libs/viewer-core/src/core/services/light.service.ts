@@ -144,7 +144,7 @@ export class LightService implements ILightService {
     if (setup.position) {
       light.position.set(setup.position.x, setup.position.y, setup.position.z);
     }
-    light.castShadow = true;
+    light.castShadow = setup.castShadow ?? false;
     if (setup.shadow) {
       light.shadow.bias = setup.shadow.bias ?? 0;
       light.shadow.normalBias = setup.shadow.normalBias ?? 0;

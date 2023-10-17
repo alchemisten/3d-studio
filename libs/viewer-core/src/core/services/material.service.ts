@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { Material, Mesh } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { IMaterialService, ISceneService } from '../../types';
-import { SceneServiceToken } from '../../util';
+import type { ILogger } from '@schablone/logging';
+import type { ILoggerService, IMaterialService, ISceneService } from '../../types';
+import { LoggerServiceToken, SceneServiceToken } from '../../util';
 
 /**
  * The material service keeps a record of all materials available in the
@@ -20,10 +21,15 @@ import { SceneServiceToken } from '../../util';
 @injectable()
 export class MaterialService implements IMaterialService {
   private assignedMaterials$: BehaviorSubject<Record<string, Material>>;
+  private readonly logger: ILogger;
   private materials: Material[];
   private readonly materials$: BehaviorSubject<Material[]>;
 
-  public constructor(@inject(SceneServiceToken) private sceneService: ISceneService) {
+  public constructor(
+    @inject(LoggerServiceToken) logger: ILoggerService,
+    @inject(SceneServiceToken) private sceneService: ISceneService
+  ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Material' } } });
     this.assignedMaterials$ = new BehaviorSubject<Record<string, Material>>({});
     this.materials = [];
     this.materials$ = new BehaviorSubject<Material[]>(this.materials);
@@ -40,11 +46,14 @@ export class MaterialService implements IMaterialService {
                 } else {
                   (node as Mesh).material = existingMaterial;
                 }
+              } else {
+                this.logger.debug('Material has no name', { objects: [node, material] });
               }
             });
           }
         });
       });
+      this.logger.debug('Updated materials', { objects: this.materials });
       this.materials$.next(this.materials);
     });
   }

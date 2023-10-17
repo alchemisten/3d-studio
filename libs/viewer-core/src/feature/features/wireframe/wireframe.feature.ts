@@ -2,10 +2,10 @@ import { inject, injectable } from 'inversify';
 import { Material, MeshStandardMaterial } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import type { IMaterialService } from '../../../types';
+import type { IMaterialService, IRenderService } from '../../../types';
 import type { FeatureConfig } from '../../types';
 import type { IWireframeFeature } from './types';
-import { MaterialServiceToken, WireframeFeatureToken } from '../../../util';
+import { MaterialServiceToken, RenderServiceToken, WireframeFeatureToken } from '../../../util';
 
 /**
  * When enabled all materials of all objects in the scene will be set to
@@ -18,7 +18,10 @@ export class WireframeFeature implements IWireframeFeature {
   private readonly enabled$: BehaviorSubject<boolean>;
   private materials!: Material[];
 
-  public constructor(@inject(MaterialServiceToken) private materialService: IMaterialService) {
+  public constructor(
+    @inject(MaterialServiceToken) private materialService: IMaterialService,
+    @inject(RenderServiceToken) private renderService: IRenderService
+  ) {
     this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
@@ -48,5 +51,6 @@ export class WireframeFeature implements IWireframeFeature {
         material.needsUpdate = true;
       }
     });
+    this.renderService.renderSingleFrame();
   }
 }

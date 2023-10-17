@@ -27,6 +27,7 @@ import Highlight from './highlight';
 @injectable()
 export class HighlightFeature implements IHighlightFeature {
   public readonly id = HighlightFeatureToken;
+  private assetPath!: string;
   private baseFov!: number;
   private camera!: PerspectiveCamera;
   private clickable: Sprite[] = [];
@@ -77,7 +78,9 @@ export class HighlightFeature implements IHighlightFeature {
     this.focusedHighlight$ = new Subject<Highlight | null>();
     this.highlights$ = new BehaviorSubject<Highlight[]>(this.highlights);
     this.controlService.getControls().subscribe((controls) => {
-      this.controls = controls;
+      if (controls) {
+        this.controls = controls;
+      }
     });
     this.renderService.getCamera().subscribe((camera) => {
       this.camera = camera;
@@ -89,6 +92,7 @@ export class HighlightFeature implements IHighlightFeature {
   public init(config: HighlightFeatureConfig) {
     this.logger.debug('Initializing with config', { objects: config });
     this.enabled = config.enabled;
+    this.assetPath = config.assetPath ?? 'assets/textures/highlights/';
     this.highlightsVisible = config.highlightsVisible ?? true;
     if (config.groupScale) {
       this.highlightGroup.scale.setScalar(config.groupScale);
@@ -98,7 +102,7 @@ export class HighlightFeature implements IHighlightFeature {
       this.highlights$.next(this.highlights);
     });
     this.renderService.hookAfterRender$.pipe(withLatestFrom(this.getEnabled())).subscribe(([, enabled]) => {
-      if (enabled) {
+      if ((enabled || this.state === HighlightMode.TO_ORBIT) && this.controls && this.camera) {
         this.update();
       }
     });
@@ -123,6 +127,9 @@ export class HighlightFeature implements IHighlightFeature {
       this.sceneService.addObjectToScene(this.highlightGroup);
       document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
     } else {
+      if (this.state === HighlightMode.HIGHLIGHT || this.state === HighlightMode.TO_HIGHLIGHT) {
+        this.leaveHighlight();
+      }
       this.sceneService.removeObjectFromScene('highlights');
       document.removeEventListener('mousemove', this.onDocumentMouseMove);
     }
@@ -212,8 +219,12 @@ export class HighlightFeature implements IHighlightFeature {
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
     );
-    this.rayCaster.setFromCamera(vector, this.camera);
 
+    if (!this.camera) {
+      return [];
+    }
+
+    this.rayCaster.setFromCamera(vector, this.camera);
     return this.rayCaster.intersectObjects(this.clickable);
   }
 
@@ -297,18 +308,7 @@ export class HighlightFeature implements IHighlightFeature {
 
   private handleMove = (newPos: Vector2): void => {
     if (this.startPos.distanceTo(newPos) > this.dragThreshold && this.state !== HighlightMode.TO_ORBIT) {
-      this.state = HighlightMode.TO_ORBIT;
-      this.focusedHighlight$.next(null);
-      // this.dispatcher.dispatch("onstate", this.state);
-      this.addListeners('wheel');
-      this.controls.position0 = this.camera.position.clone();
-      this.controls.target0 = this.viewCurrent.clone();
-      this.controls.target = this.viewCurrent.clone();
-      this.controls.reset();
-      this.controls.enabled = true;
-      // if (this.animMan.animationPlaying) {
-      //   this.mediator.dispatch("toggleState", { key: 'animatedHighlights', value: false });
-      // }
+      this.leaveHighlight();
     }
   };
 
@@ -353,6 +353,22 @@ export class HighlightFeature implements IHighlightFeature {
     return current + deltaMove;
   }
 
+  private leaveHighlight(): void {
+    this.logger.debug('Leaving highlight');
+    this.state = HighlightMode.TO_ORBIT;
+    this.focusedHighlight$.next(null);
+    // this.dispatcher.dispatch("onstate", this.state);
+    this.addListeners('wheel');
+    this.controls.position0 = this.camera.position.clone();
+    this.controls.target0 = this.viewCurrent.clone();
+    this.controls.target = this.viewCurrent.clone();
+    this.controls.reset();
+    this.controls.enabled = true;
+    // if (this.animMan.animationPlaying) {
+    //   this.mediator.dispatch("toggleState", { key: 'animatedHighlights', value: false });
+    // }
+  }
+
   private loadHighlightTextures(): Promise<HighlightTextureMap> {
     const textures: HighlightTextureMap = {
       actionTransTex: null,
@@ -362,10 +378,10 @@ export class HighlightFeature implements IHighlightFeature {
     };
     return Promise.all(
       Object.entries({
-        actionTransTex: 'assets/textures/highlights/action_trans.png',
-        actionTransHoverTex: 'assets/textures/highlights/action_trans_hover.png',
-        simpleTransTex: 'assets/textures/highlights/simple_trans.png',
-        simpleTransHoverTex: 'assets/textures/highlights/simple_trans_hover.png',
+        actionTransTex: `${this.assetPath}action_trans.png`,
+        actionTransHoverTex: `${this.assetPath}action_trans_hover.png`,
+        simpleTransTex: `${this.assetPath}simple_trans.png`,
+        simpleTransHoverTex: `${this.assetPath}simple_trans_hover.png`,
       }).map(([key, value]) =>
         this.assetService.loadTexture(value).then((texture) => {
           textures[key] = texture;
@@ -564,19 +580,15 @@ export class HighlightFeature implements IHighlightFeature {
           this.controls.target.copy(orgTarget);
         }
         this.camera.lookAt(this.controls.target);
-        this.controls.update();
         break;
       }
       case HighlightMode.HIGHLIGHT:
+        this.controls.autoRotate = false;
         this.controls.position0 = this.camera.position.clone();
         this.controls.target0 = this.viewTarget.clone();
         this.controls.target = this.viewTarget.clone();
         break;
-      case HighlightMode.ORBIT:
-        this.controls.update();
-        break;
       default:
-        this.controls.update();
         break;
     }
 

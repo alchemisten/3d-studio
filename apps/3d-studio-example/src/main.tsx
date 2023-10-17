@@ -1,8 +1,7 @@
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
-
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
+import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
 
 (function () {
   const container = document.getElementById('viewer-container');
@@ -171,7 +170,7 @@ import * as ReactDOM from 'react-dom/client';
             },
             i18n: {
               de: {
-                content: 'Schlimmer als ein SVU. Lässt keine Change zum Abrollen.',
+                content: 'Schlimmer als ein SVU. Lässt keine Chance zum Abrollen.',
                 headline: 'Fahrzeugfront',
               },
               en: {
@@ -277,8 +276,12 @@ import * as ReactDOM from 'react-dom/client';
     },
   };
 
-  const launcher = new ViewerLauncher();
-  const viewer = launcher.createHTMLViewer(container, config);
+  const launcher = new ViewerLauncher({
+    loggerOptions: {
+      environment: 'local',
+    },
+  });
+  const viewer = launcher.createCanvasViewer(config, container);
 
   const root = ReactDOM.createRoot(document.getElementById('studio-ui') as HTMLElement);
   root.render(

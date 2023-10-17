@@ -7,19 +7,29 @@ import { AlternativeLoggerService } from './logger';
     return;
   }
 
-  const launcher = new ViewerLauncher({ logger: AlternativeLoggerService });
-  launcher.createHTMLViewer(container, {
-    objects: [
-      {
-        name: 'Milk-Truck',
-        path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
-      },
-    ],
-    render: {
-      continuousRendering: true,
+  const launcher = new ViewerLauncher({
+    customManager: {
+      logger: AlternativeLoggerService,
     },
-    project: {
-      basedir: 'http://127.0.0.1:4200',
+    loggerOptions: {
+      environment: 'develop',
     },
   });
+  launcher.createCanvasViewer(
+    {
+      objects: [
+        {
+          name: 'Milk-Truck',
+          path: 'assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        },
+      ],
+      render: {
+        continuousRendering: true,
+      },
+      project: {
+        basedir: 'http://127.0.0.1:4200',
+      },
+    },
+    container
+  );
 })();

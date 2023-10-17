@@ -1,0 +1,31 @@
+.settingsButton {
+  width: 100%;
+}
+
+.buttonLeft {
+  border-radius: calc(var(--interaction-height) / 2) 0 0 calc(var(--interaction-height) / 2);
+  min-width: 50px;
+}
+
+.buttonCenter {
+  border-left: 1px solid var(--color-button);
+  min-width: 50px;
+}
+
+.buttonRight {
+  border-left: 1px solid var(--color-button);
+  border-radius: 0 calc(var(--interaction-height) / 2) calc(var(--interaction-height) / 2) 0;
+  min-width: 50px;
+}
+
+.buttonLeft,
+.buttonCenter,
+.buttonRight {
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &.active {
+    background-color: var(--color-interaction-active);
+  }
+}

@@ -1,14 +1,14 @@
 import { inject, injectable } from 'inversify';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import type { Material, MeshStandardMaterial, Texture } from 'three';
 import type { ILogger } from '@schablone/logging';
-import type { IAssetService, ILoggerService, IMaterialService, ISceneService } from '../../../types';
+import type { IAssetService, ILoggerService, IMaterialService, IRenderService, ISceneService } from '../../../types';
 import type { ISkyboxFeature, SkyboxFeatureConfig, SkyboxType } from './types';
 import {
   AssetServiceToken,
   LoggerServiceToken,
   MaterialServiceToken,
+  RenderServiceToken,
   SceneServiceToken,
   SkyboxFeatureToken,
 } from '../../../util';
@@ -20,14 +20,13 @@ export class SkyboxFeature implements ISkyboxFeature {
   private readonly enabled$: BehaviorSubject<boolean>;
   private logger: ILogger;
   private skybox!: Texture;
-  private skyboxPath!: string;
-  private type!: SkyboxType;
   private useForMaterialEnv!: boolean;
 
   public constructor(
     @inject(AssetServiceToken) private assetService: IAssetService,
     @inject(LoggerServiceToken) loggerService: ILoggerService,
     @inject(MaterialServiceToken) private materialService: IMaterialService,
+    @inject(RenderServiceToken) private renderService: IRenderService,
     @inject(SceneServiceToken) private sceneService: ISceneService
   ) {
     this.logger = loggerService.withOptions({ globalLogOptions: { tags: { Feature: 'Skybox' } } });
@@ -37,20 +36,32 @@ export class SkyboxFeature implements ISkyboxFeature {
   public init(config: SkyboxFeatureConfig): void {
     this.logger.debug('Initializing with config', { objects: config });
     this.enabled = config.enabled;
-    this.skyboxPath = config.skyboxPath;
-    this.type = config.type || 'cube';
     this.useForMaterialEnv = config.useForMaterialEnv ?? true;
 
-    this.materialService
-      .getMaterials()
-      .pipe(withLatestFrom(this.enabled$))
-      .subscribe(([materials, enabled]) => {
+    this.loadSkyBox(config.skyboxPath, config.type).then((success) => {
+      if (!success) {
+        this.logger.warn('Failed to load skybox', { objects: config });
+      } else {
+        this.logger.debug('Skybox loaded', { objects: config });
+      }
+
+      // Set environment map for all materials
+      combineLatest([this.materialService.getMaterials(), this.enabled$]).subscribe(([materials, enabled]) => {
         this.setMaterialEnvironmentMap(enabled, materials);
       });
-    if (this.enabled) {
-      this.setSceneBackground();
-    }
+    });
+
     this.enabled$.next(this.enabled);
+
+    // Set scene background
+    this.enabled$.subscribe((enabled) => {
+      this.logger.debug('SkyboxFeature enabled:', { objects: String(enabled) });
+      if (enabled) {
+        this.sceneService.scene.background = this.skybox;
+      } else {
+        this.sceneService.scene.background = null;
+      }
+    });
   }
 
   public getEnabled(): Observable<boolean> {
@@ -59,12 +70,44 @@ export class SkyboxFeature implements ISkyboxFeature {
 
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-    if (this.enabled) {
-      this.setSceneBackground();
-    } else {
-      this.sceneService.scene.background = null;
-    }
     this.enabled$.next(this.enabled);
+  }
+
+  private loadSkyBox(skyboxPath: string, type: SkyboxType = 'cube'): Promise<boolean> {
+    return new Promise((resolve) => {
+      switch (type) {
+        case 'cube':
+          this.assetService
+            .loadCubeTexture(skyboxPath)
+            .then((texture) => {
+              this.skybox = texture;
+              if (this.enabled) {
+                this.sceneService.scene.background = this.skybox;
+              }
+              resolve(true);
+            })
+            .catch(() => {
+              resolve(false);
+            });
+          break;
+        case 'equirectangular':
+          this.assetService
+            .loadEnvironmentMap(skyboxPath, 1024, this.renderService.renderer)
+            .then((texture) => {
+              this.skybox = texture.texture;
+              if (this.enabled) {
+                this.sceneService.scene.background = this.skybox;
+              }
+              resolve(true);
+            })
+            .catch(() => {
+              resolve(false);
+            });
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   private setMaterialEnvironmentMap(enabled: boolean, materials: Material[]): void {
@@ -82,33 +125,6 @@ export class SkyboxFeature implements ISkyboxFeature {
           material.needsUpdate = true;
         }
       });
-    }
-  }
-
-  private setSceneBackground(): void {
-    switch (this.type) {
-      case 'cube':
-        if (!this.skybox) {
-          this.assetService.loadCubeTexture(this.skyboxPath).then((texture) => {
-            this.skybox = texture;
-            this.sceneService.scene.background = this.skybox;
-          });
-        } else {
-          this.sceneService.scene.background = this.skybox;
-        }
-        break;
-      case 'equirectangular':
-        if (!this.skybox) {
-          this.assetService.loadEnvironmentMap(this.skyboxPath, 1024).then((texture) => {
-            this.skybox = texture.texture;
-            this.sceneService.scene.background = this.skybox;
-          });
-        } else {
-          this.sceneService.scene.background = this.skybox;
-        }
-        break;
-      default:
-        break;
     }
   }
 }
