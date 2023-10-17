@@ -30,6 +30,7 @@ export interface StudioConfig {
    * @param id The id of the project
    * @param data The data of the project as returned by the API
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projectParser?: (id: string, data: any) => ViewerConfigModel;
 }
 

@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/3d-studio/react-website"
+        "outputPath": "dist/apps/react-website"
       },
       "configurations": {
         "development": {
@@ -54,17 +54,17 @@
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["coverage/apps/3d-studio/react-website"],
+      "outputs": ["coverage/apps/react-website"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../../coverage/apps/3d-studio/react-website"
+        "reportsDirectory": "../../../coverage/apps/react-website"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/3d-studio/react-website/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/react-website/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "serve-static": {
