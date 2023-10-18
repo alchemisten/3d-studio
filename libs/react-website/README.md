@@ -14,7 +14,7 @@ import 'core-js/stable';
 import 'reflect-metadata';
 import 'regenerator-runtime/runtime';
 
-import { Studio } from '@alchemisten/3d-studio-react-website';
+import { Studio } from '@schablone/3d-studio-react-website';
 
 const App = () => {
   return (

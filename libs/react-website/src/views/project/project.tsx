@@ -1,8 +1,8 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
-import { ISkyboxFeature, IViewer, SkyboxFeatureToken, ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@schablone/3d-studio-viewer-ui';
+import { ISkyboxFeature, IViewer, SkyboxFeatureToken, ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 import { Subscription } from 'rxjs';
 import { useQuery } from '@tanstack/react-query';
 import { useLogger } from '@schablone/logging-react';

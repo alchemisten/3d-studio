@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import type { IFeature } from '@alchemisten/3d-studio-viewer-core';
+import type { IFeature } from '@schablone/3d-studio-viewer-core';
 
 import { ButtonToggle } from '../button-toggle/button-toggle';
 import styles from './feature-control.module.scss';

@@ -8,8 +8,8 @@ interface elements for the viewer and the core features.
 
 ```jsx
 import { useEffect, useRef, useState } from 'react';
-import { IViewer, ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
+import { IViewer, ViewerLauncher } from '@schablone/3d-studio-viewer-core';
+import { ViewerUI } from '@schablone/3d-studio-viewer-ui';
 
 const App = () => {
   const viewerCanvas = useRef<HTMLDivElement>(null);
