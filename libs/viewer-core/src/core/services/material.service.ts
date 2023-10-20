@@ -73,6 +73,7 @@ export class MaterialService implements IMaterialService {
     return this.materials$.asObservable();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public setAssignedMaterial(materialSlot: string, material: Material): void {
     // TODO: Implement me
   }

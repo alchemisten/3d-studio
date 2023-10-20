@@ -15,9 +15,7 @@ export default defineConfig({
     host: 'localhost',
   },
 
-  plugins: [
-    nxViteTsPaths(),
-  ],
+  plugins: [nxViteTsPaths()],
 
   // Uncomment this if you are using workers.
   // worker: {
