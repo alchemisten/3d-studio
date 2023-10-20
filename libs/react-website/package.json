@@ -8,5 +8,9 @@
       "import": "./index.mjs",
       "require": "./index.js"
     }
+  },
+  "dependencies": {
+    "@schablone/3d-studio-viewer-core": "__root_version__",
+    "@schablone/3d-studio-viewer-ui": "__root_version__"
   }
 }

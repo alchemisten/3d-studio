@@ -17,7 +17,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/viewer-ui"
+        "outputPath": "dist/libs/viewer-ui",
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {
@@ -27,6 +28,17 @@
           "mode": "production"
         }
       }
+    },
+    "publish": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-viewer-ui {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "target": "build"
+        }
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",

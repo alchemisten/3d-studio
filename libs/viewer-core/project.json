@@ -18,7 +18,7 @@
     "publish": {
       "executor": "@nx/workspace:run-commands",
       "options": {
-        "command": "ts-node tools/scripts/publish.ts viewer-core {args.ver} {args.tag}"
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-viewer-core {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
