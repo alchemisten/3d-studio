@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
+    "@babel/preset-react": "^7.22.15",
     "@nrwl/cli": "^15.9.3",
     "@nx/cypress": "16.6.0",
     "@nx/eslint-plugin": "16.6.0",
