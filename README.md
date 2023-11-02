@@ -21,3 +21,12 @@ for more details:
   extends the default *.gltf file definition with all configuration options
   necessary for the viewer.
 * GLTF Extension Validator: TODO
+
+## Development
+
+### Build
+Run `npm run build` to create a new build.
+
+### New release
+Merging to the `main` branch will automatically create a new release via
+semantic-release.
