@@ -11,8 +11,7 @@
         "outputPath": "dist/libs/gltf-extension-validator",
         "main": "libs/gltf-extension-validator/src/index.ts",
         "tsConfig": "libs/gltf-extension-validator/tsconfig.lib.json",
-        "assets": ["libs/gltf-extension-validator/*.md"],
-        "updateBuildableProjectDepsInPackageJson": true
+        "assets": ["libs/gltf-extension-validator/*.md"]
       }
     },
     "publish": {
@@ -28,7 +27,7 @@
       ]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/gltf-extension-validator/**/*.ts"]
