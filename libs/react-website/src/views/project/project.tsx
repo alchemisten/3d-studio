@@ -1,8 +1,8 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
-import { ISkyboxFeature, IViewer, SkyboxFeatureToken, ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerUI } from '@schablone/3d-studio-viewer-ui';
+import { ISkyboxFeature, IViewer, SkyboxFeatureToken, ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 import { Subscription } from 'rxjs';
 import { useQuery } from '@tanstack/react-query';
 import { useLogger } from '@schablone/logging-react';
@@ -92,18 +92,15 @@ export const Project: FC = () => {
   }, [transparent, viewer]);
 
   return (
-    <>
+    <TranslationsProvider initialLanguage={startLanguage} initialTranslations={translations}>
       <div ref={viewerCanvas} className={`${styles.viewerCanvas} ${!playClicked ? styles.hidden : ''}`} />
       {!playClicked ? (
-        // TranslationsProvider is currently only used here because nesting it above the ViewerUI causes a rendering loop
-        <TranslationsProvider initialLanguage={startLanguage} initialTranslations={translations}>
-          <LoadingScreen
-            isLoading={isLoadingAssets || isLoading}
-            onPlayClicked={() => setPlayClicked(true)}
-            title={title}
-            transparent={transparent}
-          />
-        </TranslationsProvider>
+        <LoadingScreen
+          isLoading={isLoadingAssets || isLoading}
+          onPlayClicked={() => setPlayClicked(true)}
+          title={title}
+          transparent={transparent}
+        />
       ) : (
         viewer && (
           <ViewerUI
@@ -114,6 +111,6 @@ export const Project: FC = () => {
           />
         )
       )}
-    </>
+    </TranslationsProvider>
   );
 };

@@ -1,5 +1,5 @@
 import { createContext, FC, PropsWithChildren, useContext } from 'react';
-import { ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerConfigModel } from '@schablone/3d-studio-viewer-core';
 
 export interface StudioConfig {
   /**

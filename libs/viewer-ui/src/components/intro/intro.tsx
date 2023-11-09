@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { useTranslations } from 'react-intl-provider';
-import type { IViewer, ViewerConfigModel } from '@alchemisten/3d-studio-viewer-core';
+import type { IViewer, ViewerConfigModel } from '@schablone/3d-studio-viewer-core';
 
 import { cleanHTML } from '../../util';
 import { LoadingIndicator } from '../loading-indictator/loading-indicator';

@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
-import { ViewerUI } from '@alchemisten/3d-studio-viewer-ui';
+import { ViewerLauncher } from '@schablone/3d-studio-viewer-core';
+import { ViewerUI } from '@schablone/3d-studio-viewer-ui';
 
 (function () {
   const container = document.getElementById('viewer-container');

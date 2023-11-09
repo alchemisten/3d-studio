@@ -1,4 +1,4 @@
-import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@alchemisten/3d-studio-viewer-core';
+import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@schablone/3d-studio-viewer-core';
 import { FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { Subscription } from 'rxjs';

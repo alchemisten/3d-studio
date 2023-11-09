@@ -11,12 +11,11 @@
         "outputPath": "dist/libs/gltf-extension",
         "main": "libs/gltf-extension/src/main.ts",
         "tsConfig": "libs/gltf-extension/tsconfig.lib.json",
-        "assets": ["libs/gltf-extension/*.md"],
-        "updateBuildableProjectDepsInPackageJson": true
+        "assets": ["libs/gltf-extension/*.md"]
       }
     },
     "publish": {
-      "executor": "@nx/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "command": "ts-node tools/scripts/publish.ts gltf-extension {args.ver} {args.tag}"
       },
@@ -28,7 +27,7 @@
       ]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/gltf-extension/**/*.ts"]

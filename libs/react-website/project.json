@@ -6,7 +6,7 @@
   "tags": [],
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/react-website/**/*.{ts,tsx,js,jsx}"]
@@ -17,7 +17,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/react-website"
+        "outputPath": "dist/libs/react-website",
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {
@@ -27,6 +28,17 @@
           "mode": "production"
         }
       }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-react-website {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "target": "build"
+        }
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",

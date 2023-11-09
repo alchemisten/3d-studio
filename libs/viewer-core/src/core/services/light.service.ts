@@ -82,7 +82,7 @@ export class LightService implements ILightService {
   }
 
   private addDefaultLights() {
-    const directionalLight = new DirectionalLight(0xffffff, 1.9);
+    const directionalLight = new DirectionalLight(0xffffff, 6);
     directionalLight.position.set(3, 10, -5);
     directionalLight.target = new Object3D();
     directionalLight.castShadow = true;

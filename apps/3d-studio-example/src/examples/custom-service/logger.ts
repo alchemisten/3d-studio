@@ -1,4 +1,4 @@
-import { ILoggerService } from '@alchemisten/3d-studio-viewer-core';
+import { ILoggerService } from '@schablone/3d-studio-viewer-core';
 import { injectable } from 'inversify';
 import { ILogger, LoggerOptions } from '@schablone/logging';
 

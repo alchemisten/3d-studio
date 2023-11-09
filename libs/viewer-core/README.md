@@ -28,7 +28,7 @@ Create an instance of the viewer launcher (with optional config) after
 importing the launcher into the desired application 
 
 ```javascript
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 
 const launcher = new ViewerLauncher();
 ```

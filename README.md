@@ -11,7 +11,7 @@ for more details:
   Contains the actual viewer and the core features.
 * [Viewer UI](libs/viewer-ui/README.md): 
   Contains a UI for the viewer and the core features.
-* [React Website](apps/3d-studio/README.md): 
+* [React Website](libs/react-website/README.md): 
   Contains a React Website which can be used with a single component with
   minimal configuration.
 * [Example](apps/3d-studio-example/README.md): 
@@ -21,3 +21,12 @@ for more details:
   extends the default *.gltf file definition with all configuration options
   necessary for the viewer.
 * GLTF Extension Validator: TODO
+
+## Development
+
+### Build
+Run `npm run build` to create a new build.
+
+### New release
+Merging to the `main` branch will automatically create a new release via
+semantic-release.

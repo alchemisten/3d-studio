@@ -1,0 +1,39 @@
+{
+  "branches": "main",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/npm",
+      {
+        "publish": false
+      }
+    ],
+    "@semantic-release/github",
+    [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=3d-studio-example,gltf-extension,gltf-extension-validator"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "package.json",
+          "package-lock.json"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@saithodev/semantic-release-backmerge",
+      {
+        "branches": [
+          "develop"
+        ],
+        "backmergeStrategy": "merge"
+      }
+    ]
+  ]
+}

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { HighlightModel, IHighlightFeature } from '@alchemisten/3d-studio-viewer-core';
+import { HighlightModel, IHighlightFeature } from '@schablone/3d-studio-viewer-core';
 import { useTranslations } from 'react-intl-provider';
 import { Subscription } from 'rxjs';
 

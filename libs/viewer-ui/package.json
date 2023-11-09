@@ -1,5 +1,5 @@
 {
-  "name": "@alchemisten/3d-studio-viewer-ui",
+  "name": "@schablone/3d-studio-viewer-ui",
   "version": "0.0.1",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -8,5 +8,8 @@
       "import": "./index.mjs",
       "require": "./index.js"
     }
+  },
+  "dependencies": {
+    "@schablone/3d-studio-viewer-core": "__root_version__"
   }
 }

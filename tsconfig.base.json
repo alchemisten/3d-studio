@@ -18,9 +18,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@alchemisten/3d-studio-react-website": ["libs/react-website/src/index.ts"],
-      "@alchemisten/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"],
-      "@alchemisten/3d-studio-viewer-ui": ["libs/viewer-ui/src/index.ts"]
+      "@schablone/3d-studio-react-website": ["libs/react-website/src/index.ts"],
+      "@schablone/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"],
+      "@schablone/3d-studio-viewer-ui": ["libs/viewer-ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

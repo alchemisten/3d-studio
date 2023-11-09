@@ -255,6 +255,7 @@ export class HighlightFeature implements IHighlightFeature {
     this.setClickzonesVisible(this.highlightsVisible);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private dispatchHighlightClick(hl: Highlight, immediate = false, fromStart = false) {
     // TODO: Highlight animations not yet implemented in AnimationsManager
     // check if highlight is trigger
@@ -323,6 +324,7 @@ export class HighlightFeature implements IHighlightFeature {
     this.mouseWheelFired = true;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private hoverHighlight(id: string, active: boolean): void {
     // TODO: Postprocessing not yet implemented
     // if (this._config.features.usePostProcessing.active

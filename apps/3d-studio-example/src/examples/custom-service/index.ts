@@ -1,4 +1,4 @@
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 import { AlternativeLoggerService } from './logger';
 
 (function () {
