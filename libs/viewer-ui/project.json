@@ -1,5 +1,5 @@
 {
-  "name": "viewer-ui",
+  "name": "3d-studio-viewer-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/viewer-ui/src",
   "projectType": "library",
