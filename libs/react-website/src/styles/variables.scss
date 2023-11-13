@@ -1,0 +1,37 @@
+@import './scss-variables.scss';
+
+:root {
+  --color-gray: #a9a9a9;
+  --color-gray-light: #d3d3d3;
+  --color-interaction-active: #003055;
+  --color-button: #fff;
+  --color-preload-background: rgba(0, 0, 0, 0.8);
+
+  --base-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  --base-font-size: 16px;
+  --base-line-height: 1.5;
+
+  --header-height: 80px;
+  --sidebar-width: 300px;
+  --interaction-height: 40px;
+  --preload-border-radius: 10px;
+  --preload-box-padding: 22px;
+  --preload-max-width: 390px;
+
+  --animation-time: 0.3s;
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-lg) {
+  :root {
+    --sidebar-width: 250px;
+  }
+}
+
+@media (max-width: $break-md) {
+  :root {
+    --header-height: 50px;
+  }
+}

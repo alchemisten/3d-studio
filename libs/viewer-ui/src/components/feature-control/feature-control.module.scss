@@ -1,0 +1,15 @@
+.featureControl {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: all;
+
+  .label {
+    background-color: transparent;
+    height: var(--ui-size-button);
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+}

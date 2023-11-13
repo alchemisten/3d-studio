@@ -1,0 +1,63 @@
+{
+  "name": "3d-studio-example",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/3d-studio-example/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/3d-studio-example"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production",
+          "fileReplacements": [
+            {
+              "replace": "apps/3d-studio-example/src/environments/environment.ts",
+              "with": "apps/3d-studio-example/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "3d-studio-example:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "3d-studio-example:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "3d-studio-example:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/3d-studio-example/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/3d-studio-example"],
+      "options": {
+        "jestConfig": "apps/3d-studio-example/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

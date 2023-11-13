@@ -1,0 +1,12 @@
+{
+  "name": "@schablone/3d-studio-viewer-core",
+  "description": "The core implementation for a 3d viewer based on threejs.",
+  "keywords": [
+    "typescript",
+    "threejs",
+    "3d",
+    "viewer"
+  ],
+  "author": "Alchemisten AG",
+  "license": "MIT"
+}

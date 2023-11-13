@@ -1,0 +1,100 @@
+// ===== TAGS =====
+*, :after, :before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0
+}
+
+body {
+  font-family: var(--base-font-family);
+  font-size: var(--base-font-size);
+  font-weight: 400;
+  line-height: var(--base-line-height);
+  min-height: 100vh;
+  min-width: 320px;
+}
+
+img {
+  height: auto;
+  max-width: 100%
+}
+
+video {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+  will-change: transform;
+}
+
+main,
+section,
+header,
+footer {
+  display: block
+}
+
+main {
+  padding-top: var(--header-height);
+}
+
+address {
+  font-style: normal
+}
+
+a {
+  color: inherit;
+
+  &:hover {
+    color: var(--color-interaction-hover);
+    transition: color var(--animation-time);
+  }
+
+  &.subtle {
+    text-decoration: none;
+  }
+}
+
+button {
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-block;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+blockquote,
+figure {
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: inherit;
+  font-size: inherit;
+  margin: 0;
+}
+
+p {
+  &:first-child { margin-top: 0; }
+  &:last-child { margin-bottom: 0; }
+}
+
+sup {
+  line-height: 0
+}
+
+audio, canvas, embed, iframe, img, object, svg, video {
+  display: block;
+  vertical-align: middle;
+}

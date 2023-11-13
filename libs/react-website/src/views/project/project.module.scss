@@ -1,0 +1,8 @@
+.viewerCanvas {
+  height: 100vh;
+  max-width: 100%;
+
+  &.hidden {
+    opacity: 0;
+  }
+}

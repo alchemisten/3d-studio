@@ -1,0 +1,69 @@
+@import '../../style/scss-variables.scss';
+
+.animationBar {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.rangeSlider {
+  bottom: var(--ui-size-animation-bar-bottom);
+  pointer-events: all;
+  height: var(--ui-size-animation-bar-handle);
+  position: absolute;
+  right: 0;
+  width: 100%;
+}
+
+.barWrapper {
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+  display: flex;
+  height: 100%;
+  justify-content: stretch;
+}
+
+.bar {
+  border-left: calc(var(--ui-size-animation-bar-handle) / 2) solid var(--ui-color-interaction);
+  border-right: calc(var(--ui-size-animation-bar-handle) / 2) solid var(--ui-color-font);
+  height: var(--ui-size-animation-bar-height);
+  position: relative;
+  width: 100%;
+}
+
+.handle {
+  background: var(--ui-color-font);
+  border: 5px solid var(--ui-color-interaction);
+  border-radius: calc(var(--ui-size-animation-bar-handle) / 2);
+  cursor: pointer;
+  height: var(--ui-size-animation-bar-handle);
+  pointer-events: all;
+  position: relative;
+  top: calc((var(--ui-size-animation-bar-handle) - var(--ui-size-animation-bar-height)) * -0.5);
+  margin-left: calc(var(--ui-size-animation-bar-handle) * -0.5);
+  width: var(--ui-size-animation-bar-handle);
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+  gap: var(--ui-size-element-gap);
+  padding-bottom: var(--ui-size-element-margin);
+  padding-left: var(--ui-size-element-margin);
+}
+
+
+
+// ===== MEDIA QUERIES =====
+@media (max-width: $break-sm) {
+  .time {
+    display: none;
+  }
+}
