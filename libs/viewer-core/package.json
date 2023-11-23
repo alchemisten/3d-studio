@@ -8,5 +8,13 @@
     "viewer"
   ],
   "author": "Alchemisten AG",
-  "license": "MIT"
+  "license": "MIT",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    }
+  }
 }

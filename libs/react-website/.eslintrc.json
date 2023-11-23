@@ -13,6 +13,15 @@
     {
       "files": ["*.js", "*.jsx"],
       "rules": {}
+    },
+    {
+      "files": ["package.json", "project.json"],
+      "parser": "jsonc-eslint-parser",
+      "rules": {
+        "@nx/dependency-checks": ["error", {
+          "ignoredFiles": ["libs/react-website/vite.config.ts", "libs/react-website/jest.config.ts"]
+        }]
+      }
     }
   ]
 }

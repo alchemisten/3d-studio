@@ -43,7 +43,21 @@ export default defineConfig({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: [
+        '@nx/devkit',
+        '@schablone/3d-studio-viewer-core',
+        '@schablone/3d-studio-viewer-ui',
+        '@schablone/logging',
+        '@schablone/logging-react',
+        '@tanstack/react-query',
+        'react',
+        'react-dom',
+        'react-intl',
+        'react-intl-provider',
+        'react/jsx-runtime',
+        'react-router-dom',
+        'rxjs',
+      ],
     },
   },
 });

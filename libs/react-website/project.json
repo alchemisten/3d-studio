@@ -9,7 +9,7 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/react-website/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/react-website/**/*.{ts,tsx,js,jsx}","libs/react-website/package.json","libs/react-website/project.json"]
       }
     },
     "build": {
