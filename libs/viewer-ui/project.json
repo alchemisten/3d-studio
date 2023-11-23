@@ -9,7 +9,7 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/viewer-ui/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/viewer-ui/**/*.{ts,tsx,js,jsx}","libs/viewer-ui/package.json", "libs/viewer-ui/project.json"]
       }
     },
     "build": {
