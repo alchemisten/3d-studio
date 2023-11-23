@@ -9,6 +9,5 @@
   ],
   "author": "Alchemisten AG",
   "license": "MIT",
-  "main": "./src/index.js",
   "types": "./src/index.d.ts"
 }
