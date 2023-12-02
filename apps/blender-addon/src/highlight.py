@@ -29,6 +29,28 @@ def update_highlight_id(self, context):
             obj.studio_highlight.target_object.name = f"Target {new_id}"
 
 
+def update_highlight_scale(self, context):
+    obj = context.object
+
+    # loop all highlights in WebGL Studio collection Hightlight and update scale
+    if 'WebGL Studio' in bpy.data.collections and 'Highlights' in bpy.data.collections['WebGL Studio'].children:
+        for highlight in bpy.data.collections['WebGL Studio'].children['Highlights'].objects:
+            highlight_scale = context.scene.studio_highlight_settings.scale
+            if highlight.studio_highlight.click_zone_object:
+                highlight.studio_highlight.click_zone_object.scale = (highlight_scale, highlight_scale, highlight_scale)
+
+
+class HighlightSettingsPropertyGroup(bpy.types.PropertyGroup):
+    name = "Global Highlight Settings"
+    bl_idname = "alcm.highlight_settings"
+    scale: bpy.props.FloatProperty(
+        name="Scale",
+        default=0.5,
+        min=0.01,
+        update=update_highlight_scale
+    )
+
+
 class HighlightPropertyGroup(bpy.types.PropertyGroup):
     name = "Highlight"
     bl_idname = "alcm.highlight"
@@ -161,7 +183,7 @@ class AddHighlightOperator(bpy.types.Operator):
         offset_distance = main_to_target.length * 0.05
         click_zone_location = midpoint + right_vector * offset_distance + up_vector * offset_distance
 
-        bpy.ops.object.empty_add(location=click_zone_location, type="CIRCLE", radius=0.5)
+        bpy.ops.object.empty_add(location=click_zone_location, type="SPHERE", radius=1.0)
         click_zone = bpy.context.active_object
         click_zone.name = f"Click Zone {self.highlight_id}"
         click_zone.studio_highlight_part.highlight_id = self.highlight_id
@@ -170,6 +192,9 @@ class AddHighlightOperator(bpy.types.Operator):
 
         set_parent_keep_transform(target, main_object)
         set_parent_keep_transform(click_zone, main_object)
+
+        highlight_scale = context.scene.studio_highlight_settings.scale
+        click_zone.scale = (highlight_scale, highlight_scale, highlight_scale)
 
         # Set the camera's constraints to track to the target object
         track_constraint = camera.constraints.new(type='TRACK_TO')
@@ -256,6 +281,26 @@ class SetActiveCameraOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class HighlightSettingsPanel(bpy.types.Panel):
+    bl_idname = "ALCM_PT_highlight_settings"
+    bl_label = "Global Highlight Settings"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "scene"
+
+    @classmethod
+    def poll(cls, context):
+        # TODO check if WebGL Studio is initialized at all
+        return True
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+
+        # Display the properties from HighlightSettingsPropertyGroup
+        layout.prop(scene.studio_highlight_settings, "scale")
+
+
 class HighlightPanel(bpy.types.Panel):
     bl_idname = "ALCM_PT_highlight"
     bl_label = "Highlight"
@@ -335,11 +380,13 @@ def draw_func(self, context):
 
 def register():
     bpy.types.VIEW3D_MT_add.append(draw_func)
+    bpy.types.Scene.studio_highlight_settings = bpy.props.PointerProperty(type=HighlightSettingsPropertyGroup)
     bpy.types.Object.studio_highlight = bpy.props.PointerProperty(type=HighlightPropertyGroup)
     bpy.types.Object.studio_highlight_part = bpy.props.PointerProperty(type=HighlightPartPropertyGroup)
 
 
 def unregister():
     bpy.types.VIEW3D_MT_add.remove(draw_func)
+    del bpy.types.Scene.studio_highlight_settings
     del bpy.types.Object.studio_highlight
     del bpy.types.Object.studio_highlight_part
