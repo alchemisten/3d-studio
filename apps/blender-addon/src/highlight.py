@@ -2,6 +2,18 @@ import bpy
 from mathutils import Vector
 
 
+def set_parent_keep_transform(child_obj, parent_obj):
+    # Store the world space matrix
+    child_world_matrix = child_obj.matrix_world.copy()
+
+    # Set the parent
+    child_obj.parent = parent_obj
+
+    # Reset the child's matrix to the stored world space matrix
+    child_obj.matrix_parent_inverse = parent_obj.matrix_world.inverted()
+    child_obj.matrix_world = child_world_matrix
+
+
 def update_highlight_id(self, context):
     obj = context.object
     if obj and "studio_highlight" in obj and "main_object" not in obj.studio_highlight:
@@ -9,19 +21,19 @@ def update_highlight_id(self, context):
         obj.name = f"Highlight {new_id}"
 
         # Rename linked children using stored references
-        if obj.highlight_properties.camera_object:
-            obj.highlight_properties.camera_object.name = f"Camera {new_id}"
-        if obj.highlight_properties.click_zone_object:
-            obj.highlight_properties.click_zone_object.name = f"Click Zone {new_id}"
-        if obj.highlight_properties.target_object:
-            obj.highlight_properties.target_object.name = f"Target {new_id}"
+        if obj.studio_highlight.camera_object:
+            obj.studio_highlight.camera_object.name = f"Camera {new_id}"
+        if obj.studio_highlight.click_zone_object:
+            obj.studio_highlight.click_zone_object.name = f"Click Zone {new_id}"
+        if obj.studio_highlight.target_object:
+            obj.studio_highlight.target_object.name = f"Target {new_id}"
 
 
 class HighlightPropertyGroup(bpy.types.PropertyGroup):
     name = "Highlight"
     bl_idname = "alcm.highlight"
     highlight_id: bpy.props.StringProperty(
-        name="Highlight ID",
+        name="Id",
         update=update_highlight_id
     )
     camera_object: bpy.props.PointerProperty(name="Camera Object", type=bpy.types.Object)
@@ -33,7 +45,7 @@ class HighlightPartPropertyGroup(bpy.types.PropertyGroup):
     name = "Highlight Part"
     bl_idname = "alcm.highlight_part"
     highlight_id: bpy.props.StringProperty(
-        name="Highlight ID",
+        name="Id",
         update=update_highlight_id
     )
     main_object: bpy.props.PointerProperty(name="Camera Object", type=bpy.types.Object)
@@ -50,6 +62,9 @@ class AddHighlightOperator(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
+        # Get the current 3D view region data
+        region_data = context.region_data
+
         # Check/Create the 'WebGL Studio' collection
         if 'WebGL Studio' not in bpy.data.collections:
             webgl_studio_collection = bpy.data.collections.new('WebGL Studio')
@@ -83,8 +98,12 @@ class AddHighlightOperator(bpy.types.Operator):
         context.view_layer.active_layer_collection = \
             context.view_layer.layer_collection.children['WebGL Studio'].children['Highlights']
 
+        view_matrix_inv = region_data.view_matrix.inverted()
+        view_location = view_matrix_inv.translation
+        view_direction = view_matrix_inv.to_3x3() @ Vector((0, 0, -1))  # View direction pointing forward
+
         # Create the main empty object
-        bpy.ops.object.empty_add(location=(0, 0, 0))
+        bpy.ops.object.empty_add(location=view_location)
         main_object = bpy.context.active_object
         main_object.name = highlight_name
         main_object.studio_highlight.highlight_id = self.highlight_id
@@ -98,31 +117,59 @@ class AddHighlightOperator(bpy.types.Operator):
         camera = bpy.context.active_object
         camera.name = f"Camera {self.highlight_id}"
         camera.parent = main_object
+        camera.lock_location = (True, True, True)
         camera.studio_highlight_part.highlight_id = self.highlight_id
-        camera.studio_highlight.main_object = main_object
+        camera.studio_highlight_part.main_object = main_object
         main_object.studio_highlight.camera_object = camera
 
-        # Create the child target point object at view direction but 2 units in front
-        view_direction = context.region_data.view_rotation @ Vector((0, 0, -2))
-        target_location = context.region_data.view_location + view_direction
+        # Ray origin (current view location) and direction (view direction)
+        ray_direction = region_data.view_rotation @ Vector((0, 0, -1))
+
+        # Calculate the intersection with the ground plane (z = 0)
+        if view_direction.z != 0:
+            t = -view_location.z / view_direction.z
+            target_location = view_location + (view_direction * t)
+        else:
+            # In case the view is parallel to the ground plane, place the target at a default distance
+            target_location = view_location + (view_direction * 2)
+
         bpy.ops.object.empty_add(location=target_location)
         target = bpy.context.active_object
         target.name = f"Target {self.highlight_id}"
-        target.parent = main_object
         target.studio_highlight_part.highlight_id = self.highlight_id
-        target.studio_highlight.main_object = main_object
+        target.studio_highlight_part.main_object = main_object
         main_object.studio_highlight.target_object = target
 
         # Create the child click zone object
-        click_zone_location = (camera.location + target.location) / 2
-        click_zone_location.x += 0.1  # Slightly to the right
-        bpy.ops.object.empty_add(location=click_zone_location, type="CIRCLE")
+        # Forward vector from main_object to target
+        main_to_target = target.location - main_object.location
+        forward_vector = main_to_target.normalized()
+
+        # Global 'up' vector (assumed to be Z-axis)
+        global_up = Vector((0, 0, 1))
+
+        # Right vector as a cross product of forward_vector and global_up
+        right_vector = forward_vector.cross(global_up).normalized()
+
+        # Up vector as a cross product of right_vector and forward_vector
+        up_vector = right_vector.cross(forward_vector).normalized()
+
+        # Midpoint between main_object and target
+        midpoint = (main_object.location + target.location) / 2
+
+        # Offset the click_zone_location to the right and up
+        offset_distance = main_to_target.length * 0.05
+        click_zone_location = midpoint + right_vector * offset_distance + up_vector * offset_distance
+
+        bpy.ops.object.empty_add(location=click_zone_location, type="CIRCLE", radius=0.5)
         click_zone = bpy.context.active_object
         click_zone.name = f"Click Zone {self.highlight_id}"
-        click_zone.parent = main_object
         click_zone.studio_highlight_part.highlight_id = self.highlight_id
-        click_zone.studio_highlight.main_object = main_object
+        click_zone.studio_highlight_part.main_object = main_object
         main_object.studio_highlight.click_zone_object = click_zone
+
+        set_parent_keep_transform(target, main_object)
+        set_parent_keep_transform(click_zone, main_object)
 
         # Set the camera's constraints to track to the target object
         track_constraint = camera.constraints.new(type='TRACK_TO')
@@ -151,8 +198,18 @@ class DeleteHighlightOperator(bpy.types.Operator):
     def execute(self, context):
         obj = context.object
 
-        # Collect all children (and deeper descendants) of the main object
-        objects_to_delete = [child for child in obj.children_recursive] + [obj]
+        parts = [obj]
+        if hasattr(obj, "studio_highlight"):
+            studio_highlight = obj.studio_highlight
+            if studio_highlight.camera_object:
+                parts.append(studio_highlight.camera_object)
+            if studio_highlight.click_zone_object:
+                parts.append(studio_highlight.click_zone_object)
+            if studio_highlight.target_object:
+                parts.append(studio_highlight.target_object)
+
+        # Collect all children (and deeper descendants) of the main object, if there were more
+        objects_to_delete = [child for child in obj.children_recursive] + parts
 
         # Use batch removal for efficiency
         bpy.data.batch_remove(objects_to_delete)
@@ -178,6 +235,27 @@ class SelectHighlightChildOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class SetActiveCameraOperator(bpy.types.Operator):
+    bl_idname = "alcm.set_active_camera"
+    bl_label = "Set Active Camera"
+
+    camera_name: bpy.props.StringProperty()
+
+    def execute(self, context):
+        camera = bpy.data.objects.get(self.camera_name)
+        if camera and camera.type == 'CAMERA':
+            context.scene.camera = camera
+            # Find the first 3D view and set it to camera view
+            for area in context.screen.areas:
+                if area.type == 'VIEW_3D':
+                    area.spaces.active.region_3d.view_perspective = 'CAMERA'
+                    area.spaces.active.region_3d.update()
+                    break
+        else:
+            self.report({'WARNING'}, "No camera found with the given name.")
+        return {'FINISHED'}
+
+
 class HighlightPanel(bpy.types.Panel):
     bl_idname = "ALCM_PT_highlight"
     bl_label = "Highlight"
@@ -187,14 +265,14 @@ class HighlightPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.object and hasattr(context.object, "studio_highlight")
+        return context.object and hasattr(context.object, "studio_highlight") or hasattr(context.object, "studio_highlight_part")
 
     def draw(self, context):
         layout = self.layout
         obj = context.object
 
         # Display the properties from HighlightPropertyGroup
-        if hasattr(obj, "studio_highlight") and obj.studio_highlight.highlight_id is not "":
+        if hasattr(obj, "studio_highlight") and obj.studio_highlight.highlight_id != "":
             highlight_props = obj.studio_highlight
 
             # Display the Highlight ID
@@ -203,6 +281,7 @@ class HighlightPanel(bpy.types.Panel):
             # Display readonly fields for the child objects
             if highlight_props.camera_object:
                 row = layout.row()
+                self.add_set_active_camera_button(layout, highlight_props.camera_object)
                 self.add_select_button(layout, highlight_props.camera_object, "Camera", 'CAMERA_DATA')
             if highlight_props.click_zone_object:
                 row = layout.row()
@@ -218,12 +297,14 @@ class HighlightPanel(bpy.types.Panel):
             highlight_part_props = obj.studio_highlight_part
 
             # Display the Highlight ID
-            layout.prop(highlight_part_props, "highlight_id")
+            layout.label(text=f"Highlight ID: {highlight_part_props.highlight_id}")
 
             # Display readonly fields for the child objects
             if highlight_part_props.main_object:
                 row = layout.row()
-                self.add_select_button(layout, highlight_part_props.main_object, "Main", 'OBJECT_DATA')
+                self.add_select_button(layout, highlight_part_props.main_object, "Main Object", 'OBJECT_DATA')
+
+            self.add_set_active_camera_button(layout, obj)
 
     def add_select_button(self, layout, child_obj, label, icon):
         if child_obj:
@@ -232,6 +313,11 @@ class HighlightPanel(bpy.types.Panel):
             op = row.operator("alcm.highlight_select_child", text=f"Select {child_obj.name}", icon=icon)
             op.object_name = child_obj.name
 
+    def add_set_active_camera_button(self, layout, camera_obj):
+        if camera_obj and camera_obj.type == 'CAMERA':
+            row = layout.row()
+            op = row.operator("alcm.set_active_camera", text="Set Camera Active", icon='CAMERA_DATA')
+            op.camera_name = camera_obj.name
 
 class WebGLStudioMenu(bpy.types.Menu):
     bl_idname = "ALCM_MT_menu"
