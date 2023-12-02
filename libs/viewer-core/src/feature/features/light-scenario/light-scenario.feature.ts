@@ -106,10 +106,10 @@ export class LightScenarioFeature implements ILightScenarioFeature {
   private transformLightSetups(scenarios: LightScenarioModel[]): LightScenarioModel[] {
     return scenarios.reduce((all, scenario) => {
       const newScenario = { ...scenario };
-      if (scenario.lightSetups) {
-        scenario.lightSetups.forEach((setup) => {
+      if (newScenario.lightSetups) {
+        newScenario.lightSetups.forEach((setup) => {
           try {
-            scenario.lights[setup.name] = LightService.transformLightSetup(setup);
+            newScenario.lights[setup.name] = LightService.transformLightSetup(setup);
           } catch (error) {
             this.logger.warn(`Couldn't transform light setup`, { error: error });
             this.logger.debug('Light setup', { objects: [setup] });

@@ -157,10 +157,11 @@ export default class Highlight implements HighlightModel {
   private initClickzone() {
     const wFrame = new MeshBasicMaterial({
       color: 0xffffff,
-      wireframe: true,
-      transparent: true,
+      name: 'Studio_Clickzone',
       opacity: 0,
+      transparent: true,
       visible: false,
+      wireframe: true,
     });
 
     const sp1g = new SphereGeometry(0.15, 20, 20);
@@ -179,10 +180,11 @@ export default class Highlight implements HighlightModel {
   private initGlow(): Sprite {
     return new Sprite(
       new SpriteMaterial({
-        map: this.isTrigger ? this.textures.actionTransTex : this.textures.simpleTransTex,
-        color: this.color,
-        transparent: true,
         blending: NormalBlending,
+        color: this.color,
+        map: this.isTrigger ? this.textures.actionTransTex : this.textures.simpleTransTex,
+        name: 'Studio_GlowSprite',
+        transparent: true,
       })
     );
   }

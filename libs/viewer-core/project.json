@@ -16,9 +16,9 @@
       }
     },
     "publish": {
-      "executor": "@nx/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node tools/scripts/publish.ts viewer-core {args.ver} {args.tag}"
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-viewer-core {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
@@ -28,7 +28,7 @@
       ]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/viewer-core/**/*.ts"]
@@ -36,7 +36,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/libs/viewer-core"],
+      "outputs": ["{workspaceRoot}/coverage/libs/viewer-core"],
       "options": {
         "jestConfig": "libs/viewer-core/jest.config.ts",
         "passWithNoTests": true

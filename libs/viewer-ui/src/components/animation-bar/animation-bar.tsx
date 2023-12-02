@@ -116,7 +116,7 @@ export const AnimationBar: FC = () => {
                 style={{
                   background: getTrackBackground({
                     values: [animationData?.time || 0],
-                    colors: ['var(--ui-color-interaction)', '#fff'],
+                    colors: ['var(--ui-color-interaction)', 'var(--ui-color-bar)'],
                     min: 0,
                     max: animation?.duration || 1,
                   }),

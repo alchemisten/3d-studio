@@ -2,8 +2,8 @@ import { inject, injectable } from 'inversify';
 import { Group, Mesh, Object3D, Scene } from 'three';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
-import type { ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
-import { LoggerServiceToken } from '../../util';
+import type { IAssetService, IConfigService, ILoggerService, ISceneService, ObjectSetupModel } from '../../types';
+import { AssetServiceToken, ConfigServiceToken, LoggerServiceToken } from '../../util';
 
 /**
  * The scene service provides access to the rendered scene and keeps track of
@@ -20,7 +20,11 @@ export class SceneService implements ISceneService {
   private objects$: BehaviorSubject<Object3D[]>;
   private lastObjectAdded$: ReplaySubject<Object3D>;
 
-  public constructor(@inject(LoggerServiceToken) logger: ILoggerService) {
+  public constructor(
+    @inject(AssetServiceToken) private assetService: IAssetService,
+    @inject(ConfigServiceToken) private configService: IConfigService,
+    @inject(LoggerServiceToken) logger: ILoggerService
+  ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Scene' } } });
     this.scene = new Scene();
     this.group = new Group();
@@ -29,6 +33,19 @@ export class SceneService implements ISceneService {
     this.objects$ = new BehaviorSubject<Object3D[]>(this.group.children);
     this.lastObjectAdded$ = new ReplaySubject<Object3D>(1);
     this.objectAddedToScene$ = this.lastObjectAdded$.asObservable();
+
+    this.configService.getConfig().subscribe((config) => {
+      config.objects.forEach((objectSetup) => {
+        this.assetService
+          .loadObject(objectSetup.path)
+          .then((object) => {
+            this.addObjectToScene(object, objectSetup);
+          })
+          .catch((error) => {
+            this.logger.error('Could not load object', { objects: objectSetup, error });
+          });
+      });
+    });
   }
 
   public addObjectToScene(object: Object3D, objectSetup?: ObjectSetupModel): void {

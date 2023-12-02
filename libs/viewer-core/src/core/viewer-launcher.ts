@@ -15,8 +15,8 @@ import type {
   ISceneService,
   IViewer,
   IViewerLauncher,
-  SizeModel,
   ViewerConfigModel,
+  ViewerLauncherConfig,
 } from '../types';
 import { Viewer } from './viewer';
 import {
@@ -55,44 +55,75 @@ export class ViewerLauncher implements IViewerLauncher {
   private readonly featureRegistry: IFeatureRegistryService;
   private readonly logger: ILoggerService;
 
-  public constructor() {
+  public constructor(config?: ViewerLauncherConfig) {
+    const customManager = config?.customManager || {};
     this.containerDI = new Container();
-    this.containerDI.bind<IAnimationService>(AnimationServiceToken).to(AnimationService).inSingletonScope();
-    this.containerDI.bind<IAssetService>(AssetServiceToken).to(AssetService).inSingletonScope();
-    this.containerDI.bind<IConfigService>(ConfigServiceToken).to(ConfigService).inSingletonScope();
-    this.containerDI.bind<IControlService>(ControlServiceToken).to(ControlService).inSingletonScope();
-    this.containerDI.bind<ILightService>(LightServiceToken).to(LightService).inSingletonScope();
-    this.containerDI.bind<ILoggerService>(LoggerServiceToken).to(LoggerService).inSingletonScope();
-    this.containerDI.bind<IMaterialService>(MaterialServiceToken).to(MaterialService).inSingletonScope();
-    this.containerDI.bind<IRenderService>(RenderServiceToken).to(RenderService).inSingletonScope();
-    this.containerDI.bind<ISceneService>(SceneServiceToken).to(SceneService).inSingletonScope();
-    this.containerDI.bind<IFeatureService>(FeatureServiceToken).to(FeatureService).inSingletonScope();
+    this.containerDI
+      .bind<ILoggerService>(LoggerServiceToken)
+      .to(customManager?.logger ?? LoggerService)
+      .inSingletonScope();
+    this.logger = this.containerDI.get<ILoggerService>(LoggerServiceToken);
+    this.logger.init(config?.loggerOptions, config?.logger);
+
+    this.containerDI
+      .bind<IAnimationService>(AnimationServiceToken)
+      .to(customManager?.animation ?? AnimationService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IAssetService>(AssetServiceToken)
+      .to(customManager?.asset ?? AssetService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IConfigService>(ConfigServiceToken)
+      .to(customManager?.config ?? ConfigService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IControlService>(ControlServiceToken)
+      .to(customManager?.control ?? ControlService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<ILightService>(LightServiceToken)
+      .to(customManager?.light ?? LightService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IMaterialService>(MaterialServiceToken)
+      .to(customManager?.material ?? MaterialService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IRenderService>(RenderServiceToken)
+      .to(customManager?.render ?? RenderService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<ISceneService>(SceneServiceToken)
+      .to(customManager?.scene ?? SceneService)
+      .inSingletonScope();
+    this.containerDI
+      .bind<IFeatureService>(FeatureServiceToken)
+      .to(customManager?.feature ?? FeatureService)
+      .inSingletonScope();
     this.containerDI
       .bind<IFeatureRegistryService>(FeatureRegistryServiceToken)
-      .to(FeatureRegistryService)
+      .to(customManager?.featureRegistry ?? FeatureRegistryService)
       .inSingletonScope();
     this.containerDI.bind<IViewer>(ViewerToken).to(Viewer);
 
     this.featureRegistry = this.containerDI.get<IFeatureRegistryService>(FeatureRegistryServiceToken);
     this.featureRegistry.setDIContainer(this.containerDI);
-
-    this.logger = this.containerDI.get<ILoggerService>(LoggerServiceToken);
   }
 
   /**
    * Initializes a viewer that renders to a canvas element that is added to
    * the provided container.
    *
-   * @param container The renderer's canvas element will be appended as a
-   * child of this HTMLElement
    * @param config ViewerConfigModel containing at least one object that
    * should be loaded
+   * @param context The renderer's canvas element will be appended as a
+   * child of this HTMLElement
    * @returns The created viewer instance
    */
-  public createHTMLViewer(container: HTMLElement, config: ViewerConfigModel): IViewer {
+  public createCanvasViewer(config: ViewerConfigModel, context: HTMLElement | WebGL2RenderingContext): IViewer {
     const viewer = this.containerDI.get<IViewer>(ViewerToken);
-    const screenSize = container.getBoundingClientRect() as SizeModel;
-    viewer.init(screenSize, config, container);
+    viewer.init(config, context);
 
     return viewer;
   }
@@ -101,15 +132,13 @@ export class ViewerLauncher implements IViewerLauncher {
    * Initializes a viewer that renders images at the provided size and
    * returns them as an Observable.
    *
-   * @param renderSize SizeModel with the width and height of the desired
-   * rendering
    * @param config ViewerConfigModel containing at least one object that
    * should be loaded
    * @returns An Observable of base64 encoded image source strings
    */
-  public createImageViewer(renderSize: SizeModel, config: ViewerConfigModel): Observable<string> {
+  public createImageViewer(config: ViewerConfigModel): Observable<string> {
     const viewer = this.containerDI.get<IViewer>(ViewerToken);
-    viewer.init(renderSize, config);
+    viewer.init(config);
     const renderService = this.containerDI.get<IRenderService>(RenderServiceToken);
 
     return renderService.hookAfterRender$.pipe(map(() => renderService.renderer.domElement.toDataURL()));

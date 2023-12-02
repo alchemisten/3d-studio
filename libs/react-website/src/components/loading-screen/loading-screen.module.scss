@@ -1,0 +1,59 @@
+.loadingScreen {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10vh;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  padding: var(--ui-size-box-padding);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+
+  &.transparent {
+    background-image: none;
+  }
+}
+
+.background {
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 0;
+}
+
+.button {
+  background: var(--color-preload-background);
+  border-radius: 50%;
+  color: var(--color-button);
+  height: 80px;
+  padding: 16px;
+  position: relative;
+  width: 80px;
+  z-index: 1;
+
+  &[disabled] {
+    opacity: 0.3;
+  }
+
+  &:hover {
+    background: var(--color-interaction-active);
+  }
+}
+
+.box {
+  background: var(--color-preload-background);
+  border-radius: var(--preload-border-radius);
+  color: var(--color-button);
+  max-width: var(--preload-max-width);
+  padding: var(--preload-box-padding);
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 1;
+}

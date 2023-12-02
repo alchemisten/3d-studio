@@ -1,0 +1,14 @@
+.button {
+  background-color: var(--color-gray);
+  color: var(--color-button);
+  display: inline-block;
+  font-family: var(--base-font-family);
+  font-size: var(--base-font-size);
+  height: var(--interaction-height);
+  line-height: var(--interaction-height);
+  padding: 0 10px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color var(--animation-time);
+}

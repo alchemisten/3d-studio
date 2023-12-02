@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
-import viteTsConfigPaths from 'vite-tsconfig-paths';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
   cacheDir: '../../.vite/3d-studio-example',
@@ -15,11 +15,7 @@ export default defineConfig({
     host: 'localhost',
   },
 
-  plugins: [
-    viteTsConfigPaths({
-      root: '../../',
-    }),
-  ],
+  plugins: [nxViteTsPaths()],
 
   // Uncomment this if you are using workers.
   // worker: {

@@ -1,9 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BehaviorSubject, Observable } from 'rxjs';
+import type { ILogger } from '@schablone/logging';
 
-import type { IControlService } from '../../../types';
-import { CameraRotationFeatureToken, ControlServiceToken } from '../../../util';
+import type { IControlService, ILoggerService } from '../../../types';
+import { CameraRotationFeatureToken, ControlServiceToken, LoggerServiceToken } from '../../../util';
 import type { CameraRotationFeatureConfig, ICameraRotationFeature } from './types';
 
 /**
@@ -15,8 +16,13 @@ export class CameraRotationFeature implements ICameraRotationFeature {
   private controls!: OrbitControls;
   private enabled!: boolean;
   private readonly enabled$: BehaviorSubject<boolean>;
+  private readonly logger: ILogger;
 
-  public constructor(@inject(ControlServiceToken) private controlService: IControlService) {
+  public constructor(
+    @inject(ControlServiceToken) private controlService: IControlService,
+    @inject(LoggerServiceToken) logger: ILoggerService
+  ) {
+    this.logger = logger.withOptions({ globalLogOptions: { tags: { Feature: 'CameraRotation' } } });
     this.enabled$ = new BehaviorSubject<boolean>(false);
   }
 
@@ -26,14 +32,24 @@ export class CameraRotationFeature implements ICameraRotationFeature {
 
   public init(config: CameraRotationFeatureConfig): void {
     this.enabled = config.enabled;
+    this.logger.debug('Initialized with config', { objects: config });
     this.enabled$.next(this.enabled);
     this.controlService.getControls().subscribe((controls) => {
-      this.controls = controls;
+      if (controls) {
+        this.controls = controls;
+        this.setRotationEnabled(this.enabled);
+        if (config.rotationSpeed) {
+          this.setRotationSpeed(config.rotationSpeed);
+        }
+      }
+    });
+
+    if (this.controls) {
       this.setRotationEnabled(this.enabled);
       if (config.rotationSpeed) {
         this.setRotationSpeed(config.rotationSpeed);
       }
-    });
+    }
   }
 
   public setEnabled(enabled: boolean): void {
@@ -47,6 +63,8 @@ export class CameraRotationFeature implements ICameraRotationFeature {
   }
 
   private setRotationEnabled(enabled: boolean): void {
-    this.controls.autoRotate = enabled;
+    if (this.controls) {
+      this.controls.autoRotate = enabled;
+    }
   }
 }

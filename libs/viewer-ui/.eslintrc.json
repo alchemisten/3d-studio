@@ -13,6 +13,15 @@
     {
       "files": ["*.js", "*.jsx"],
       "rules": {}
+    },
+    {
+      "files": ["package.json", "project.json"],
+      "parser": "jsonc-eslint-parser",
+      "rules": {
+        "@nx/dependency-checks": ["error", {
+          "ignoredFiles": ["libs/viewer-ui/vite.config.ts", "libs/viewer-ui/jest.config.ts"]
+        }]
+      }
     }
   ]
 }

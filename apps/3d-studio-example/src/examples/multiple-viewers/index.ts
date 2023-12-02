@@ -1,4 +1,4 @@
-import { ViewerLauncher } from '@alchemisten/3d-studio-viewer-core';
+import { ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 import { Vector3 } from 'three';
 
 (function () {
@@ -8,33 +8,47 @@ import { Vector3 } from 'three';
     return;
   }
 
-  const launcherOne = new ViewerLauncher();
-  launcherOne.createHTMLViewer(containerOne, {
-    features: {
-      WireframeFeature: { enabled: true },
+  const launcherOne = new ViewerLauncher({
+    loggerOptions: {
+      environment: 'local',
     },
-    objects: [
-      {
-        name: 'Milk-Truck',
-        path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
-      },
-    ],
   });
+  launcherOne.createCanvasViewer(
+    {
+      features: {
+        WireframeFeature: { enabled: true },
+      },
+      objects: [
+        {
+          name: 'Milk-Truck',
+          path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        },
+      ],
+    },
+    containerOne
+  );
 
-  const launcherTwo = new ViewerLauncher();
-  launcherTwo.createHTMLViewer(containerTwo, {
-    camera: {
-      fov: 90,
-      position: new Vector3(-5, 2, -1),
+  const launcherTwo = new ViewerLauncher({
+    loggerOptions: {
+      environment: 'local',
     },
-    features: {
-      WireframeFeature: { enabled: false },
-    },
-    objects: [
-      {
-        name: 'Milk-Truck',
-        path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
-      },
-    ],
   });
+  launcherTwo.createCanvasViewer(
+    {
+      camera: {
+        fov: 90,
+        position: new Vector3(-5, 2, -1),
+      },
+      features: {
+        WireframeFeature: { enabled: false },
+      },
+      objects: [
+        {
+          name: 'Milk-Truck',
+          path: '../../../assets/models/milk-truck-draco/CesiumMilkTruck.gltf',
+        },
+      ],
+    },
+    containerTwo
+  );
 })();

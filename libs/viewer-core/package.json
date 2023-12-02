@@ -1,5 +1,5 @@
 {
-  "name": "@alchemisten/3d-studio-viewer-core",
+  "name": "@schablone/3d-studio-viewer-core",
   "description": "The core implementation for a 3d viewer based on threejs.",
   "keywords": [
     "typescript",
@@ -8,5 +8,6 @@
     "viewer"
   ],
   "author": "Alchemisten AG",
-  "license": "ISC"
+  "license": "MIT",
+  "types": "./src/index.d.ts"
 }

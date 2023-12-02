@@ -2,9 +2,9 @@ import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
-import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService } from '../../types';
+import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService, ISceneService } from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
-import { LoggerServiceToken, RenderServiceToken } from '../../util';
+import { LoggerServiceToken, RenderServiceToken, SceneServiceToken } from '../../util';
 import { AnimationTimeMap } from '../../types';
 import { map } from 'rxjs/operators';
 
@@ -21,7 +21,8 @@ export class AnimationService implements IAnimationService {
 
   public constructor(
     @inject(LoggerServiceToken) logger: ILoggerService,
-    @inject(RenderServiceToken) private renderService: IRenderService
+    @inject(RenderServiceToken) private renderService: IRenderService,
+    @inject(SceneServiceToken) private sceneService: ISceneService
   ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Animation' } } });
     this.animations = {};
@@ -37,6 +38,9 @@ export class AnimationService implements IAnimationService {
           this.mixers[key].update(delta);
         }
       }
+    });
+    this.sceneService.objectAddedToScene$.subscribe((object) => {
+      this.addMixerForObject(object);
     });
   }
 

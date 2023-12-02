@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 
+import { cleanHTML } from '../../util';
 import styles from './select-box.module.scss';
 
 export interface SelectBoxEntry {
@@ -36,7 +37,7 @@ export const SelectBox: FC<SelectBoxProps> = ({ currentEntry, entries, onEntrySe
         <div className={styles.list}>
           {entries.map((entry) => (
             <button className={styles.listEntry} type="button" key={entry.id} onClick={() => onEntrySelected(entry)}>
-              {entry.label}
+              {cleanHTML(entry.label)}
             </button>
           ))}
         </div>
@@ -50,7 +51,7 @@ export const SelectBox: FC<SelectBoxProps> = ({ currentEntry, entries, onEntrySe
       </button>
 
       <button type="button" className={styles.current} onClick={() => setListOpen(!listOpen)}>
-        {currentEntry?.label || ''}
+        {cleanHTML(currentEntry?.label)}
       </button>
 
       <button type="button" className={styles.next} onClick={selectNextEntry}>

@@ -1,15 +1,15 @@
 {
-  "name": "viewer-ui",
+  "name": "3d-studio-viewer-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/viewer-ui/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/viewer-ui/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/viewer-ui/**/*.{ts,tsx,js,jsx}","libs/viewer-ui/package.json", "libs/viewer-ui/project.json"]
       }
     },
     "build": {
@@ -17,7 +17,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/viewer-ui"
+        "outputPath": "dist/libs/viewer-ui",
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {
@@ -27,6 +28,17 @@
           "mode": "production"
         }
       }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-viewer-ui {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "target": "build"
+        }
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
