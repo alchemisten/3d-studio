@@ -6,13 +6,13 @@ from .components.translations import I18nPropertyGroup
 
 
 class ResourcePropertyGroup(bpy.types.PropertyGroup):
-    bl_idname = "alcm.cv_resource"
+    bl_idname = "alcm.resource"
     resource_id: StringProperty(name="Resource ID", description="Enter the resource ID", default="")
     #  active_index: IntProperty(name="Active Index")
 
 
 class ResourceSettingsPanel(bpy.types.Panel):
-    bl_idname = "alcm.cv_scene_resource_settings"
+    bl_idname = "ALCM_PT_resource_settings"
     bl_label = "Content Viewer"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"

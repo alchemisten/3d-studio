@@ -4,14 +4,14 @@ from bpy.props import StringProperty, IntProperty, CollectionProperty, PointerPr
 
 
 class TranslationPropertyGroup(bpy.types.PropertyGroup):
-    bl_idname = "alcm.cv_translations"
+    bl_idname = "alcm.translations"
     language_key: StringProperty(name="Language Key", description="Enter the language key", default="")
     translation: StringProperty(name="Translation", description="Enter the translation", default="")
 
 
 class I18nPropertyGroup(bpy.types.PropertyGroup):
     name = 'bnre'
-    bl_idname = "alcm.cv_i18n"
+    bl_idname = "alcm.i18n"
     value: CollectionProperty(type=TranslationPropertyGroup)
     active_index: IntProperty(name="Active Index", default=0)
 
@@ -27,7 +27,7 @@ def has_i18n_property(obj):
 
 
 class TranslationUIList(bpy.types.UIList):
-    bl_idname = "alcm.cv_ui_TranslationUIList"
+    bl_idname = "ALCM_UL_TranslationList"
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
@@ -47,7 +47,7 @@ class TranslationUIList(bpy.types.UIList):
 
 
 class I18nPanel(bpy.types.Panel):
-    bl_idname = "alcm.cv_i18n"
+    bl_idname = "ALCM_PT_i18n"
     bl_label = "Translations"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
@@ -80,7 +80,7 @@ class I18nPanel(bpy.types.Panel):
 
 
 class AddTranslationOperator(bpy.types.Operator):
-    bl_idname = "alcm.cv_scene_add_translation"
+    bl_idname = "alcm.scene_add_translation"
     bl_label = "Add Translation"
 
     use_scene: BoolProperty()
@@ -98,7 +98,7 @@ class AddTranslationOperator(bpy.types.Operator):
 
 
 class RemoveTranslationOperator(bpy.types.Operator):
-    bl_idname = "alcm.cv_scene_remove_translation"
+    bl_idname = "alcm.scene_remove_translation"
     bl_label = "Remove Translation"
 
     use_scene: BoolProperty()
