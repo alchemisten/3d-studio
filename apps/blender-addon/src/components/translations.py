@@ -3,6 +3,11 @@ import bpy
 from bpy.props import StringProperty, IntProperty, CollectionProperty, PointerProperty, BoolProperty
 
 
+class LanguageCodeItem(bpy.types.PropertyGroup):
+    bl_idname = "alcm.language_code_item"
+    code: bpy.props.StringProperty(name="Language Code", default="")
+
+
 class TranslationPropertyGroup(bpy.types.PropertyGroup):
     bl_idname = "alcm.translations"
     language_key: StringProperty(name="Language Key", description="Enter the language key", default="")

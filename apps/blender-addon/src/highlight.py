@@ -321,22 +321,24 @@ class HighlightPanel(bpy.types.Panel):
             highlight_props = obj.studio_highlight
 
             # Display the Highlight ID
-            layout.prop(highlight_props, "highlight_id")
+            main = layout.box()
+            main.prop(highlight_props, "highlight_id")
 
             # Display readonly fields for the child objects
+            self.add_set_active_camera_button(layout, highlight_props.camera_object)
+            select = layout.box()
+            select.label(text="Select:")
             if highlight_props.camera_object:
-                row = layout.row()
-                self.add_set_active_camera_button(layout, highlight_props.camera_object)
-                self.add_select_button(layout, highlight_props.camera_object, "Camera", 'CAMERA_DATA')
+                self.add_select_button(select, highlight_props.camera_object, "Camera", 'CAMERA_DATA')
             if highlight_props.click_zone_object:
-                row = layout.row()
-                self.add_select_button(layout, highlight_props.click_zone_object, "Click Zone", 'MESH_PLANE')
+                self.add_select_button(select, highlight_props.click_zone_object, "Click Zone", 'MESH_PLANE')
             if highlight_props.target_object:
-                row = layout.row()
-                self.add_select_button(layout, highlight_props.target_object, "Target", 'OBJECT_DATA')
+                self.add_select_button(select, highlight_props.target_object, "Target", 'OBJECT_DATA')
 
             # Button to delete the highlight
-            layout.operator("alcm.highlight_delete_operator")
+            row = layout.box()
+            row.label(text="Actions:")
+            row.operator("alcm.highlight_delete_operator", text=f"Delete Highlight {highlight_props.highlight_id}", icon='TRASH')
 
         if hasattr(obj, 'studio_highlight_part'):
             highlight_part_props = obj.studio_highlight_part
@@ -354,15 +356,15 @@ class HighlightPanel(bpy.types.Panel):
     def add_select_button(self, layout, child_obj, label, icon):
         if child_obj:
             row = layout.row()
-            row.label(text=f"{label}:")
-            op = row.operator("alcm.highlight_select_child", text=f"Select {child_obj.name}", icon=icon)
+            op = row.operator("alcm.highlight_select_child", text=f"Select '{child_obj.name}'", icon=icon)
             op.object_name = child_obj.name
 
     def add_set_active_camera_button(self, layout, camera_obj):
         if camera_obj and camera_obj.type == 'CAMERA':
             row = layout.row()
-            op = row.operator("alcm.set_active_camera", text="Set Camera Active", icon='CAMERA_DATA')
+            op = row.operator("alcm.set_active_camera", text="Preview Highlight Camera", icon='CAMERA_DATA')
             op.camera_name = camera_obj.name
+
 
 class WebGLStudioMenu(bpy.types.Menu):
     bl_idname = "ALCM_MT_menu"
