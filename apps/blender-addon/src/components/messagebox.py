@@ -1,11 +1,12 @@
 import bpy
 
+from bpy.props import StringProperty
 
 class MessageBoxOperator(bpy.types.Operator):
     bl_idname = "alcm.message_box_operator"
     bl_label = "WebGL Studio Message"
 
-    message: bpy.props.StringProperty(default="Message")
+    message: StringProperty(default="Message")
 
     def execute(self, context):
         self.report({'INFO'}, self.message)

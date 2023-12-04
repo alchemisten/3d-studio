@@ -1,7 +1,11 @@
 import bpy
+
+from bpy.props import StringProperty, FloatProperty, PointerProperty
+
 from mathutils import Vector
 
 from .components.translations import I18nPropertyGroup
+
 
 def set_parent_keep_transform(child_obj, parent_obj):
     # Store the world space matrix
@@ -44,7 +48,7 @@ def update_highlight_scale(self, context):
 class HighlightSettingsPropertyGroup(bpy.types.PropertyGroup):
     name = "Global Highlight Settings"
     bl_idname = "alcm.highlight_settings"
-    scale: bpy.props.FloatProperty(
+    scale: FloatProperty(
         name="Scale",
         default=0.5,
         min=0.01,
@@ -55,24 +59,34 @@ class HighlightSettingsPropertyGroup(bpy.types.PropertyGroup):
 class HighlightPropertyGroup(bpy.types.PropertyGroup):
     name = "Highlight"
     bl_idname = "alcm.highlight"
-    highlight_id: bpy.props.StringProperty(
+    highlight_id: StringProperty(
         name="Id",
         update=update_highlight_id
     )
-    name: I18nPropertyGroup
-    camera_object: bpy.props.PointerProperty(name="Camera Object", type=bpy.types.Object)
-    click_zone_object: bpy.props.PointerProperty(name="Click Zone Object", type=bpy.types.Object)
-    target_object: bpy.props.PointerProperty(name="Target Object", type=bpy.types.Object)
+    title: PointerProperty(name="Title", type=I18nPropertyGroup)
+    content: PointerProperty(name="Content", type=I18nPropertyGroup)
+    camera_object: PointerProperty(name="Camera Object", type=bpy.types.Object)
+    click_zone_object: PointerProperty(name="Click Zone Object", type=bpy.types.Object)
+    target_object: PointerProperty(name="Target Object", type=bpy.types.Object)
+
+    def show_i18n(self):
+        """Determine whether to show the I18n panel based on highlight_id."""
+        return (
+            self.highlight_id != "" and
+            self.camera_object is not None and
+            self.click_zone_object is not None and
+            self.target_object is not None
+        )
 
 
 class HighlightPartPropertyGroup(bpy.types.PropertyGroup):
     name = "Highlight Part"
     bl_idname = "alcm.highlight_part"
-    highlight_id: bpy.props.StringProperty(
+    highlight_id: StringProperty(
         name="Id",
         update=update_highlight_id
     )
-    main_object: bpy.props.PointerProperty(name="Camera Object", type=bpy.types.Object)
+    main_object: PointerProperty(name="Camera Object", type=bpy.types.Object)
 
 
 class AddHighlightOperator(bpy.types.Operator):
@@ -80,7 +94,7 @@ class AddHighlightOperator(bpy.types.Operator):
     bl_label = "Add Highlight"
     bl_options = {'REGISTER', 'UNDO'}
 
-    highlight_id: bpy.props.StringProperty(name="Highlight ID")
+    highlight_id: StringProperty(name="Highlight ID")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -247,7 +261,7 @@ class SelectHighlightChildOperator(bpy.types.Operator):
     bl_idname = "alcm.highlight_select_child"
     bl_label = "Select Highlight Object"
 
-    object_name: bpy.props.StringProperty()
+    object_name: StringProperty()
 
     def execute(self, context):
         # Deselect all objects
@@ -266,7 +280,7 @@ class SetActiveCameraOperator(bpy.types.Operator):
     bl_idname = "alcm.set_active_camera"
     bl_label = "Set Active Camera"
 
-    camera_name: bpy.props.StringProperty()
+    camera_name: StringProperty()
 
     def execute(self, context):
         camera = bpy.data.objects.get(self.camera_name)
@@ -312,7 +326,8 @@ class HighlightPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.object and hasattr(context.object, "studio_highlight") or hasattr(context.object, "studio_highlight_part")
+        return context.object and hasattr(context.object, "studio_highlight") or hasattr(context.object,
+                                                                                         "studio_highlight_part")
 
     def draw(self, context):
         layout = self.layout
@@ -340,7 +355,8 @@ class HighlightPanel(bpy.types.Panel):
             # Button to delete the highlight
             row = layout.box()
             row.label(text="Actions:")
-            row.operator("alcm.highlight_delete_operator", text=f"Delete Highlight {highlight_props.highlight_id}", icon='TRASH')
+            row.operator("alcm.highlight_delete_operator", text=f"Delete Highlight {highlight_props.highlight_id}",
+                         icon='TRASH')
 
         if hasattr(obj, 'studio_highlight_part') and obj.studio_highlight_part.highlight_id != "":
             highlight_part_props = obj.studio_highlight_part
@@ -384,9 +400,9 @@ def draw_func(self, context):
 
 def register():
     bpy.types.VIEW3D_MT_add.append(draw_func)
-    bpy.types.Scene.studio_highlight_settings = bpy.props.PointerProperty(type=HighlightSettingsPropertyGroup)
-    bpy.types.Object.studio_highlight = bpy.props.PointerProperty(type=HighlightPropertyGroup)
-    bpy.types.Object.studio_highlight_part = bpy.props.PointerProperty(type=HighlightPartPropertyGroup)
+    bpy.types.Scene.studio_highlight_settings = PointerProperty(type=HighlightSettingsPropertyGroup)
+    bpy.types.Object.studio_highlight = PointerProperty(type=HighlightPropertyGroup)
+    bpy.types.Object.studio_highlight_part = PointerProperty(type=HighlightPartPropertyGroup)
 
 
 def unregister():
