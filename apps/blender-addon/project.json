@@ -39,7 +39,7 @@
       },
       "configurations": {
         "unix": {
-          "args": "--blenderPythonPath=$(BLENDER_PYTHON_PATH) --cwd=$(pwd)"
+          "args": "--blenderPythonPath=$BLENDER_PYTHON_PATH --cwd=$(pwd)"
         },
         "windows-powershell": {
           "args": "--blenderPythonPath=%BLENDER_PYTHON_PATH% --cwd=%cd%"

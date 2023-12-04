@@ -1,6 +1,7 @@
 import bpy
 from mathutils import Vector
 
+from .components.translations import I18nPropertyGroup
 
 def set_parent_keep_transform(child_obj, parent_obj):
     # Store the world space matrix
@@ -58,6 +59,7 @@ class HighlightPropertyGroup(bpy.types.PropertyGroup):
         name="Id",
         update=update_highlight_id
     )
+    name: I18nPropertyGroup
     camera_object: bpy.props.PointerProperty(name="Camera Object", type=bpy.types.Object)
     click_zone_object: bpy.props.PointerProperty(name="Click Zone Object", type=bpy.types.Object)
     target_object: bpy.props.PointerProperty(name="Target Object", type=bpy.types.Object)
@@ -340,7 +342,7 @@ class HighlightPanel(bpy.types.Panel):
             row.label(text="Actions:")
             row.operator("alcm.highlight_delete_operator", text=f"Delete Highlight {highlight_props.highlight_id}", icon='TRASH')
 
-        if hasattr(obj, 'studio_highlight_part'):
+        if hasattr(obj, 'studio_highlight_part') and obj.studio_highlight_part.highlight_id != "":
             highlight_part_props = obj.studio_highlight_part
 
             # Display the Highlight ID
