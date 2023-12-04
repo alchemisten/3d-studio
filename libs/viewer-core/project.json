@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/viewer-core",
-        "main": "libs/viewer-core/src/main.ts",
+        "main": "libs/viewer-core/src/index.ts",
         "tsConfig": "libs/viewer-core/tsconfig.lib.json",
         "assets": ["libs/viewer-core/*.md"],
         "updateBuildableProjectDepsInPackageJson": true
