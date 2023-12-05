@@ -2,6 +2,7 @@ import bpy
 
 from bpy.props import StringProperty, CollectionProperty
 
+from itertools import chain
 
 all_languages = [
         ("de", "German", "", 1),
@@ -9,6 +10,49 @@ all_languages = [
     ]
 
 language_name_map = {code: name for code, name, _, _ in all_languages}
+
+
+def available_language_items(self, context):
+    if hasattr(context.scene, "studio_settings") and hasattr(context.scene.studio_settings, "languages"):
+        used_language_codes = {lang.code for lang in context.scene.studio_settings.languages}
+        remaining = [lang for lang in all_languages if lang[0] not in used_language_codes]
+        if len(remaining) > 0:
+            return remaining
+        else:
+            return [("null", "Null", "", 0)]
+    return all_languages
+
+
+def update_languages(self, context):
+    scene = context.scene
+    studio_settings = scene.studio_settings  # Assuming this is where the languages are stored
+
+    # Extract the set of language codes from studio_settings
+    desired_language_codes = {lang.code for lang in studio_settings.languages}
+
+    # Iterate over all objects in the scene
+    for obj in chain(scene.objects, [scene]):
+        # Check each property group in the object
+        for prop_name, _ in obj.bl_rna.properties.items():
+            if prop_name.startswith("studio_") and isinstance(getattr(obj, prop_name, None), bpy.types.PropertyGroup):
+                studio_prop_group = getattr(obj, prop_name)
+
+                # Check for properties of type I18nPropertyGroup
+                for group_prop_name, _ in studio_prop_group.bl_rna.properties.items():
+                    group_prop = getattr(studio_prop_group, group_prop_name, None)
+                    if isinstance(group_prop, I18nPropertyGroup):
+                        # Ensure that i18n_group has entries for all desired languages
+                        existing_codes = {lang.code for lang in group_prop.i18n}
+                        for code in desired_language_codes:
+                            if code not in existing_codes:
+                                new_lang = group_prop.i18n.add()
+                                new_lang.code = code
+
+                        # Remove languages not in desired_language_codes
+                        for index, lang in reversed(list(enumerate(group_prop.i18n))):
+                            if lang.code not in desired_language_codes:
+                                group_prop.i18n.remove(index)
+
 
 
 class LanguageCodeItem(bpy.types.PropertyGroup):
@@ -49,8 +93,6 @@ class I18nPanelBase:
 
     def draw(self, context):
         layout = self.layout
-
-        layout.progress(text="Loading...", type="RING")
 
         obj = context.object or context.scene
         studio_settings = context.scene.studio_settings
@@ -99,3 +141,50 @@ class I18nScenePanel(I18nPanelBase, bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         return context.scene and cls.has_i18n_property_group(context.scene)
+    
+
+class AddLanguageOperator(bpy.types.Operator):
+    bl_idname = "alcm.add_language"
+    bl_label = "Add Language"
+
+    code: bpy.props.StringProperty()
+
+    def execute(self, context):
+        studio_settings = context.scene.studio_settings
+
+        lang = studio_settings.languages.add()
+        lang.code = self.code
+
+        available_languages = available_language_items(self, context)
+
+        if available_languages:
+            studio_settings.available_languages = available_languages[0][0]
+
+        update_languages(self, context)
+        return {'FINISHED'}
+
+
+class RemoveLanguageOperator(bpy.types.Operator):
+    bl_idname = "alcm.remove_language"
+    bl_label = "Remove Language"
+
+    index: bpy.props.IntProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return len(context.scene.studio_settings.languages) > 0
+
+    def execute(self, context):
+        studio_settings = context.scene.studio_settings
+
+        languages = studio_settings.languages
+        if self.index < len(languages):
+            languages.remove(self.index)
+
+        available_languages = available_language_items(self, context)
+
+        if available_languages:
+            studio_settings.available_languages = available_languages[0][0]
+
+        update_languages(self, context)
+        return {'FINISHED'}
