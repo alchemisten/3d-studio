@@ -15,6 +15,7 @@ import 'reflect-metadata';
 import 'regenerator-runtime/runtime';
 
 import { Studio } from '@schablone/3d-studio-react-website';
+import '@schablone/3d-studio-react-website/style.css';
 
 const App = () => {
   return (

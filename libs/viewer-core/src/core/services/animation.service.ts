@@ -1,12 +1,18 @@
 import { inject, injectable } from 'inversify';
 import { AnimationAction, AnimationClip, AnimationMixer, Clock, Object3D } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import type { ILogger } from '@schablone/logging';
-import type { AnimationIdModel, IAnimationService, ILoggerService, IRenderService, ISceneService } from '../../types';
+import type {
+  AnimationIdModel,
+  AnimationTimeMap,
+  IAnimationService,
+  ILoggerService,
+  IRenderService,
+  ISceneService,
+} from '../../types';
 import { MissingAnimationError, MissingMixerError, ObjectHasNoAnimationsError } from '../exceptions';
 import { LoggerServiceToken, RenderServiceToken, SceneServiceToken } from '../../util';
-import { AnimationTimeMap } from '../../types';
-import { map } from 'rxjs/operators';
 
 @injectable()
 export class AnimationService implements IAnimationService {
