@@ -10,6 +10,7 @@ interface elements for the viewer and the core features.
 import { useEffect, useRef, useState } from 'react';
 import { IViewer, ViewerLauncher } from '@schablone/3d-studio-viewer-core';
 import { ViewerUI } from '@schablone/3d-studio-viewer-ui';
+import '@schablone/3d-studio-viewer-ui/style.css';
 
 const App = () => {
   const viewerCanvas = useRef<HTMLDivElement>(null);
