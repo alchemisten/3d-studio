@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { AnimationAction, AnimationClip } from 'three';
+import type { AnimationAction, AnimationClip } from 'three';
 import { timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import { getTrackBackground, Range } from 'react-range';
