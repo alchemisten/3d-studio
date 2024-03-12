@@ -9,5 +9,25 @@
   ],
   "author": "Alchemisten AG",
   "license": "MIT",
-  "types": "./src/index.d.ts"
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    }
+  },
+  "peerDependencies": {
+    "@schablone/logging": "^1.1.7",
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "three": "^0.158.0"
+  },
+  "devDependencies": {
+    "@nx/devkit": "17.0.3",
+    "@nx/vite": "17.0.3",
+    "vite": "4.3.9",
+    "vite-plugin-dts": "2.3.0"
+  }
 }
