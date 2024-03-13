@@ -43,7 +43,17 @@ export default defineConfig({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: () => true,
+      external: [
+        '@nx/devkit',
+        '@nx/vite',
+        '@schablone/logging',
+        'inversify',
+        'reflect-metadata',
+        'rxjs',
+        'three',
+        'vite',
+        'vite-plugin-dts',
+      ],
     },
   },
 });
