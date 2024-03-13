@@ -28,17 +28,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/gltf-extension-validator/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/gltf-extension-validator"],
       "options": {
-        "jestConfig": "libs/gltf-extension-validator/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/gltf-extension-validator/jest.config.ts"
       }
     }
   },

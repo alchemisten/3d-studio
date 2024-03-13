@@ -35,17 +35,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/viewer-core/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/viewer-core"],
       "options": {
-        "jestConfig": "libs/viewer-core/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/viewer-core/jest.config.ts"
       }
     }
   },
