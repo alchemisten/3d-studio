@@ -1,15 +1,15 @@
 .projectPreview {
   --project-preview-title-color: #fff;
 
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: -1px 4px 50px 0 rgba(0,0,0,.5);
+  background: var(--color-preview-background);
+  border-radius: var(--project-preview-border-radius);
+  box-shadow: var(--project-preview-box-shadow);
   overflow: hidden;
   position: relative;
 }
 
 .image {
-  background-color: var(--color-gray);
+  background: var(--project-preview-image-background);
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -42,7 +42,6 @@
 }
 
 .controls {
-  background-color: #fff;
   display: flex;
   height: 80px;
   justify-content: space-between;
@@ -50,17 +49,19 @@
 }
 
 .selectButton {
-  background: var(--color-gray-light);
-  border: 8px solid var(--color-gray);
+  background: var(--color-select-button-background);
+  background-clip: var(--select-button-background-clip);
+  border: var(--select-button-border);
   border-radius: 25px;
   height: var(--interaction-height);
   outline: none;
-  padding: 0;
+  padding: var(--select-button-padding);
   transition: background var(--animation-time) opacity var(--animation-time);
   width: var(--interaction-height);
 
   &.selected {
     background: var(--color-interaction-active);
+    background-clip: var(--select-button-background-clip);
   }
 
   &:hover {
@@ -69,11 +70,11 @@
 }
 
 .button {
-  border-radius: 2px;
-  color: var(--color-button);
+  border-radius: var(--project-button-border-radius);
+  color: var(--color-button-text);
 
   &:hover {
     background-color: var(--color-interaction-active);
-    color: var(--color-button);
+    color: var(--color-button-text);
   }
 }

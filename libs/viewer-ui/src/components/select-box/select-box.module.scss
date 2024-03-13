@@ -55,7 +55,8 @@
     background-color: transparent;
     flex: 0 0 auto;
     font-size: var(--ui-font-size);
-    height: var(--ui-size-button);
+    min-height: var(--ui-size-button);
+    padding: var(--ui-size-select-list-entry-padding);
   }
 }
 

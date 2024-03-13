@@ -3,7 +3,7 @@
 .pageHeader {
   align-items: center;
   background: #fff;
-  box-shadow: 0 3px 15px rgba(0,0,0,.2);
+  box-shadow: var(--header-box-shadow);
   box-sizing: border-box;
   display: flex;
   height: var(--header-height);
@@ -41,6 +41,7 @@
 
 .headline {
   font-size: 30px;
+  font-weight: var(--headline-font-weight);
 }
 
 

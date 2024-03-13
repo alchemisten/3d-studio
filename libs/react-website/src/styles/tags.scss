@@ -15,9 +15,10 @@ body {
 }
 
 body {
+  color: var(--base-font-color);
   font-family: var(--base-font-family);
   font-size: var(--base-font-size);
-  font-weight: 400;
+  font-weight: var(--base-font-weight);
   line-height: var(--base-line-height);
   min-height: 100vh;
   min-width: 320px;

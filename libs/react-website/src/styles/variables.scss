@@ -1,22 +1,39 @@
 @import './scss-variables.scss';
 
 :root {
-  --color-gray: #a9a9a9;
-  --color-gray-light: #d3d3d3;
+  --color-button-background: #a9a9a9;
+  --color-button-text: #fff;
+  --color-code-window-background: #d3d3d3;
   --color-interaction-active: #003055;
-  --color-button: #fff;
+  --color-overview-background: transparent;
+  --color-preview-background: #fff;
   --color-preload-background: rgba(0, 0, 0, 0.8);
+  --color-select-button-background: #d3d3d3;
+  --color-sidebar-background: #fff;
 
+  --base-font-color: #000;
   --base-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   --base-font-size: 16px;
+  --base-font-weight: 400;
   --base-line-height: 1.5;
+  --headline-font-weight: 400;
 
+  --header-box-shadow: 0 3px 15px rgba(0,0,0,.2);
   --header-height: 80px;
-  --sidebar-width: 300px;
   --interaction-height: 40px;
   --preload-border-radius: 10px;
   --preload-box-padding: 22px;
   --preload-max-width: 390px;
+  --project-button-border-radius: 2px;
+  --project-preview-border-radius: 3px;
+  --project-preview-box-shadow: -1px 4px 50px 0 rgba(0,0,0,.5);
+  --project-preview-image-background: #a9a9a9;
+  --select-button-border: 8px solid #a9a9a9;
+  --select-button-background-clip: initial;
+  --select-button-padding: 0;
+  --settings-button-border-radius: calc(var(--interaction-height) / 2);
+  --sidebar-box-shadow: 0 0 50px 0 rgba(0,0,0,.25);
+  --sidebar-width: 300px;
 
   --animation-time: 0.3s;
 }
