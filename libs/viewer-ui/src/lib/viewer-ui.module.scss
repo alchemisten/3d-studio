@@ -11,6 +11,7 @@
   --ui-color-loading-indicator: #005cb1;
   --ui-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
   --ui-font-size: 16px;
+  --ui-font-weight: 400;
   --ui-size-animation-bar-bottom: 80px;
   --ui-size-animation-bar-handle: 24px;
   --ui-size-animation-bar-height: 4px;
@@ -34,12 +35,14 @@
   --ui-size-menu-width: 270px;
   --ui-size-select-list-bottom: 95px;
   --ui-size-select-list-width: 310px;
+  --ui-size-select-list-entry-padding: 10px;
   --ui-size-select-step-button-width: 25px;
 
   box-sizing: border-box;
   color: var(--ui-color-font);
   font-family: var(--ui-font-family);
   font-size: var(--ui-font-size);
+  font-weight: var(--ui-font-weight);
   height: 100%;
   left: 0;
   overflow: hidden;
