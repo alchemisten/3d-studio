@@ -59,7 +59,7 @@ export default defineConfig({
         'react-intl-provider',
         'react/jsx-runtime',
         'react-router-dom',
-        'rxjs',
+        /rxjs.*/,
       ],
     },
   },
