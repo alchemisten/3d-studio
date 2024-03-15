@@ -8,8 +8,9 @@
 
 input,
 select {
-  border: 1px solid #000;
+  border: 1px solid var(--base-font-color);
   border-radius: 2px;
+  color: var(--base-font-color);
   font-family: var(--base-font-family);
   font-size: var(--base-font-size);
   height: 30px;

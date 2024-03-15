@@ -3,18 +3,18 @@
 }
 
 .buttonLeft {
-  border-radius: calc(var(--interaction-height) / 2) 0 0 calc(var(--interaction-height) / 2);
+  border-radius: var(--settings-button-border-radius) 0 0 var(--settings-button-border-radius);
   min-width: 50px;
 }
 
 .buttonCenter {
-  border-left: 1px solid var(--color-button);
+  border-left: 1px solid var(--color-button-text);
   min-width: 50px;
 }
 
 .buttonRight {
-  border-left: 1px solid var(--color-button);
-  border-radius: 0 calc(var(--interaction-height) / 2) calc(var(--interaction-height) / 2) 0;
+  border-left: 1px solid var(--color-button-text);
+  border-radius: 0 var(--settings-button-border-radius) var(--settings-button-border-radius) 0;
   min-width: 50px;
 }
 

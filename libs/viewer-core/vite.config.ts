@@ -1,13 +1,12 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
 import { joinPathFragments } from '@nx/devkit';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/viewer-ui',
+  cacheDir: '../../node_modules/.vite/viewer-core',
 
   plugins: [
     dts({
@@ -15,7 +14,6 @@ export default defineConfig({
       tsConfigFilePath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
       skipDiagnostics: true,
     }),
-    react(),
     nxViteTsPaths(),
   ],
 
@@ -31,13 +29,13 @@ export default defineConfig({
   // Configuration for building your library.
   // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
-    outDir: '../../dist/libs/viewer-ui',
+    outDir: '../../dist/libs/viewer-core',
     reportCompressedSize: true,
     commonjsOptions: { transformMixedEsModules: true },
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: 'viewer-ui',
+      name: 'viewer-core',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forgot to update your package.json as well.
@@ -47,18 +45,14 @@ export default defineConfig({
       // External packages that should not be bundled into your library.
       external: [
         '@nx/devkit',
-        '@schablone/3d-studio-viewer-core',
-        '@schablone/logging-react',
-        'dompurify',
-        'html-react-parser',
-        'react',
-        'react-dom',
-        'react-intl',
-        'react-intl-provider',
-        'react/jsx-runtime',
-        'react-range',
+        '@nx/vite',
+        '@schablone/logging',
+        'inversify',
+        'reflect-metadata',
         'rxjs',
         'three',
+        'vite',
+        'vite-plugin-dts',
       ],
     },
   },

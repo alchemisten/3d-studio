@@ -46,17 +46,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/3d-studio-example/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/3d-studio-example"],
       "options": {
-        "jestConfig": "apps/3d-studio-example/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/3d-studio-example/jest.config.ts"
       }
     }
   }

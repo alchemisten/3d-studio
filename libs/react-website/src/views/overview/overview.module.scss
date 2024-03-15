@@ -1,6 +1,7 @@
 @import '../../styles/scss-variables.scss';
 
 .pageContent {
+  background-color: var(--color-overview-background);
   padding-left: 0;
   padding-top: var(--header-height);
   transition: padding-left var(--animation-time);

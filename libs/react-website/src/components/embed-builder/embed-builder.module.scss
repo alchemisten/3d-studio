@@ -1,9 +1,9 @@
 @import '../../styles/scss-variables.scss';
 
 .sidebar {
-  background-color: #fff;
+  background-color: var(--color-sidebar-background);
   bottom: 0;
-  box-shadow: 0 0 50px 0 rgba(0,0,0,.25);
+  box-shadow: var(--sidebar-box-shadow);
   box-sizing: border-box;
   left: calc(-1 * var(--sidebar-width));
   overflow-y: auto;
@@ -21,18 +21,20 @@
 
 .headline {
   font-size: 24px;
+  font-weight: var(--headline-font-weight);
   margin: 20px 0;
   text-transform: uppercase;
 }
 
 .subheadline {
   font-size: 19px;
+  font-weight: var(--headline-font-weight);
   margin: 20px 0;
   text-transform: uppercase;
 }
 
 .codeWindow {
-  background: var(--color-gray-light);
+  background: var(--color-code-window-background);
   font-size: 14px;
   margin: 15px 0;
   min-height: 200px;
