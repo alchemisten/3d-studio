@@ -1,4 +1,4 @@
-@import '../../style/scss-variables.scss';
+@use '../../style/scss-variables.scss';
 
 .selectBox {
   bottom: var(--ui-size-element-margin);
@@ -63,7 +63,7 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   .selectBox {
     width: auto;
 

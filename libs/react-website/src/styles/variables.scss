@@ -1,4 +1,4 @@
-@import './scss-variables.scss';
+@use './scss-variables.scss';
 
 :root {
   --color-button-background: #a9a9a9;
@@ -41,13 +41,13 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-lg) {
+@media (max-width: scss-variables.$break-lg) {
   :root {
     --sidebar-width: 250px;
   }
 }
 
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   :root {
     --header-height: 50px;
   }

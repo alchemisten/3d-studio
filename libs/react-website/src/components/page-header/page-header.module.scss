@@ -1,4 +1,4 @@
-@import '../../styles/scss-variables.scss';
+@use '../../styles/scss-variables.scss';
 
 .pageHeader {
   align-items: center;
@@ -47,7 +47,7 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   .headline {
     font-size: 24px;
   }
