@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/viewer-core/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
@@ -44,6 +45,5 @@
         "jestConfig": "libs/viewer-core/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }
