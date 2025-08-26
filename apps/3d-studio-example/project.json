@@ -6,11 +6,10 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\apps\\3d-studio-example"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/3d-studio-example"
+        "outDir": "../../dist/apps/3d-studio-example"
       },
       "configurations": {
         "development": {
@@ -28,31 +27,33 @@
       }
     },
     "serve": {
-      "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "3d-studio-example:build"
-      },
       "configurations": {
-        "development": {
-          "buildTarget": "3d-studio-example:build:development",
-          "hmr": true
-        },
-        "production": {
-          "buildTarget": "3d-studio-example:build:production",
-          "hmr": false
-        }
+        "development": {},
+        "production": {}
       }
     },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/3d-studio-example"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js",
+        {
+          "externalDependencies": ["jest"]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/3d-studio-example",
+        "{workspaceRoot}\\coverage\\apps\\3d-studio-example"
+      ],
       "options": {
-        "jestConfig": "apps/3d-studio-example/jest.config.ts"
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
       }
     }
   }
