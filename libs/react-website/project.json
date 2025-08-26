@@ -9,11 +9,12 @@
       "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\react-website"],
       "defaultConfiguration": "production",
       "options": {
-        "outDir": "../../dist/libs/react-website"
+        "outDir": "dist/libs/react-website"
       },
       "configurations": {
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "outDir": "../../dist/libs/react-website"
         },
         "production": {
           "mode": "production"

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "nx serve 3d-studio-example",
     "build": "nx run-many --target=build --exclude=3d-studio-example,gltf-extension,gltf-extension-validator",
+    "build:dev": "nx run-many --target=build --configuration=development --exclude=3d-studio-example,gltf-extension,gltf-extension-validator",
     "test": "nx run-many --target=test --exclude=gltf-extension,gltf-extension-validator",
     "lint": "nx run-many --target=lint --exclude=gltf-extension,gltf-extension-validator"
   },
