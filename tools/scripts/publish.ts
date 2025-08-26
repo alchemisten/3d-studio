@@ -1,6 +1,7 @@
 import { readCachedProjectGraph } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
 
 const expectOrError = (condition: unknown, message: string): void => {
   if (!condition) {
@@ -30,7 +31,8 @@ expectOrError(
   `Could not find "build.options.outDir" of project "${name}". Is project.json configured  correctly?`,
 );
 
-process.chdir(outDir);
+const absOutDir = resolve(outDir);
+process.chdir(absOutDir);
 
 // Updating the version in "package.json" before publishing
 try {
