@@ -9,11 +9,12 @@
       "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\viewer-core"],
       "defaultConfiguration": "production",
       "options": {
-        "outDir": "../../dist/libs/viewer-core"
+        "outDir": "dist/libs/viewer-core"
       },
       "configurations": {
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "outDir": "../../dist/libs/viewer-core"
         },
         "production": {
           "mode": "production"

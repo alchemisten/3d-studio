@@ -31,8 +31,7 @@ expectOrError(
   `Could not find "build.options.outDir" of project "${name}". Is project.json configured  correctly?`,
 );
 
-const absOutDir = resolve(outDir);
-process.chdir(absOutDir);
+process.chdir(outDir);
 
 // Updating the version in "package.json" before publishing
 try {
