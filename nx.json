@@ -1,8 +1,5 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "affected": {
-    "defaultBase": "main"
-  },
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
@@ -71,5 +68,31 @@
       }
     }
   },
-  "nxCloudAccessToken": "MWNjZTIxNTUtYjRkYS00NTBkLTg0ZGMtMzA4NDA1MjMzNDQzfHJlYWQtd3JpdGU="
+  "defaultBase": "main",
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "options": {
+        "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/vite/plugin",
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve",
+        "previewTargetName": "preview",
+        "testTargetName": "test",
+        "serveStaticTargetName": "serve-static",
+        "devTargetName": "dev",
+        "typecheckTargetName": "typecheck"
+      }
+    }
+  ]
 }

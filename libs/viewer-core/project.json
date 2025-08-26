@@ -3,14 +3,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/viewer-core/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\viewer-core"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/viewer-core",
-        "generatePackageJson": true
+        "outDir": "../../dist/libs/viewer-core"
       },
       "configurations": {
         "development": {
@@ -33,17 +32,25 @@
         }
       ]
     },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/viewer-core"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js",
+        {
+          "externalDependencies": ["jest"]
+        }
+      ],
+      "outputs": ["{workspaceRoot}/coverage/libs/viewer-core", "{workspaceRoot}\\coverage\\libs\\viewer-core"],
       "options": {
-        "jestConfig": "libs/viewer-core/jest.config.ts"
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
       }
     }
-  },
-  "tags": []
+  }
 }

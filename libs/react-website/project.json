@@ -5,17 +5,11 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\react-website"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/react-website",
-        "generatePackageJson": true
+        "outDir": "../../dist/libs/react-website"
       },
       "configurations": {
         "development": {
@@ -38,10 +32,23 @@
       ]
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js",
+        {
+          "externalDependencies": ["jest"]
+        }
+      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}", "{workspaceRoot}\\coverage\\libs\\react-website"],
       "options": {
-        "jestConfig": "libs/react-website/jest.config.ts"
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
       }
     }
   }

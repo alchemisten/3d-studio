@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 

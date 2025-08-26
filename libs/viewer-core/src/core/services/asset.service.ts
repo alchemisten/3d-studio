@@ -11,8 +11,8 @@ import {
   WebGLCubeRenderTarget,
   WebGLRenderer,
 } from 'three';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { IAssetService, IConfigService, ILoggerService } from '../../types';

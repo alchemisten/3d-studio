@@ -5,17 +5,11 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\viewer-ui"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/libs/viewer-ui",
-        "generatePackageJson": true
+        "outDir": "../../dist/libs/viewer-ui"
       },
       "configurations": {
         "development": {
@@ -38,10 +32,23 @@
       ]
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js",
+        {
+          "externalDependencies": ["jest"]
+        }
+      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}", "{workspaceRoot}\\coverage\\libs\\viewer-ui"],
       "options": {
-        "jestConfig": "libs/viewer-ui/jest.config.ts"
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
       }
     }
   }
