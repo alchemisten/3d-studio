@@ -1,4 +1,4 @@
-@import '../../styles/scss-variables.scss';
+@use '../../styles/scss-variables.scss';
 
 .pageContent {
   background-color: var(--color-overview-background);
@@ -23,7 +23,7 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   .page {
     &.sidebarOpen {
       height: 100vh;

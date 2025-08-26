@@ -1,4 +1,4 @@
-@import '../../styles/scss-variables.scss';
+@use '../../styles/scss-variables.scss';
 
 .sidebar {
   background-color: var(--color-sidebar-background);
@@ -68,7 +68,7 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   .sidebar {
     bottom: 0;
     left: -110vw;

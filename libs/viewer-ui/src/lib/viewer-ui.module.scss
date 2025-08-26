@@ -1,4 +1,4 @@
-@import '../style/scss-variables.scss';
+@use '../style/scss-variables.scss';
 
 .viewerUi {
   --ui-animation-time: 0.2s ease-in-out;
@@ -110,7 +110,7 @@
 
 
 // ===== MEDIA QUERIES =====
-@media (max-width: $break-md) {
+@media (max-width: scss-variables.$break-md) {
   .viewerUi {
     --ui-size-button: 50px;
     --ui-size-animation-bar-bottom: 70px;
