@@ -16,7 +16,7 @@ const [, , name, version] = process.argv;
 const validVersion = /^\d+\.\d+\.\d+(-\w+\.\d+)?/;
 expectOrError(
   version && validVersion.test(version),
-  `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${version}.`
+  `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${version}.`,
 );
 
 const graph = readCachedProjectGraph();
@@ -24,13 +24,13 @@ const project = graph.nodes[name];
 
 expectOrError(project, `Could not find project "${name}" in the workspace. Is the project.json configured correctly?`);
 
-const outputPath = project.data?.targets?.build?.options?.outputPath;
+const outDir = project.data?.targets?.build?.options?.outDir;
 expectOrError(
-  outputPath,
-  `Could not find "build.options.outputPath" of project "${name}". Is project.json configured  correctly?`
+  outDir,
+  `Could not find "build.options.outDir" of project "${name}". Is project.json configured  correctly?`,
 );
 
-process.chdir(outputPath);
+process.chdir(outDir);
 
 // Updating the version in "package.json" before publishing
 try {
@@ -48,7 +48,7 @@ try {
     type: 'git',
     url: 'https://github.com/alchemisten/3d-studio.git',
   };
-  json.homepage = `https://github.com/alchemisten/3d-studio/tree/v${version}/${outputPath.replace(/^dist\//, '')}`;
+  json.homepage = `https://github.com/alchemisten/3d-studio/tree/v${version}/${outDir.replace(/^dist\//, '')}`;
 
   const serializedJson = JSON.stringify(json, null, '\t').replace(/__root_version__/g, version);
 
