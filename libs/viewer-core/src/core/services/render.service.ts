@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { PerspectiveCamera, WebGLRenderer } from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import type { ILogger } from '@schablone/logging';

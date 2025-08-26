@@ -15,7 +15,7 @@ import type {
   WebGLRenderer,
 } from 'three';
 import type { Observable } from 'rxjs';
-import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { ILogger, LoggerOptions } from '@schablone/logging';
 import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
 import { LightType } from './enums';
