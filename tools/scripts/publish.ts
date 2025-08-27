@@ -10,7 +10,6 @@ const expectOrError = (condition: unknown, message: string): void => {
   }
 };
 
-// Default "tag" to "next" so we won't publish the "latest" tag by accident.
 const [, , name, version] = process.argv;
 
 // A simple SemVer validation to validate the version
@@ -22,16 +21,17 @@ expectOrError(
 
 const graph = readCachedProjectGraph();
 const project = graph.nodes[name];
-
 expectOrError(project, `Could not find project "${name}" in the workspace. Is the project.json configured correctly?`);
 
-const outDir = project.data?.targets?.build?.options?.outDir;
+const outDir = project.data?.targets?.build?.options?.outDir as string | undefined;
 expectOrError(
   outDir,
   `Could not find "build.options.outDir" of project "${name}". Is project.json configured  correctly?`,
 );
 
-process.chdir(outDir);
+// Resolve to absolute path from repo root CWD
+const absOutDir = resolve(process.cwd(), outDir);
+process.chdir(absOutDir);
 
 // Updating the version in "package.json" before publishing
 try {
@@ -58,5 +58,5 @@ try {
   console.error(`Error reading package.json file from library build output.`);
 }
 
-// Execute "npm publish" to publish
-execSync(`npm publish`);
+// Publish
+execSync(`npm publish`, { stdio: 'inherit' });

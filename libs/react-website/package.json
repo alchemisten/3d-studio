@@ -1,5 +1,16 @@
 {
   "name": "@schablone/3d-studio-react-website",
+  "description": "A react based website for the 3d-studio viewer.",
+  "keywords": [
+    "typescript",
+    "threejs",
+    "3d",
+    "viewer",
+    "react",
+    "website"
+  ],
+  "author": "Alchemisten AG",
+  "license": "MIT",
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {

@@ -5,17 +5,6 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
 import { joinPathFragments } from '@nx/devkit';
 
-// These options were migrated by @nx/vite:convert-to-inferred from the project.json file.
-const configValues = { default: {}, development: {}, production: {} };
-
-// Determine the correct configValue to use based on the configuration
-const nxConfiguration = process.env.NX_TASK_TARGET_CONFIGURATION ?? 'default';
-
-const options = {
-  ...configValues.default,
-  ...(configValues[nxConfiguration] ?? {}),
-};
-
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/viewer-ui',
@@ -23,8 +12,7 @@ export default defineConfig({
   plugins: [
     dts({
       entryRoot: 'src',
-      tsConfigFilePath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
-      skipDiagnostics: true,
+      tsconfigPath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
     }),
     react(),
     nxViteTsPaths(),
@@ -43,6 +31,7 @@ export default defineConfig({
   // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
     outDir: '../../dist/libs/viewer-ui',
+    emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: { transformMixedEsModules: true },
     lib: {
