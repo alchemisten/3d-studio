@@ -23,7 +23,7 @@ const graph = readCachedProjectGraph();
 const project = graph.nodes[name];
 expectOrError(project, `Could not find project "${name}" in the workspace. Is the project.json configured correctly?`);
 
-const outDir = project.data?.targets?.build?.options?.outDir as string | undefined;
+const outDir = project.data?.targets?.build?.options?.outDir;
 expectOrError(
   outDir,
   `Could not find "build.options.outDir" of project "${name}". Is project.json configured  correctly?`,
