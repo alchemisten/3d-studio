@@ -1,7 +1,7 @@
 import { readCachedProjectGraph } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { isAbsolute, resolve } from 'path';
 
 const expectOrError = (condition: unknown, message: string): void => {
   if (!condition) {
@@ -23,6 +23,7 @@ const graph = readCachedProjectGraph();
 const project = graph.nodes[name];
 expectOrError(project, `Could not find project "${name}" in the workspace. Is the project.json configured correctly?`);
 
+const projectRoot = project.data?.root ?? '';
 const outDir = project.data?.targets?.build?.options?.outDir;
 expectOrError(
   outDir,
@@ -30,7 +31,11 @@ expectOrError(
 );
 
 // Resolve to absolute path from repo root CWD
-const absOutDir = resolve(process.cwd(), outDir);
+const absOutDir = isAbsolute(outDir)
+  ? outDir
+  : outDir.startsWith('../') || outDir.startsWith('./')
+    ? resolve(process.cwd(), projectRoot, outDir)
+    : resolve(process.cwd(), outDir);
 process.chdir(absOutDir);
 
 // Updating the version in "package.json" before publishing
