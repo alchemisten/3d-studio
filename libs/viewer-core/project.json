@@ -6,15 +6,14 @@
   "tags": [],
   "targets": {
     "build": {
-      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}\\dist\\libs\\viewer-core"],
+      "outputs": ["{workspaceRoot}/dist/libs/viewer-core"],
       "defaultConfiguration": "production",
       "options": {
-        "outDir": "dist/libs/viewer-core"
+        "outDir": "../../dist/libs/viewer-core"
       },
       "configurations": {
         "development": {
-          "mode": "development",
-          "outDir": "../../dist/libs/viewer-core"
+          "mode": "development"
         },
         "production": {
           "mode": "production"
