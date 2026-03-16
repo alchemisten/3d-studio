@@ -1,35 +1,17 @@
-import { createContext, FC, PropsWithChildren, useContext } from 'react';
-import { ViewerConfigModel } from '@schablone/3d-studio-viewer-core';
+import { ComponentType, createContext, FC, PropsWithChildren, useContext } from 'react';
+import { IFeature, ViewerConfigModel } from '@schablone/3d-studio-viewer-core';
+import type { interfaces } from 'inversify';
 
 export interface StudioConfig {
-  /**
-   * Base url for all API calls
-   */
+  basename?: string;
   baseUrl: string;
-  /**
-   * Custom styles for the studio
-   */
+  customFeatures?: Record<string, interfaces.ServiceIdentifier<IFeature>>;
   customStyles?: {
-    /**
-     * Custom styles for the viewer UI, the provided class will be added to the
-     * root element of the viewer UI.
-     */
     viewerUI?: string;
   };
-  /**
-   * Custom path for the API call to get all projects, default to `{baseUrl}/api/customer/projects/`
-   */
+  featureComponents?: Record<string, ComponentType<{ feature: IFeature }>>;
   pathAllProjects?: string;
-  /**
-   * Custom path for the API call to get a single project, default to `{baseUrl}/api/projects/`
-   */
   pathSingleProject?: string;
-  /**
-   * Optional parser for the project data. If no parser is provided, the data will be used as is.
-   *
-   * @param id The id of the project
-   * @param data The data of the project as returned by the API
-   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projectParser?: (id: string, data: any) => ViewerConfigModel;
 }

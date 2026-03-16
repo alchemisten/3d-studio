@@ -17,7 +17,7 @@ import type {
 import type { Observable } from 'rxjs';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { ILogger, LoggerOptions } from '@schablone/logging';
-import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
+import type { FeatureSetup, IFeature, IFeatureRegistryService, IFeatureService } from './feature';
 import { LightType } from './enums';
 import type { interfaces } from 'inversify';
 
@@ -222,21 +222,9 @@ export interface IViewer {
 }
 
 export interface ViewerLauncherConfig {
-  /**
-   * A map of custom services to use instead of the default ones. Services must
-   * fulfill the interface to the service they are replacing
-   */
+  customFeatures?: Record<string, interfaces.ServiceIdentifier<IFeature>>;
   customManager?: CustomManagerMap;
-  /**
-   * Logger to use in the services and features. If not provided, a default
-   * logger is used that will behave as if it was in a production environment.
-   */
   logger?: ILogger;
-  /**
-   * Options to configure the internal logger in the viewer. Can be supplied
-   * instead of a logger instance if the logger needs to be configured, but not
-   * used outside the viewer.
-   */
   loggerOptions?: LoggerOptions;
 }
 

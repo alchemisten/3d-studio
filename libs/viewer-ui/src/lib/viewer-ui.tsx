@@ -1,5 +1,5 @@
-import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@schablone/3d-studio-viewer-core';
-import { FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { HighlightFeatureToken, IFeature, IHighlightFeature, IViewer } from '@schablone/3d-studio-viewer-core';
+import { ComponentType, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { Subscription } from 'rxjs';
 
@@ -11,17 +11,30 @@ import styles from './viewer-ui.module.scss';
 
 export interface ViewerUIProps extends PropsWithChildren {
   className?: string;
+  featureComponents?: Record<string, ComponentType<{ feature: IFeature }>>;
   initialLanguage?: string | null;
   logo?: ReactNode;
   viewer: IViewer;
 }
 
-export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLanguage = 'de', logo, viewer }) => {
+export const ViewerUI: FC<ViewerUIProps> = ({
+  children,
+  className,
+  featureComponents,
+  initialLanguage = 'de',
+  logo,
+  viewer,
+}) => {
   const [features, setFeatures] = useState<FeatureMap>({});
   const [introClosed, setIntroClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const availableLanguages = Object.keys(translations);
+
+  const allFeatureComponents: Record<string, ComponentType<{ feature: IFeature }>> = {
+    [String(HighlightFeatureToken)]: HighlightUi as ComponentType<{ feature: IFeature }>,
+    ...featureComponents,
+  };
 
   const handleUIClick = () => {
     if (!isLoading) {
@@ -69,9 +82,13 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLangua
           )}
           <Controls features={features} />
           <AnimationBar />
-          {features[String(HighlightFeatureToken)] && (
-            <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
-          )}
+          {Object.entries(allFeatureComponents).map(([key, Component]) => {
+            const feature = features[key];
+            if (!feature) {
+              return null;
+            }
+            return <Component key={key} feature={feature} />;
+          })}
           {children}
         </div>
       </ViewerProvider>

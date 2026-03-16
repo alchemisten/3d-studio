@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'react-intl-provider';
 
 import type { FeatureMap } from '../../types';
@@ -16,6 +16,16 @@ export const Controls: FC<ControlsProps> = ({ features }) => {
   const { currentLanguage, setLanguage, translations } = useTranslations();
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [featureMenuOpen, setFeatureMenuOpen] = useState(false);
+
+  const handleLanguageChange = useCallback(
+    (lang: string) => {
+      setLanguage(lang);
+      const params = new URLSearchParams(window.location.search);
+      params.set('lang', lang);
+      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    },
+    [setLanguage],
+  );
 
   const featureMenuClicked = () => {
     setLanguageMenuOpen(false);
@@ -38,7 +48,7 @@ export const Controls: FC<ControlsProps> = ({ features }) => {
             elements={Object.keys(translations).map((key) => {
               return { value: key, label: `language.${key}` };
             })}
-            onChange={setLanguage}
+            onChange={handleLanguageChange}
             value={currentLanguage}
           />
         </TextBox>

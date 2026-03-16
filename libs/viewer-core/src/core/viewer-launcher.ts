@@ -109,6 +109,12 @@ export class ViewerLauncher implements IViewerLauncher {
 
     this.featureRegistry = this.containerDI.get<IFeatureRegistryService>(FeatureRegistryServiceToken);
     this.featureRegistry.setDIContainer(this.containerDI);
+
+    if (config?.customFeatures) {
+      Object.entries(config.customFeatures).forEach(([id, feature]) => {
+        this.registerFeature(id, feature);
+      });
+    }
   }
 
   /**
