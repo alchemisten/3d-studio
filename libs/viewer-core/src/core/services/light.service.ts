@@ -86,10 +86,15 @@ export class LightService implements ILightService {
     directionalLight.position.set(3, 10, -5);
     directionalLight.target = new Object3D();
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
     directionalLight.shadow.camera.near = 0.1;
-    directionalLight.shadow.camera.far = 60;
+    directionalLight.shadow.camera.far = 20;
+    directionalLight.shadow.camera.left = -3;
+    directionalLight.shadow.camera.right = 3;
+    directionalLight.shadow.camera.top = 3;
+    directionalLight.shadow.camera.bottom = -3;
+    directionalLight.shadow.normalBias = 0.02;
     this.addLights({
       ambient: new AmbientLight('#aaaaaa'),
       directional: directionalLight,
