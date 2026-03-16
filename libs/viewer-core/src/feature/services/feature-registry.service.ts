@@ -39,7 +39,7 @@ export class FeatureRegistryService implements IFeatureRegistryService {
   private containerDI!: Container;
 
   public constructor() {
-    this.registry = coreFeatures;
+    this.registry = { ...coreFeatures };
   }
 
   public getFeatureInstance(id: string): IFeature {
@@ -56,13 +56,14 @@ export class FeatureRegistryService implements IFeatureRegistryService {
   }
 
   public registerFeature(id: string, feature: interfaces.ServiceIdentifier<IFeature>): void {
-    // TODO: Check if id is needed or can be deduced from feature via Decorator
     const token = Symbol.for(id);
     if (Object.prototype.hasOwnProperty.call(this.registry, token)) {
       throw new FeatureAlreadyRegisteredError(`Feature with id ${token.toString()} already registered`);
     }
-    // TODO: Find out how to bind registered features or pass containerDI to new features so they can bind themselves
     this.registry[token] = feature;
+    if (this.containerDI) {
+      this.containerDI.bind<IFeature>(token).to(feature as interfaces.Newable<IFeature>).inSingletonScope();
+    }
   }
 
   public setDIContainer(containerDI: Container): void {

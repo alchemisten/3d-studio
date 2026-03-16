@@ -14,7 +14,8 @@ import styles from './project.module.scss';
 
 export const Project: FC = () => {
   const { logger } = useLogger();
-  const { baseUrl, customStyles, pathAllProjects, pathSingleProject, projectParser } = useConfigContext();
+  const { baseUrl, customFeatures, customStyles, featureComponents, pathAllProjects, pathSingleProject, projectParser } =
+    useConfigContext();
   const { id } = useParams();
   const { data, error, isError, isLoading, isSuccess } = useQuery({
     queryKey: ['project', id],
@@ -31,10 +32,10 @@ export const Project: FC = () => {
   const [playClicked, setPlayClicked] = useState(searchParams.get('e') !== 'true');
   const [title, setTitle] = useState<string>();
   const [viewer, setViewer] = useState<IViewer>();
-  const [launcher] = useState(new ViewerLauncher({ logger }));
+  const [launcher] = useState(new ViewerLauncher({ customFeatures, logger }));
 
   const transparent = searchParams.get('t') === 'true';
-  const initialLanguage = searchParams.get('lng');
+  const initialLanguage = searchParams.get('lang') || searchParams.get('lng');
   const availableLanguages = Object.keys(translations);
   const startLanguage = initialLanguage && availableLanguages.includes(initialLanguage) ? initialLanguage : 'de';
 
@@ -105,6 +106,7 @@ export const Project: FC = () => {
         viewer && (
           <ViewerUI
             className={customStyles?.viewerUI}
+            featureComponents={featureComponents}
             initialLanguage={initialLanguage}
             logo={logo && customer?.logo ? <img src={`${baseUrl}${customer?.logo}`} alt={customer.name} /> : undefined}
             viewer={viewer}
