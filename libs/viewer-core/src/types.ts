@@ -221,10 +221,30 @@ export interface IViewer {
   sceneService: ISceneService;
 }
 
+export type CustomFeatureList = Record<string, interfaces.ServiceIdentifier<IFeature>>;
+
 export interface ViewerLauncherConfig {
-  customFeatures?: Record<string, interfaces.ServiceIdentifier<IFeature>>;
+  /**
+   * A record of custom features that will be added to the feature registry.
+   * The key is the ID for the feature as a string, the value has to be an
+   * inversify service and implement the IFeature interface.
+   */
+  customFeatures?: CustomFeatureList;
+  /**
+   * A map of custom services to use instead of the default ones. Services must
+   * fulfill the interface to the service they are replacing
+   */
   customManager?: CustomManagerMap;
+  /**
+   * Logger to use in the services and features. If not provided, a default
+   * logger is used that will behave as if it was in a production environment.
+   */
   logger?: ILogger;
+  /**
+   * Options to configure the internal logger in the viewer. Can be supplied
+   * instead of a logger instance if the logger needs to be configured, but not
+   * used outside the viewer.
+   */
   loggerOptions?: LoggerOptions;
 }
 
