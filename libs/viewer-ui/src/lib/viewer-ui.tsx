@@ -1,4 +1,4 @@
-import { HighlightFeatureToken, IFeature, IHighlightFeature, IViewer } from '@schablone/3d-studio-viewer-core';
+import { HighlightFeatureToken, IFeature, IViewer } from '@schablone/3d-studio-viewer-core';
 import { ComponentType, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
 import { Subscription } from 'rxjs';
@@ -48,7 +48,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({
     subscription.add(
       viewer.assetService.getIsLoading().subscribe((loading) => {
         setIsLoading(loading);
-      })
+      }),
     );
 
     subscription.add(
@@ -57,9 +57,9 @@ export const ViewerUI: FC<ViewerUIProps> = ({
           featureList.reduce((all, feature) => {
             all[String(feature.id)] = feature;
             return all;
-          }, {} as FeatureMap)
+          }, {} as FeatureMap),
         );
-      })
+      }),
     );
 
     return () => {
