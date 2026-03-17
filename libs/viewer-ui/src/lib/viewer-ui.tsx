@@ -1,7 +1,7 @@
 import { HighlightFeatureToken, IFeature, IViewer } from '@schablone/3d-studio-viewer-core';
 import { ComponentType, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
-import { Subscription } from 'rxjs';
+import { combineLatest, map, Subscription } from 'rxjs';
 
 import type { FeatureMap } from '../types';
 import { AnimationBar, Controls, HighlightUi, Intro } from '../components';
@@ -28,6 +28,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({
   const [features, setFeatures] = useState<FeatureMap>({});
   const [introClosed, setIntroClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [enabledFeatures, setEnabledFeatures] = useState<Record<string, boolean>>({});
 
   const availableLanguages = Object.keys(translations);
 
@@ -67,6 +68,32 @@ export const ViewerUI: FC<ViewerUIProps> = ({
     };
   }, [viewer]);
 
+  useEffect(() => {
+    const subscription = new Subscription();
+
+    subscription.add(
+      combineLatest(Object.values(features).map((feature) => feature.getEnabled()))
+        .pipe(
+          map((enabledList) => {
+            return Object.keys(features).reduce(
+              (acc, feat, index) => {
+                acc[feat] = enabledList[index];
+                return acc;
+              },
+              {} as Record<string, boolean>,
+            );
+          }),
+        )
+        .subscribe((enabledMap) => {
+          setEnabledFeatures(enabledMap);
+        }),
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [features]);
+
   return (
     <TranslationsProvider
       initialLanguage={initialLanguage && availableLanguages.includes(initialLanguage) ? initialLanguage : 'de'}
@@ -84,7 +111,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({
           <AnimationBar />
           {Object.entries(allFeatureComponents).map(([key, Component]) => {
             const feature = features[key];
-            if (!feature) {
+            if (!feature || !enabledFeatures[key]) {
               return null;
             }
             return <Component key={key} feature={feature} />;
