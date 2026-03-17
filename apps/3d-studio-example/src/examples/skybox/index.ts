@@ -30,9 +30,9 @@ import { ViewerLauncher } from '@schablone/3d-studio-viewer-core';
         continuousRendering: true,
       },
       project: {
-        basedir: 'http://127.0.0.1:4200',
+        basedir: import.meta.env.BASE_URL,
       },
     },
-    container
+    container,
   );
 })();

@@ -27,9 +27,9 @@ import { AlternativeLoggerService } from './logger';
         continuousRendering: true,
       },
       project: {
-        basedir: 'http://127.0.0.1:4200',
+        basedir: import.meta.env.BASE_URL,
       },
     },
-    container
+    container,
   );
 })();
