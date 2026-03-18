@@ -1,7 +1,7 @@
-import { HighlightFeatureToken, IHighlightFeature, IViewer } from '@schablone/3d-studio-viewer-core';
-import { FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { HighlightFeatureToken, IFeature, IViewer } from '@schablone/3d-studio-viewer-core';
+import { ComponentType, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { TranslationsProvider } from 'react-intl-provider';
-import { Subscription } from 'rxjs';
+import { combineLatest, map, Subscription } from 'rxjs';
 
 import type { FeatureMap } from '../types';
 import { AnimationBar, Controls, HighlightUi, Intro } from '../components';
@@ -11,17 +11,31 @@ import styles from './viewer-ui.module.scss';
 
 export interface ViewerUIProps extends PropsWithChildren {
   className?: string;
+  featureComponents?: Record<string, ComponentType<{ feature: IFeature }>>;
   initialLanguage?: string | null;
   logo?: ReactNode;
   viewer: IViewer;
 }
 
-export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLanguage = 'de', logo, viewer }) => {
+export const ViewerUI: FC<ViewerUIProps> = ({
+  children,
+  className,
+  featureComponents,
+  initialLanguage = 'de',
+  logo,
+  viewer,
+}) => {
   const [features, setFeatures] = useState<FeatureMap>({});
   const [introClosed, setIntroClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [enabledFeatures, setEnabledFeatures] = useState<Record<string, boolean>>({});
 
   const availableLanguages = Object.keys(translations);
+
+  const allFeatureComponents: Record<string, ComponentType<{ feature: IFeature }>> = {
+    [String(HighlightFeatureToken)]: HighlightUi as ComponentType<{ feature: IFeature }>,
+    ...featureComponents,
+  };
 
   const handleUIClick = () => {
     if (!isLoading) {
@@ -35,7 +49,7 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLangua
     subscription.add(
       viewer.assetService.getIsLoading().subscribe((loading) => {
         setIsLoading(loading);
-      })
+      }),
     );
 
     subscription.add(
@@ -44,15 +58,41 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLangua
           featureList.reduce((all, feature) => {
             all[String(feature.id)] = feature;
             return all;
-          }, {} as FeatureMap)
+          }, {} as FeatureMap),
         );
-      })
+      }),
     );
 
     return () => {
       subscription.unsubscribe();
     };
   }, [viewer]);
+
+  useEffect(() => {
+    const subscription = new Subscription();
+
+    subscription.add(
+      combineLatest(Object.values(features).map((feature) => feature.getEnabled()))
+        .pipe(
+          map((enabledList) => {
+            return Object.keys(features).reduce(
+              (acc, feat, index) => {
+                acc[feat] = enabledList[index];
+                return acc;
+              },
+              {} as Record<string, boolean>,
+            );
+          }),
+        )
+        .subscribe((enabledMap) => {
+          setEnabledFeatures(enabledMap);
+        }),
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [features]);
 
   return (
     <TranslationsProvider
@@ -69,9 +109,13 @@ export const ViewerUI: FC<ViewerUIProps> = ({ children, className, initialLangua
           )}
           <Controls features={features} />
           <AnimationBar />
-          {features[String(HighlightFeatureToken)] && (
-            <HighlightUi feature={features[String(HighlightFeatureToken)] as IHighlightFeature} />
-          )}
+          {Object.entries(allFeatureComponents).map(([key, Component]) => {
+            const feature = features[key];
+            if (!feature || !enabledFeatures[key]) {
+              return null;
+            }
+            return <Component key={key} feature={feature} />;
+          })}
           {children}
         </div>
       </ViewerProvider>

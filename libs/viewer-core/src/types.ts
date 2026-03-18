@@ -17,7 +17,7 @@ import type {
 import type { Observable } from 'rxjs';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { ILogger, LoggerOptions } from '@schablone/logging';
-import type { FeatureSetup, IFeatureRegistryService, IFeatureService } from './feature';
+import type { FeatureSetup, IFeature, IFeatureRegistryService, IFeatureService } from './feature';
 import { LightType } from './enums';
 import type { interfaces } from 'inversify';
 
@@ -221,7 +221,15 @@ export interface IViewer {
   sceneService: ISceneService;
 }
 
+export type CustomFeatureList = Record<string, interfaces.ServiceIdentifier<IFeature>>;
+
 export interface ViewerLauncherConfig {
+  /**
+   * A record of custom features that will be added to the feature registry.
+   * The key is the ID for the feature as a string, the value has to be an
+   * inversify service and implement the IFeature interface.
+   */
+  customFeatures?: CustomFeatureList;
   /**
    * A map of custom services to use instead of the default ones. Services must
    * fulfill the interface to the service they are replacing

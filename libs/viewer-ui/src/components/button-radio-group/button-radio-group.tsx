@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styles from './button-radio-group.module.scss';
 
 export interface RadioElement {
+  defaultLabel?: string;
   label: string;
   value: string;
 }
@@ -23,7 +24,7 @@ export const ButtonRadioGroup: FC<ButtonRadioGroupProps> = ({ elements, onChange
           key={element.value}
           className={`${styles.label} ${value === element.value ? styles.active : ''}`}
         >
-          <FormattedMessage id={element.label} />
+          <FormattedMessage id={element.label} defaultMessage={element.defaultLabel ?? element.label} />
           <input
             className={`${styles.input}`}
             value={element.value}

@@ -2,9 +2,11 @@
   align-items: center;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
-  line-height: var(--ui-size-label-line-height);
+  font-size: var(--ui-size-button-font);
   gap: var(--ui-size-element-gap);
+  justify-content: space-between;
+  min-height: var(--ui-size-label-min-height);
+  line-height: 1;
   pointer-events: all;
 
   &:after {

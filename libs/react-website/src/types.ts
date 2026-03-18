@@ -1,3 +1,6 @@
+import type { ComponentType } from 'react';
+import type { IFeature } from '@schablone/3d-studio-viewer-core';
+
 export interface CodeParams {
   allowZoom?: boolean;
   height: string;
@@ -10,6 +13,8 @@ export interface CodeParams {
 
   [key: string]: string | boolean | undefined;
 }
+
+export type FeatureComponentList = Record<string, ComponentType<{ feature: IFeature }>>;
 
 export interface LegacyConfig {
   color: string;
