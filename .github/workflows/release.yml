@@ -20,7 +20,4 @@ jobs:
       - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run test
-      - run: npm config get provenance
-      - run: npm -v
-      - run: npm whoami
       - run: npx semantic-release
