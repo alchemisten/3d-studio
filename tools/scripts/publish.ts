@@ -64,4 +64,4 @@ try {
 }
 
 // Publish
-execSync(`npm publish`, { stdio: 'inherit' });
+execSync(`npm publish --provenance`, { stdio: 'inherit' });
