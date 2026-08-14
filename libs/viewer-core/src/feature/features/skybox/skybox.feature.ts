@@ -47,21 +47,29 @@ export class SkyboxFeature implements ISkyboxFeature {
 
     this.enabled$.next(this.enabled);
 
-    // Set scene background
     this.enabled$.subscribe((enabled) => {
       this.logger.debug('SkyboxFeature enabled:', { objects: String(enabled) });
-      if (enabled) {
-        this.sceneService.scene.background = this.skybox;
-        if (this.useForMaterialEnv) {
-          this.sceneService.scene.environment = this.skybox;
-        }
-      } else {
-        this.sceneService.scene.background = null;
-        if (this.useForMaterialEnv) {
-          this.sceneService.scene.environment = null;
-        }
-      }
+      this.enabled = enabled;
+      this.applySkybox();
     });
+  }
+
+  /**
+   * The enabled flag controls the visible background only. Image based lighting
+   * stays applied whenever a skybox is loaded, so switching the background off
+   * yields a transparent background without unlighting every material.
+   */
+  private applySkybox(): void {
+    if (!this.skybox) {
+      this.sceneService.scene.background = null;
+      return;
+    }
+
+    if (this.useForMaterialEnv) {
+      this.sceneService.scene.environment = this.skybox;
+    }
+
+    this.sceneService.scene.background = this.enabled ? this.skybox : null;
   }
 
   public getEnabled(): Observable<boolean> {
@@ -86,12 +94,7 @@ export class SkyboxFeature implements ISkyboxFeature {
             .then((texture) => {
               this.skybox = texture;
               this.skybox.colorSpace = colorSpace;
-              if (this.enabled) {
-                this.sceneService.scene.background = this.skybox;
-                if (this.useForMaterialEnv) {
-                  this.sceneService.scene.environment = this.skybox;
-                }
-              }
+              this.applySkybox();
               resolve(true);
             })
             .catch(() => {
@@ -103,12 +106,7 @@ export class SkyboxFeature implements ISkyboxFeature {
             .loadEnvironmentMap(skyboxPath, 1024, this.renderService.renderer)
             .then((texture) => {
               this.skybox = texture.texture;
-              if (this.enabled) {
-                this.sceneService.scene.background = this.skybox;
-                if (this.useForMaterialEnv) {
-                  this.sceneService.scene.environment = this.skybox;
-                }
-              }
+              this.applySkybox();
               resolve(true);
             })
             .catch(() => {
