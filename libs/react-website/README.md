@@ -23,3 +23,30 @@ const App = () => {
   );
 };
 ```
+
+### Router configuration
+
+By default, the studio uses a browser router, which derives the current route
+from the document url and optionally respects the `basename` config option. In
+environments where the url can't be controlled, for example when the app is
+loaded from a `file://` url or a custom protocol inside a native shell, a
+memory router can be used instead:
+
+```jsx
+<Studio
+  config={{
+    baseUrl: 'https://my.project.com',
+    router: {
+      initialEntry: '/view/my-project-id',
+      mode: 'memory',
+    },
+  }}
+/>
+```
+
+| Option                 | Type                    | Default    | Description                                                    |
+| ---------------------- | ----------------------- | ---------- | -------------------------------------------------------------- |
+| `router.mode`          | `'browser' \| 'memory'` | `'browser'`| Router implementation to use.                                    |
+| `router.initialEntry`  | `string`                | `'/'`      | Initial route for the memory router, e.g. `/view/my-project-id`. |
+
+When the `router` option is omitted, the behaviour is unchanged.

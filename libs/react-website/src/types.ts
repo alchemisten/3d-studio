@@ -33,3 +33,17 @@ export interface LegacyProject {
   name: string;
   version: number;
 }
+
+export interface RouterConfig {
+  /**
+   * The initial route the memory router starts at, for example
+   * `/view/my-project-id`. Only used when mode is `memory`, defaults to `/`.
+   */
+  initialEntry?: string;
+  /**
+   * The router implementation to use. `browser` (the default) reads the route
+   * from the document url. `memory` keeps the route in memory only, which is
+   * required in environments without a usable History API.
+   */
+  mode: 'browser' | 'memory';
+}

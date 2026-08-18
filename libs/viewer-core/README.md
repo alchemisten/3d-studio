@@ -69,6 +69,24 @@ should be loaded. Currently, the viewer only support GTLF files. Further
 configuration of the viewer is optionally possible via the config. See 
 the corresponding [ViewerConfigModel interface](src/types.ts#L24) and examples for now.
 
+### Offline usage
+
+Draco compressed objects are decoded with decoder files that are loaded from
+Google's static hosting by default. If the viewer has to run without internet
+access, point the loader at a local copy of the decoder files via the config:
+
+```javascript
+launcher.createCanvasViewer({
+  assets: {
+    dracoDecoderPath: '/assets/draco/',
+  },
+  objects: [{ path: 'path/to/object.gtlf' }],
+}, container);
+```
+
+The path has to end with a slash and defaults to
+`https://www.gstatic.com/draco/v1/decoders/` when omitted.
+
 For further usage, see the [examples in the repository](https://github.com/alchemisten/3d-studio/tree/develop/apps/3d-studio-example/src/examples).
 
 ## Planed features

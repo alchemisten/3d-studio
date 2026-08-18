@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
-import { joinPathFragments } from '@nx/devkit';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   root: __dirname,
@@ -10,8 +10,9 @@ export default defineConfig({
 
   plugins: [
     dts({
-      entryRoot: 'src',
-      tsconfigPath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
+      entryRoot: resolve(__dirname, 'src'),
+      outDir: resolve(__dirname, '../../dist/libs/viewer-core'),
+      tsconfigPath: resolve(__dirname, 'tsconfig.lib.json'),
     }),
     nxViteTsPaths(),
   ],

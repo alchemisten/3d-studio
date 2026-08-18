@@ -23,6 +23,11 @@ import type { interfaces } from 'inversify';
 
 export interface ViewerConfigModel {
   /**
+   * The configuration for asset loading, for example the path draco decoders
+   * are loaded from. If not provided, the default asset configuration is used.
+   */
+  assets?: Partial<AssetConfigModel>;
+  /**
    * The configuration for the camera. If not provided, the default camera
    * configuration is used. See the config service source for the default
    * configuration.
@@ -53,6 +58,17 @@ export interface ViewerConfigModel {
    * configuration.
    */
   render?: Partial<RenderConfigModel>;
+}
+
+export interface AssetConfigModel {
+  /**
+   * The path the draco decoder files are loaded from. Defaults to the Google
+   * static hosted decoders at
+   * `https://www.gstatic.com/draco/v1/decoders/`. Set this to a local path,
+   * for example `/draco/`, if the viewer has to run without internet access.
+   * The path has to end with a slash.
+   */
+  dracoDecoderPath: string;
 }
 
 export interface ControlConfigModel {

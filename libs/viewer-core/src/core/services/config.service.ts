@@ -1,7 +1,12 @@
 import { injectable } from 'inversify';
 import { PCFSoftShadowMap, SRGBColorSpace, Vector3 } from 'three';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
+import { AssetConfigModel, CameraConfigModel, IConfigService, RenderConfigModel, ViewerConfigModel } from '../../types';
+import { Constants } from '../../util';
+
+export const defaultAssetConfig = <AssetConfigModel>{
+  dracoDecoderPath: Constants.DRACO_GOOGLE_STATIC_DECODER_URL,
+};
 
 export const defaultRenderConfig = <RenderConfigModel>{
   autoClear: true,

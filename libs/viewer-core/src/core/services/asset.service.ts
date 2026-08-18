@@ -16,7 +16,8 @@ import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import type { ILogger } from '@schablone/logging';
 import type { IAssetService, IConfigService, ILoggerService } from '../../types';
-import { ConfigServiceToken, Constants, LoggerServiceToken } from '../../util';
+import { ConfigServiceToken, LoggerServiceToken } from '../../util';
+import { defaultAssetConfig } from './config.service';
 
 /**
  * The asset service handles all file loading for the 3D scene, like
@@ -44,17 +45,17 @@ export class AssetService implements IAssetService {
 
   public constructor(
     @inject(ConfigServiceToken) private configService: IConfigService,
-    @inject(LoggerServiceToken) logger: ILoggerService
+    @inject(LoggerServiceToken) logger: ILoggerService,
   ) {
     this.logger = logger.withOptions({ globalLogOptions: { tags: { Service: 'Asset' } } });
     this.loadingManager = new LoadingManager(
       this.onLoadingComplete.bind(this),
       this.onLoadingProgress.bind(this),
-      this.onLoadingError.bind(this)
+      this.onLoadingError.bind(this),
     );
     this.cubeTextureLoader = new CubeTextureLoader(this.loadingManager);
     this.dracoLoader = new DRACOLoader(this.loadingManager);
-    this.dracoLoader.setDecoderPath(Constants.DRACO_GOOGLE_STATIC_DECODER_URL);
+    this.dracoLoader.setDecoderPath(defaultAssetConfig.dracoDecoderPath);
     this.gltfLoader = new GLTFLoader(this.loadingManager);
     this.gltfLoader.setDRACOLoader(this.dracoLoader);
     this.textureLoader = new TextureLoader(this.loadingManager);
@@ -63,6 +64,7 @@ export class AssetService implements IAssetService {
     this.isLoading$ = new BehaviorSubject(false);
     this.configService.getConfig().subscribe((config) => {
       this.basePath = config.project?.basedir ? `${config.project.basedir.replace(/\/+$/, '')}/` : '';
+      this.dracoLoader.setDecoderPath(config.assets?.dracoDecoderPath ?? defaultAssetConfig.dracoDecoderPath);
     });
   }
 
@@ -87,7 +89,7 @@ export class AssetService implements IAssetService {
         () => undefined,
         (error) => {
           reject(error);
-        }
+        },
       );
     });
 
@@ -141,7 +143,7 @@ export class AssetService implements IAssetService {
         () => undefined,
         (error) => {
           reject(error);
-        }
+        },
       );
     });
 
@@ -159,7 +161,7 @@ export class AssetService implements IAssetService {
         () => undefined,
         (error) => {
           reject(error);
-        }
+        },
       );
     });
   }

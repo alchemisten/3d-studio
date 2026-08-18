@@ -1,7 +1,7 @@
 import type { FC, PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 import type { CustomFeatureList, ViewerConfigModel } from '@schablone/3d-studio-viewer-core';
-import type { FeatureComponentList } from '../types';
+import type { FeatureComponentList, RouterConfig } from '../types';
 
 export interface StudioConfig {
   /**
@@ -51,6 +51,13 @@ export interface StudioConfig {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projectParser?: (id: string, data: any) => ViewerConfigModel;
+  /**
+   * Optional router configuration. If omitted, a browser router is used, which
+   * relies on the URL of the document. Use the memory router mode for
+   * environments where the URL can't be controlled, for example when the app
+   * is loaded from a `file://` url or a custom protocol inside a native shell.
+   */
+  router?: RouterConfig;
 }
 
 export const defaultConfig: StudioConfig = {
