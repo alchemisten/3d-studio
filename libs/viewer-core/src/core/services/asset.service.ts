@@ -113,6 +113,8 @@ export class AssetService implements IAssetService {
     const [type] = path.split('.').slice(-1);
 
     switch (type) {
+      // GLTFLoader parses both the JSON and the binary container.
+      case 'glb':
       case 'gltf':
         this.assetMap[path] = this.loadGLTF(path).then((gltf) => {
           gltf.scene.animations = gltf.animations;
