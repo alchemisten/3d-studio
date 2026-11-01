@@ -24,3 +24,10 @@
   font-size: var(--ds-font-size-3);
   pointer-events: none;
 }
+
+.ds-viewer__layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}

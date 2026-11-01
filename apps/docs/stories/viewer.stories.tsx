@@ -5,6 +5,7 @@ import { skybox } from '@schablone/3d-studio-feature-skybox';
 import { wireframe } from '@schablone/3d-studio-feature-wireframe';
 import { lightScenarios } from '@schablone/3d-studio-feature-light-scenarios';
 import { animation } from '@schablone/3d-studio-feature-animation';
+import { highlights } from '@schablone/3d-studio-feature-highlights';
 import { cameraRotation } from '@schablone/3d-studio-feature-camera-rotation';
 
 const SOURCE = './models/milk-truck-draco/CesiumMilkTruck.gltf';
@@ -51,6 +52,38 @@ export const Animation: Story = {
     source: './models/spinning-box/spinning-box.gltf',
     canvasChildren: <ambientLight intensity={2} />,
     features: [animation.use({ loop: 'repeat' })],
+  },
+};
+
+export const Highlights: Story = {
+  args: {
+    source: './models/spinning-box/spinning-box.gltf',
+    canvasChildren: <ambientLight intensity={2} />,
+    features: [
+      animation,
+      highlights.use({
+        highlights: [
+          {
+            id: 'corner',
+            label: 'Corner (attached to the node, follows the spin)',
+            anchor: { node: 'Box', offset: [0.5, 0.5, 0.5] },
+            target: { node: 'Box' },
+            pointer: true,
+            color: '#ff3d71',
+            camera: { position: [1.6, 1.2, 1.6] },
+            animation: { targetTime: 0, delay: 200 },
+          },
+          {
+            id: 'fixed',
+            label: 'Fixed marker (static in the world, only visible at 0-2 s)',
+            kind: 'action',
+            anchor: { position: [0, 1, 0] },
+            camera: { position: [0, 2, 2], target: [0, 0, 0], fov: 35 },
+            visibility: { from: 0, to: 2 },
+          },
+        ],
+      }),
+    ],
   },
 };
 

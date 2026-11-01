@@ -88,3 +88,8 @@ Per feature port, agree on: public config shape, glTF extension name/schema, slo
 ## Out of scope (for now)
 
 Embed builder port, non-glTF formats.
+
+## Feature port status
+
+Ported: skybox, wireframe, camera-rotation, light-scenarios, animation, highlights.
+Highlights anchors (`anchor` = click position, `target` = what it means) are either static world positions or attached to a node and follow animations. Hotspots are DOM buttons in the `viewer.layer` slot, positioned from the scene each frame.

@@ -13,6 +13,13 @@ declare module '@schablone/3d-studio-ui' {
   }
 }
 
+declare module '@schablone/3d-studio-core' {
+  interface ViewerEventMap {
+    /** Request from other features (e.g. highlights) to jump the timeline. */
+    'animation:seek': { time: number };
+  }
+}
+
 export interface AnimationConfig {
   /** Initial state of the toggle; `false` pauses all animations. */
   enabled: boolean;
@@ -178,6 +185,13 @@ export const animation = defineFeature<AnimationConfig>({
   gltf: { extension: 'ALCM_animation' },
   toggle: { label: 'Animations' },
   scene: AnimationScene,
+  setup: ({ viewer }) => {
+    const sub = viewer.on$('animation:seek').subscribe(({ time }) => {
+      const current = (viewer.getState().featureState[FEATURE_ID] as AnimationState | undefined) ?? EMPTY;
+      viewer.setFeatureState(FEATURE_ID, { ...current, seekRequest: { time, n: (current.seekRequest?.n ?? 0) + 1 } });
+    });
+    return () => sub.unsubscribe();
+  },
   slots: ({ config }) => {
     if (!config.controls) {
       return {};

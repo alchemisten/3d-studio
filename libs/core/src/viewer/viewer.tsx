@@ -23,6 +23,8 @@ declare module '@schablone/3d-studio-ui' {
     'viewer.error': { error: Error | undefined };
     /** Rows of the 'View options' menu; toggle features add `MenuCheckboxItem`s here. */
     'viewer.options': Record<string, never>;
+    /** Full-size DOM layer between canvas and overlay, e.g. for hotspots positioned from the scene. Children opt into pointer events. */
+    'viewer.layer': Record<string, never>;
   }
 }
 
@@ -136,6 +138,9 @@ const ViewerLayout = ({
           </ViewerContext.Provider>
         </Canvas>
       </ViewerErrorBoundary>
+      <div className="ds-viewer__layer" data-testid="ds-viewer-layer">
+        <Slot name="viewer.layer" />
+      </div>
       <Overlay>
         {children}
         {viewOptions !== false && <ViewOptions {...viewOptions} />}
