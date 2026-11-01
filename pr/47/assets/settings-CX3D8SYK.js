@@ -1,4 +1,4 @@
-import{c as e}from"./panel-o3QF1S_A.js";/**
+import{c as e}from"./panel-BsZqmoZT.js";/**
  * @license lucide-react v1.66.0 - ISC
  *
  * This source code is licensed under the ISC license.
