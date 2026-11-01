@@ -61,7 +61,17 @@ const DRAG_LEAVE_PX = 8;
 const HIT_RADIUS_TOUCH = 40;
 const OCCLUSION_INTERVAL = 0.1;
 // Stop the occlusion ray slightly short so anchors lying on a surface do not occlude themselves.
-const OCCLUSION_MARGIN = 0.98;
+const OCCLUSION_MARGIN = 0.02;
+const OCCLUSION_MARGIN_MAX = 0.05;
+
+const isShown = (object: Object3D | null): boolean => {
+  for (let node = object; node; node = node.parent) {
+    if (!node.visible) {
+      return false;
+    }
+  }
+  return true;
+};
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
 const hotspotRegistry = new WeakMap<ViewerStore, Map<string, HTMLElement>>();
@@ -333,8 +343,8 @@ const HighlightsScene = () => {
         const distance = world.distanceTo(camera.position);
         occ.direction.copy(world).sub(camera.position).normalize();
         occ.raycaster.set(camera.position, occ.direction);
-        occ.raycaster.far = distance * OCCLUSION_MARGIN;
-        const blocked = occ.raycaster.intersectObject(root, true).length > 0;
+        occ.raycaster.far = distance - Math.min(distance * OCCLUSION_MARGIN, OCCLUSION_MARGIN_MAX);
+        const blocked = occ.raycaster.intersectObject(root, true).some((hit) => isShown(hit.object));
         if (blocked) {
           occ.hidden.add(id);
         } else {
