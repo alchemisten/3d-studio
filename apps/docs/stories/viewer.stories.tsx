@@ -60,7 +60,12 @@ export const Highlights: Story = {
     source: './models/spinning-box/spinning-box.gltf',
     canvasChildren: <ambientLight intensity={2} />,
     features: [
-      animation,
+      animation.use({
+        cues: [
+          { id: 'look', time: 1.5 },
+          { id: 'away', time: 2.5 },
+        ],
+      }),
       highlights.use({
         highlights: [
           {
@@ -80,6 +85,17 @@ export const Highlights: Story = {
             anchor: { position: [0, 1, 0] },
             camera: { position: [0, 2, 2], target: [0, 0, 0], fov: 35 },
             visibility: { from: 0, to: 2 },
+            actions: [
+              { id: 'pause', label: 'Pause', run: { pause: true } },
+              { id: 'half', label: 'Jump to 1 s', run: { seek: 1 } },
+            ],
+          },
+          {
+            id: 'cued',
+            label: 'Opened by the 1.5 s cue, closed by the 2.5 s cue',
+            anchor: { position: [0, -1, 0] },
+            camera: { position: [0, 0, 3], target: [0, 0, 0] },
+            trigger: { cue: 'look', releaseCue: 'away' },
           },
         ],
       }),

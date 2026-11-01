@@ -1,4 +1,5 @@
 import { Vector3, type Object3D } from 'three';
+import type { ViewerStore } from '@schablone/3d-studio-core';
 
 export type Vec3 = [number, number, number];
 
@@ -30,16 +31,60 @@ export interface Highlight {
   /** Mesh node names that glow while the highlight is focused. */
   nodes?: string[];
   speed?: { in?: number; out?: number; fov?: number };
-  /** Only show the hotspot while the animation time (seconds) is within the window. */
-  visibility?: { from: number; to: number; whenPlaying?: boolean };
-  /** Jump the animation timeline to `targetTime` (seconds) after `delay` ms when focused. */
-  animation?: { targetTime: number; delay?: number };
+  /**
+   * Only show the hotspot while the animation matches: time (seconds) within `from`..`to`,
+   * and/or the clip (all clips when omitted) in one of the given states.
+   */
+  visibility?: { from?: number; to?: number; clip?: string; state?: ClipState | ClipState[] };
+  /** When focused: jump the timeline to `targetTime` (seconds) after `delay` ms, then set `state`. */
+  animation?: { targetTime?: number; delay?: number; state?: 'playing' | 'paused'; clip?: string };
+  /** Focus this highlight when the animation crosses `cue`; release it on `releaseCue`. */
+  trigger?: { cue: string; releaseCue?: string };
+  /** Buttons in the default detail panel. */
+  actions?: HighlightAction[];
+}
+
+export type ClipState = 'playing' | 'paused' | 'stopped';
+
+export type HighlightCommand =
+  | { seek: number }
+  | { play: string | true }
+  | { pause: string | true }
+  | { stop: string | true }
+  | { focus: string };
+
+export interface HighlightAction {
+  id: string;
+  label: string;
+  /** A declarative command, or a function for anything else (it receives the viewer store). */
+  run: HighlightCommand | ((viewer: ViewerStore) => void);
 }
 
 export interface AnimationSnapshot {
   time: number;
-  playing: boolean;
+  /** Per-clip state; empty when there is no animation. */
+  status: Record<string, string>;
 }
+
+const overallState = (status: Record<string, string>): ClipState => {
+  const values = Object.values(status);
+  return values.includes('playing') ? 'playing' : values.includes('paused') ? 'paused' : 'stopped';
+};
+
+/** Runs a declarative command against the viewer's event ports. */
+export const runCommand = (viewer: ViewerStore, command: HighlightCommand) => {
+  if ('seek' in command) {
+    viewer.emit('animation:seek', { time: command.seek });
+  } else if ('play' in command) {
+    viewer.emit('animation:play', { clip: command.play === true ? undefined : command.play });
+  } else if ('pause' in command) {
+    viewer.emit('animation:pause', { clip: command.pause === true ? undefined : command.pause });
+  } else if ('stop' in command) {
+    viewer.emit('animation:stop', { clip: command.stop === true ? undefined : command.stop });
+  } else {
+    viewer.emit('highlight:focus', { id: command.focus });
+  }
+};
 
 /** Resolves an anchor to a world-space point. Falls back to the origin for unknown nodes. */
 export const resolveAnchor = (anchor: Anchor, root: Object3D | undefined, out: Vector3): Vector3 => {
@@ -59,8 +104,15 @@ export const isHighlightVisible = (highlight: Highlight, animation: AnimationSna
   if (!visibility || !animation) {
     return true;
   }
-  const inWindow = animation.time >= visibility.from && animation.time <= visibility.to;
-  return inWindow && (visibility.whenPlaying !== false || !animation.playing);
+  const { from = -Infinity, to = Infinity, clip, state } = visibility;
+  if (animation.time < from || animation.time > to) {
+    return false;
+  }
+  if (state) {
+    const current = clip ? ((animation.status[clip] as ClipState | undefined) ?? 'stopped') : overallState(animation.status);
+    return (Array.isArray(state) ? state : [state]).includes(current);
+  }
+  return true;
 };
 
 export const highlightLabel = (highlight: Highlight, locale: string): string => {

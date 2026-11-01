@@ -1,7 +1,7 @@
 import { resolveFeatureConfig } from '@schablone/3d-studio-core';
 import { Group, Object3D, Vector3 } from 'three';
-import { describe, expect, it } from 'vitest';
-import { highlightLabel, highlights, isHighlightVisible, resolveAnchor, type Highlight } from './index';
+import { describe, expect, it, vi } from 'vitest';
+import { highlightLabel, runCommand, highlights, isHighlightVisible, resolveAnchor, type Highlight } from './index';
 
 const base: Highlight = { id: 'h', anchor: { position: [0, 0, 0] }, camera: { position: [1, 1, 1] } };
 
@@ -34,17 +34,20 @@ describe('anchors', () => {
 describe('visibility', () => {
   const windowed: Highlight = { ...base, visibility: { from: 1, to: 2 } };
   it('is always visible without a window or animation', () => {
-    expect(isHighlightVisible(base, { time: 99, playing: true })).toBe(true);
+    expect(isHighlightVisible(base, { time: 99, status: { a: 'playing' } })).toBe(true);
     expect(isHighlightVisible(windowed, undefined)).toBe(true);
   });
   it('respects the time window', () => {
-    expect(isHighlightVisible(windowed, { time: 1.5, playing: false })).toBe(true);
-    expect(isHighlightVisible(windowed, { time: 3, playing: false })).toBe(false);
+    expect(isHighlightVisible(windowed, { time: 1.5, status: {} })).toBe(true);
+    expect(isHighlightVisible(windowed, { time: 3, status: {} })).toBe(false);
   });
-  it('can hide while playing', () => {
-    const hidden = { ...base, visibility: { from: 0, to: 5, whenPlaying: false } };
-    expect(isHighlightVisible(hidden, { time: 1, playing: true })).toBe(false);
-    expect(isHighlightVisible(hidden, { time: 1, playing: false })).toBe(true);
+  it('binds to animation state, overall or per clip', () => {
+    const paused = { ...base, visibility: { state: 'paused' as const } };
+    expect(isHighlightVisible(paused, { time: 1, status: { a: 'paused' } })).toBe(true);
+    expect(isHighlightVisible(paused, { time: 1, status: { a: 'playing', b: 'paused' } })).toBe(false);
+    const clip = { ...base, visibility: { clip: 'b', state: ['playing' as const, 'paused' as const] } };
+    expect(isHighlightVisible(clip, { time: 0, status: { a: 'stopped', b: 'playing' } })).toBe(true);
+    expect(isHighlightVisible(clip, { time: 0, status: { a: 'playing' } })).toBe(false);
   });
 });
 
@@ -70,5 +73,20 @@ describe('highlights feature', () => {
     expect(Object.keys(slots({ config }))).toEqual(['viewer.layer', 'overlay.bottom-left']);
     const without = resolveFeatureConfig({ feature: highlights, props: { detail: false } });
     expect(Object.keys(slots({ config: without }))).toEqual(['viewer.layer']);
+  });
+});
+
+describe('commands', () => {
+  it('maps declarative commands to viewer events', () => {
+    const emit = vi.fn();
+    const viewer = { emit } as never;
+    runCommand(viewer, { seek: 2 });
+    runCommand(viewer, { play: true });
+    runCommand(viewer, { pause: 'spin' });
+    expect(emit.mock.calls).toEqual([
+      ['animation:seek', { time: 2 }],
+      ['animation:play', { clip: undefined }],
+      ['animation:pause', { clip: 'spin' }],
+    ]);
   });
 });

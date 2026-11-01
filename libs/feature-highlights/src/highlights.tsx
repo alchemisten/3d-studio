@@ -12,7 +12,7 @@ import {
 } from '@schablone/3d-studio-core';
 import { IconButton, Panel, Slot } from '@schablone/3d-studio-ui';
 import './highlights.css';
-import { highlightLabel, isHighlightVisible, resolveAnchor, type AnimationSnapshot, type Highlight } from './highlight-model';
+import { highlightLabel, isHighlightVisible, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
 
 declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
@@ -26,6 +26,11 @@ declare module '@schablone/3d-studio-ui' {
 declare module '@schablone/3d-studio-core' {
   interface ViewerEventMap {
     'animation:seek': { time: number };
+    'animation:play': { clip?: string };
+    'animation:pause': { clip?: string };
+    'animation:stop': { clip?: string };
+    'animation:cue': { id: string; time: number };
+    /** Command and notification: focus a highlight, or release with `null`. */
     'highlight:focus': { id: string | null };
   }
 }
@@ -70,11 +75,11 @@ export interface HighlightsApi {
 export const useHighlights = (): HighlightsApi => {
   const viewer = useViewer();
   const focusedId = useViewerState((s) => (s.featureState[FEATURE_ID] as HighlightsState | undefined)?.focusedId ?? null);
-  const set = (id: string | null) => {
-    viewer.setFeatureState(FEATURE_ID, { focusedId: id });
-    viewer.emit('highlight:focus', { id });
+  return {
+    focusedId,
+    focus: (id) => viewer.emit('highlight:focus', { id }),
+    release: () => viewer.emit('highlight:focus', { id: null }),
   };
-  return { focusedId, focus: (id) => set(id), release: () => set(null) };
 };
 
 interface OrbitLike {
@@ -103,7 +108,7 @@ const animationSnapshot = (viewer: ViewerStore): AnimationSnapshot | undefined =
   if (!state || state.clips.length === 0) {
     return undefined;
   }
-  return { time: state.time, playing: Object.values(state.status).includes('playing') };
+  return { time: state.time, status: state.status };
 };
 
 const PointerLine = ({ highlight }: { highlight: Highlight }) => {
@@ -182,9 +187,16 @@ const HighlightsScene = () => {
         speed: { position: speed.in, fov: speed.fov },
         followTarget: !focused.camera.target,
       };
-      const seek = focused.animation;
-      if (seek) {
-        const timer = setTimeout(() => viewer.emit('animation:seek', { time: seek.targetTime }), seek.delay ?? 0);
+      const anim = focused.animation;
+      if (anim) {
+        const timer = setTimeout(() => {
+          if (anim.targetTime !== undefined) {
+            viewer.emit('animation:seek', { time: anim.targetTime });
+          }
+          if (anim.state) {
+            viewer.emit(anim.state === 'playing' ? 'animation:play' : 'animation:pause', { clip: anim.clip });
+          }
+        }, anim.delay ?? 0);
         return () => clearTimeout(timer);
       }
     } else if (saved.current) {
@@ -297,6 +309,7 @@ const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
 };
 
 const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
+  const viewer = useViewer();
   const { focusedId, release } = useHighlights();
   const enabled = useViewerState((s) => s.featureEnabled[FEATURE_ID] ?? false);
   const highlight = config.highlights.find((h) => h.id === focusedId);
@@ -310,7 +323,23 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
       title={highlightLabel(highlight, config.locale)}
       actions={<IconButton label="Close" icon="✕" data-testid="ds-highlight-detail-close" onClick={release} />}
     >
-      <Slot name="highlights.detail" props={{ highlight }} />
+      <Slot name="highlights.detail" props={{ highlight }}>
+        {highlight.actions?.length ? (
+          <div className="ds-highlight-detail__actions" data-testid="ds-highlight-detail-actions">
+            {highlight.actions.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                className="ds-highlight-detail__action"
+                data-testid={`ds-highlight-action-${highlight.id}-${action.id}`}
+                onClick={() => (typeof action.run === 'function' ? action.run(viewer) : runCommand(viewer, action.run))}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </Slot>
     </Panel>
   );
 };
@@ -328,10 +357,22 @@ export const highlights = defineFeature<HighlightsConfig>({
       ? { 'overlay.bottom-left': { mode: 'append' as const, order: 0, content: <DetailPanel config={config} /> } }
       : {}),
   }),
-  setup: ({ viewer }) => {
-    if (focusedIdOf(viewer) === null && viewer.getState().featureState[FEATURE_ID] === undefined) {
+  setup: ({ viewer, config }) => {
+    if (viewer.getState().featureState[FEATURE_ID] === undefined) {
       viewer.setFeatureState(FEATURE_ID, { focusedId: null });
     }
-    return undefined;
+    const subs = [
+      viewer.on$('highlight:focus').subscribe(({ id }) => viewer.setFeatureState(FEATURE_ID, { focusedId: id })),
+      viewer.on$('animation:cue').subscribe(({ id: cue }) => {
+        config.highlights.forEach((h) => {
+          if (h.trigger?.cue === cue) {
+            viewer.emit('highlight:focus', { id: h.id });
+          } else if (h.trigger?.releaseCue === cue && focusedIdOf(viewer) === h.id) {
+            viewer.emit('highlight:focus', { id: null });
+          }
+        });
+      }),
+    ];
+    return () => subs.forEach((sub) => sub.unsubscribe());
   },
 });
