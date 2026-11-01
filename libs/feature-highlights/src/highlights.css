@@ -137,11 +137,14 @@
   color: var(--ds-color-accent);
 }
 
-@media (max-width: 40rem) {
-  /* Own row below the detail panel so the arrows are never covered */
+/* Own row below the detail panel so the selector is never covered */
+@media (max-width: 60rem) {
   .ds-overlay__region[data-region='bottom-center'] {
     grid-area: 5 / 1 / 6 / 4;
   }
+}
+
+@media (max-width: 40rem) {
   .ds-highlight-select__current {
     display: none;
   }

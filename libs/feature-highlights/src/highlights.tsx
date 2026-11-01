@@ -59,7 +59,6 @@ const HIT_RADIUS = 28;
 const PAUSE_RADIUS = 110;
 const DRAG_LEAVE_PX = 8;
 const HIT_RADIUS_TOUCH = 40;
-const OCCLUSION_INTERVAL = 0.1;
 // Stop the occlusion ray slightly short so anchors lying on a surface do not occlude themselves.
 const OCCLUSION_MARGIN = 0.02;
 const OCCLUSION_MARGIN_MAX = 0.05;
@@ -186,7 +185,7 @@ const HighlightsScene = () => {
   const pausedClips = useRef<string[]>([]);
   const nearId = useRef<string | null>(null);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
-  const occlusion = useRef({ raycaster: new Raycaster(), direction: new Vector3(), elapsed: Infinity, hidden: new Set<string>() });
+  const occlusion = useRef({ raycaster: new Raycaster(), direction: new Vector3(), cursor: 0, hidden: new Set<string>() });
   const gl = useThree((s) => s.gl);
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
   const pointer = useRef<{ x: number; y: number } | null>(null);
@@ -327,11 +326,10 @@ const HighlightsScene = () => {
     const { world, target } = tmp.current;
 
     const occ = occlusion.current;
-    occ.elapsed += delta;
-    const recheck = occ.elapsed >= OCCLUSION_INTERVAL;
-    if (recheck) {
-      occ.elapsed = 0;
-    }
+    // One raycast per frame, round-robin over the hotspots, keeps the cost flat on heavy models.
+    const registered = hotspotsOf(viewer);
+    const turn = registered.size ? occ.cursor++ % registered.size : 0;
+    let index = -1;
     const visiblePoints: Array<{ id: string; x: number; y: number }> = [];
     hotspotsOf(viewer).forEach((element, id) => {
       const highlight = config.highlights.find((h) => h.id === id);
@@ -339,7 +337,8 @@ const HighlightsScene = () => {
         return;
       }
       resolveAnchor(highlight.anchor, root, world);
-      if (recheck && root && enabled) {
+      index += 1;
+      if (index === turn && root && enabled) {
         const distance = world.distanceTo(camera.position);
         occ.direction.copy(world).sub(camera.position).normalize();
         occ.raycaster.set(camera.position, occ.direction);
