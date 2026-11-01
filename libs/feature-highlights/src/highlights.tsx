@@ -43,6 +43,8 @@ export interface HighlightsConfig {
   locale: string;
   /** Show the default detail panel (bottom-left) while a highlight is focused. */
   detail: boolean;
+  /** Pause playing animations while the pointer is over a hotspot so moving hotspots are easy to hit. */
+  pauseOnHover: boolean;
 }
 
 interface HighlightsState {
@@ -50,9 +52,10 @@ interface HighlightsState {
 }
 
 const FEATURE_ID = 'highlights';
-const HIT_RADIUS = 16;
+const HIT_RADIUS = 28;
+const PAUSE_RADIUS = 110;
 const DRAG_LEAVE_PX = 8;
-const HIT_RADIUS_TOUCH = 28;
+const HIT_RADIUS_TOUCH = 40;
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
 const hotspotRegistry = new WeakMap<ViewerStore, Map<string, HTMLElement>>();
@@ -164,6 +167,8 @@ const HighlightsScene = () => {
   const goal = useRef<Goal | null>(null);
   const saved = useRef<Pose | null>(null);
   const leftByDrag = useRef(false);
+  const pausedClips = useRef<string[]>([]);
+  const nearId = useRef<string | null>(null);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
   const gl = useThree((s) => s.gl);
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
@@ -324,6 +329,24 @@ const HighlightsScene = () => {
     });
     points.current = visiblePoints;
     hovered.current = pickHotspot(visiblePoints, pointer.current, HIT_RADIUS, hovered.current);
+    // Pause on approach: pausing goes through React state, so the hotspot would drift away from a precise hover.
+    const near = config.pauseOnHover ? pickHotspot(visiblePoints, pointer.current, PAUSE_RADIUS, nearId.current, 24) : null;
+    const wasNear = nearId.current;
+    nearId.current = near;
+    if (!!wasNear !== !!near) {
+      // Moving hotspots are hard to hit: freeze playing animations while hovering, resume afterwards.
+      if (near) {
+        const playing = Object.entries(animation?.status ?? {}).filter(([, status]) => status === 'playing').map(([clip]) => clip);
+        pausedClips.current = playing;
+        playing.forEach((clip) => viewer.emit('animation:pause', { clip }));
+      } else {
+        const clips = pausedClips.current;
+        pausedClips.current = [];
+        if (!latest.current.focusedId) {
+          clips.forEach((clip) => viewer.emit('animation:play', { clip }));
+        }
+      }
+    }
     hotspotsOf(viewer).forEach((element, id) => element.toggleAttribute('data-hover', id === hovered.current));
     gl.domElement.style.cursor = hovered.current ? 'pointer' : '';
 
@@ -451,7 +474,7 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
 /** glTF extension: `ALCM_highlights`. Hotspots are DOM buttons (`.ds-hotspot`), focus moves the camera. */
 export const highlights = defineFeature<HighlightsConfig>({
   id: FEATURE_ID,
-  defaults: { enabled: true, highlights: [], locale: 'en', detail: true },
+  defaults: { enabled: true, highlights: [], locale: 'en', detail: true, pauseOnHover: true },
   gltf: { extension: 'ALCM_highlights' },
   toggle: { label: 'Highlights' },
   scene: HighlightsScene,
