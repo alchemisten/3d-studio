@@ -1,4 +1,4 @@
-import{c as L,j as g,k as M,a as c}from"./panel-BrDeZqkP.js";import{r as m,j as s}from"./iframe-CKAJd7HH.js";/**
+import{c as L,j as g,k as M,a as c}from"./panel-CdDioUBy.js";import{r as m,j as s}from"./iframe-CIicS8m7.js";/**
  * @license lucide-react v1.66.0 - ISC
  *
  * This source code is licensed under the ISC license.
