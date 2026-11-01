@@ -81,6 +81,11 @@ const ToggleItem = ({ featureId, label, icon }: { featureId: string; label: stri
   const viewer = useViewerStore();
   const checked = useViewerState((s) => s.featureEnabled[featureId] ?? false);
   return (
-    <MenuCheckboxItem label={label} icon={icon} checked={checked} onChange={(v) => viewer.setFeatureEnabled(featureId, v)} />
+    <MenuCheckboxItem
+      label={label}
+      icon={icon}
+      className={`ds-view-option ds-view-option--${featureId}`}
+      testId={`ds-view-option-${featureId}`}
+      checked={checked} onChange={(v) => viewer.setFeatureEnabled(featureId, v)} />
   );
 };

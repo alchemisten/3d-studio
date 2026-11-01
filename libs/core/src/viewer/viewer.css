@@ -8,6 +8,7 @@
 }
 
 .ds-viewer > canvas,
+.ds-viewer__canvas,
 .ds-viewer > div:first-child {
   position: absolute;
   inset: 0;

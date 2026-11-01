@@ -4,6 +4,7 @@ import { IconButton, Overlay } from '@schablone/3d-studio-ui';
 import { skybox } from '@schablone/3d-studio-feature-skybox';
 import { wireframe } from '@schablone/3d-studio-feature-wireframe';
 import { lightScenarios } from '@schablone/3d-studio-feature-light-scenarios';
+import { animation } from '@schablone/3d-studio-feature-animation';
 import { cameraRotation } from '@schablone/3d-studio-feature-camera-rotation';
 
 const SOURCE = './models/milk-truck-draco/CesiumMilkTruck.gltf';
@@ -42,6 +43,14 @@ export const LightScenarios: Story = {
         ],
       }),
     ],
+  },
+};
+
+export const Animation: Story = {
+  args: {
+    source: './models/spinning-box/spinning-box.gltf',
+    canvasChildren: <ambientLight intensity={2} />,
+    features: [animation.use({ loop: 'repeat' })],
   },
 };
 

@@ -24,7 +24,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         className={cx('ds-icon-button', className)}
         data-active={active ? '' : undefined}
       >
-        {icon}
+        <span className="ds-icon-button__icon">{icon}</span>
       </button>
     );
     return tooltip ? <Tooltip label={label}>{button}</Tooltip> : button;

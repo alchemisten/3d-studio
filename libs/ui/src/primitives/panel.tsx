@@ -12,7 +12,7 @@ export const Panel = ({ title, actions, className, children, ...rest }: PanelPro
     {(title || actions) && (
       <header className="ds-panel__header">
         <h2 className="ds-panel__title">{title}</h2>
-        {actions}
+        {actions && <div className="ds-panel__actions">{actions}</div>}
       </header>
     )}
     <div className="ds-panel__body">{children}</div>

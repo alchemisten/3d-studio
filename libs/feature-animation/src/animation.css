@@ -1,0 +1,11 @@
+.ds-animation-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2, 8px);
+  min-width: 15rem;
+}
+
+.ds-animation-controls__scrubber {
+  flex: 1;
+  accent-color: var(--ds-color-accent);
+}

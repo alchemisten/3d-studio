@@ -56,7 +56,7 @@ export interface ViewerProps {
 const ViewerError = () => {
   const error = useViewerState((s) => s.error);
   return (
-    <div className="ds-viewer__message" role="alert">
+    <div className="ds-viewer__message ds-viewer__message--error" role="alert" data-testid="ds-viewer-error">
       <Slot name="viewer.error" props={{ error }}>
         {error?.message ?? 'Something went wrong while loading the model.'}
       </Slot>
@@ -69,7 +69,7 @@ const ViewOptions = ({ region = 'top-right', order = 100, label = 'View options'
   const Region = REGION_COMPONENTS[region];
   return hasItems ? (
     <Region id="viewer.options" order={order}>
-      <Menu label={label} icon="⚙" placement={region.endsWith('right') ? 'bottom-end' : 'bottom-start'}>
+      <Menu label={label} icon="⚙" className="ds-view-options" testId="ds-view-options" placement={region.endsWith('right') ? 'bottom-end' : 'bottom-start'}>
         <Slot name="viewer.options" />
       </Menu>
     </Region>
@@ -110,7 +110,7 @@ const ViewerLayout = ({
   }, [source, store]);
 
   return (
-    <div className={['ds-viewer', className].filter(Boolean).join(' ')} style={style}>
+    <div className={['ds-viewer', className].filter(Boolean).join(' ')} style={style} data-status={status} data-testid="ds-viewer">
       <ViewerErrorBoundary
         fallback={<ViewerError />}
         onError={(error) => {
@@ -118,7 +118,7 @@ const ViewerLayout = ({
           store.emit('model:error', { error });
         }}
       >
-        <Canvas {...canvas}>
+        <Canvas {...canvas} className={['ds-viewer__canvas', canvas?.className].filter(Boolean).join(' ')} data-testid="ds-viewer-canvas">
           <ViewerContext.Provider value={store}>
             <Suspense fallback={null}>
               <Model url={source} draco={draco} />
@@ -141,7 +141,7 @@ const ViewerLayout = ({
         {viewOptions !== false && <ViewOptions {...viewOptions} />}
       </Overlay>
       {(status === 'idle' || status === 'loading') && (
-        <div className="ds-viewer__message">
+        <div className="ds-viewer__message ds-viewer__message--loading" data-testid="ds-viewer-loading">
           <Slot name="viewer.loading">Loading…</Slot>
         </div>
       )}

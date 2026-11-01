@@ -18,7 +18,7 @@ const Region = ({ region }: { region: OverlayRegion }) => {
     return null;
   }
   return (
-    <div className="ds-overlay__region" data-region={region}>
+    <div className={`ds-overlay__region ds-overlay__region--${region}`} data-region={region} data-testid={`ds-overlay-region-${region}`}>
       <Slot name={name} />
     </div>
   );
@@ -31,7 +31,7 @@ const Region = ({ region }: { region: OverlayRegion }) => {
 export const Overlay = ({ className, children }: OverlayProps) => {
   useSlotContext();
   return (
-    <div className={cx('ds-overlay', className)}>
+    <div className={cx('ds-overlay', className)} data-testid="ds-overlay">
       {children}
       {OVERLAY_REGIONS.map((region) => (
         <Region key={region} region={region} />

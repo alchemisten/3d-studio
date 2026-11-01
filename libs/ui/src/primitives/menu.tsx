@@ -18,11 +18,13 @@ export interface MenuProps {
   items?: MenuItem[];
   children?: ReactNode;
   className?: string;
+  /** Stable `data-testid` prefix: trigger `<id>`, popup `<id>-popup`, simple items `<id>-item-<item.id>`. */
+  testId?: string;
   /** Direction the popup opens in. */
   placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
 }
 
-export const Menu = ({ label, icon, items, children, className, placement = 'bottom-start' }: MenuProps) => {
+export const Menu = ({ label, icon, items, children, className, testId, placement = 'bottom-start' }: MenuProps) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const popupId = useId();
@@ -46,10 +48,12 @@ export const Menu = ({ label, icon, items, children, className, placement = 'bot
   }, [open]);
 
   return (
-    <div ref={rootRef} className={cx('ds-menu', className)} data-placement={placement}>
+    <div ref={rootRef} className={cx('ds-menu', className)} data-placement={placement} data-open={open ? '' : undefined}>
       <IconButton
         label={label}
         icon={icon}
+        className="ds-menu__trigger"
+        data-testid={testId}
         active={open}
         tooltip={!open}
         aria-haspopup="menu"
@@ -58,13 +62,14 @@ export const Menu = ({ label, icon, items, children, className, placement = 'bot
         onClick={() => setOpen((o) => !o)}
       />
       {open && (
-        <div id={popupId} className="ds-menu__popup" role="menu">
+        <div id={popupId} className="ds-menu__popup" role="menu" data-testid={testId && `${testId}-popup`}>
           {items?.map((item) => (
             <button
               key={item.id}
               type="button"
               role="menuitem"
               className="ds-menu__item"
+              data-testid={testId && `${testId}-item-${item.id}`}
               disabled={item.disabled}
               onClick={() => {
                 item.onSelect();
@@ -72,7 +77,7 @@ export const Menu = ({ label, icon, items, children, className, placement = 'bot
               }}
             >
               {item.icon}
-              {item.label}
+              <span className="ds-menu__label">{item.label}</span>
             </button>
           ))}
           {children}
@@ -87,22 +92,26 @@ export interface MenuCheckboxItemProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   icon?: ReactNode;
+  className?: string;
+  /** Rendered as `data-testid`. */
+  testId?: string;
 }
 
 /** A toggle row for `<Menu>` children. Keeps the menu open when toggled. */
-export const MenuCheckboxItem = ({ label, checked, onChange, icon }: MenuCheckboxItemProps) => (
+export const MenuCheckboxItem = ({ label, checked, onChange, icon, className, testId }: MenuCheckboxItemProps) => (
   <button
     type="button"
     role="menuitemcheckbox"
     aria-checked={checked}
-    className="ds-menu__item"
+    className={cx('ds-menu__item', 'ds-menu__item--checkbox', className)}
+    data-testid={testId}
     onClick={() => onChange(!checked)}
   >
     <span className="ds-menu__check" aria-hidden="true">
       {checked ? '✓' : ''}
     </span>
     {icon}
-    {label}
+    <span className="ds-menu__label">{label}</span>
   </button>
 );
 
@@ -111,15 +120,25 @@ export interface MenuRadioItemProps {
   checked: boolean;
   onSelect: () => void;
   icon?: ReactNode;
+  className?: string;
+  /** Rendered as `data-testid`. */
+  testId?: string;
 }
 
 /** A single-choice row for `<Menu>` children. Keeps the menu open when selected. */
-export const MenuRadioItem = ({ label, checked, onSelect, icon }: MenuRadioItemProps) => (
-  <button type="button" role="menuitemradio" aria-checked={checked} className="ds-menu__item" onClick={onSelect}>
+export const MenuRadioItem = ({ label, checked, onSelect, icon, className, testId }: MenuRadioItemProps) => (
+  <button
+    type="button"
+    role="menuitemradio"
+    aria-checked={checked}
+    className={cx('ds-menu__item', 'ds-menu__item--radio', className)}
+    data-testid={testId}
+    onClick={onSelect}
+  >
     <span className="ds-menu__check" aria-hidden="true">
       {checked ? '●' : ''}
     </span>
     {icon}
-    {label}
+    <span className="ds-menu__label">{label}</span>
   </button>
 );

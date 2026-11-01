@@ -113,6 +113,8 @@ const ScenarioItems = ({ config }: { config: LightScenariosConfig }): ReactNode 
   return config.scenarios.map((scenario) => (
     <MenuRadioItem
       key={scenario.id}
+      className="ds-light-scenario"
+      testId={`ds-light-scenario-${scenario.id}`}
       label={scenarioLabel(scenario, config.locale)}
       checked={scenario.id === activeId}
       onSelect={() => setActive(scenario.id)}
