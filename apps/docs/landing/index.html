@@ -7,14 +7,36 @@
     <style>
       body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; }
       a { color: #2563eb; }
+      select { font: inherit; padding: 0.25rem; }
     </style>
   </head>
   <body>
     <h1>3D Studio</h1>
     <p>React Three Fiber based viewer with style tokens, slots and an expandable overlay.</p>
-    <ul>
-      <li><a href="./storybook/">Storybook: UI primitives, overlay and viewer demos</a></li>
-      <li><a href="https://github.com/alchemisten/3d-studio">Source on GitHub</a></li>
-    </ul>
+    <p>
+      <label>Version <select id="version"></select></label>
+      <button id="go">Open Storybook</button>
+    </p>
+    <p><a href="https://github.com/alchemisten/3d-studio">Source on GitHub</a></p>
+    <script>
+      const select = document.getElementById('version');
+      const add = (label, entries) => {
+        if (!entries.length) return;
+        const group = document.createElement('optgroup');
+        group.label = label;
+        entries.forEach((entry) => group.append(new Option(entry, entry)));
+        select.append(group);
+      };
+      fetch('./versions.json')
+        .then((r) => r.json())
+        .then((v) => {
+          add('Channels', v.channels);
+          add('Releases', v.versions);
+          add('Pull requests', v.previews);
+        });
+      document.getElementById('go').onclick = () => {
+        if (select.value) location.href = `./${select.value}/`;
+      };
+    </script>
   </body>
 </html>
