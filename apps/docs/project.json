@@ -1,0 +1,18 @@
+{
+  "name": "docs",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/docs",
+  "tags": [],
+  "targets": {
+    "storybook": {
+      "executor": "nx:run-commands",
+      "options": { "command": "storybook dev -p 6006 -c apps/docs/.storybook" }
+    },
+    "build-storybook": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/pages/storybook"],
+      "options": { "command": "storybook build -c apps/docs/.storybook -o dist/pages/storybook --quiet" }
+    }
+  }
+}

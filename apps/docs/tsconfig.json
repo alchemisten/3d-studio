@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strict": true,
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": ["stories/**/*", ".storybook/*.ts", ".storybook/*.tsx"]
+}

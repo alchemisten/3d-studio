@@ -94,7 +94,7 @@ const ViewerLayout = ({
   featureConfig,
   canvas,
   draco,
-  controls,
+  controls = true,
   canvasChildren,
   viewOptions,
   className,
