@@ -47,6 +47,8 @@
   --ds-glass-border: rgb(255 255 255 / 65%);
   --ds-glass-edge: rgb(20 23 29 / 20%);
   --ds-glass-highlight: rgb(255 255 255 / 70%);
+  --ds-glass-control-bg: rgb(255 255 255 / 35%);
+  --ds-glass-hover: rgb(255 255 255 / 55%);
   --ds-color-accent: var(--ds-color-neutral-900);
   --ds-color-accent-hover: var(--ds-color-neutral-700);
   --ds-color-accent-contrast: var(--ds-color-neutral-0);
@@ -69,6 +71,8 @@
   --ds-glass-border: rgb(255 255 255 / 16%);
   --ds-glass-edge: rgb(0 0 0 / 35%);
   --ds-glass-highlight: rgb(255 255 255 / 22%);
+  --ds-glass-control-bg: rgb(255 255 255 / 8%);
+  --ds-glass-hover: rgb(255 255 255 / 16%);
   --ds-color-accent: var(--ds-color-neutral-50);
   --ds-color-accent-hover: var(--ds-color-neutral-300);
   --ds-color-accent-contrast: var(--ds-color-neutral-900);
@@ -87,6 +91,10 @@
     --ds-glass-border: rgb(255 255 255 / 16%);
     --ds-glass-edge: rgb(0 0 0 / 35%);
     --ds-glass-highlight: rgb(255 255 255 / 22%);
+    --ds-glass-control-bg: rgb(255 255 255 / 8%);
+    --ds-glass-hover: rgb(255 255 255 / 16%);
+  --ds-glass-control-bg: rgb(255 255 255 / 8%);
+  --ds-glass-hover: rgb(255 255 255 / 16%);
     --ds-color-accent: var(--ds-color-neutral-50);
     --ds-color-accent-hover: var(--ds-color-neutral-300);
     --ds-color-accent-contrast: var(--ds-color-neutral-900);
@@ -102,7 +110,7 @@
   --ds-glass-saturate: 160%;
 
   --ds-icon-button-bg: var(--ds-glass-bg);
-  --ds-icon-button-bg-hover: var(--ds-color-surface-raised);
+  --ds-icon-button-bg-hover: var(--ds-glass-hover);
   --ds-icon-button-color: var(--ds-color-text);
   --ds-icon-button-border: var(--ds-glass-border);
 
@@ -115,7 +123,7 @@
   --ds-menu-bg: var(--ds-glass-bg);
   --ds-menu-radius: var(--ds-radius-control);
   --ds-menu-shadow: var(--ds-shadow-2);
-  --ds-menu-item-hover: var(--ds-color-surface-raised);
+  --ds-menu-item-hover: var(--ds-glass-hover);
 
   --ds-tooltip-bg: var(--ds-color-neutral-900);
   --ds-tooltip-color: var(--ds-color-neutral-50);
@@ -123,24 +131,25 @@
 
   --ds-control-height: 2.25rem;
   --ds-control-radius: var(--ds-radius-control);
-  --ds-control-bg: var(--ds-color-surface);
+  --ds-control-bg: var(--ds-glass-control-bg);
   --ds-control-color: var(--ds-color-text);
-  --ds-control-border: var(--ds-color-border);
+  --ds-control-border: var(--ds-glass-border);
 
   --ds-switch-bg: var(--ds-color-neutral-500);
   --ds-switch-bg-checked: var(--ds-color-accent);
   --ds-switch-thumb: #fff;
 
-  --ds-checkbox-bg: var(--ds-color-surface);
-  --ds-checkbox-border: var(--ds-color-border);
+  --ds-checkbox-bg: var(--ds-glass-control-bg);
+  --ds-checkbox-border: var(--ds-glass-edge);
   --ds-checkbox-color: var(--ds-color-accent-contrast);
 
-  --ds-slider-track: var(--ds-color-neutral-300);
+  --ds-slider-track: var(--ds-glass-edge);
   --ds-slider-track-height: 4px;
   --ds-slider-thumb: rgb(255 255 255 / 14%);
   --ds-slider-thumb-size: 1.5rem;
+  --ds-slider-thumb-outline: color-mix(in srgb, var(--ds-color-text) 55%, transparent);
 
-  --ds-progress-track: var(--ds-color-neutral-300);
+  --ds-progress-track: var(--ds-glass-edge);
   --ds-progress-height: 0.375rem;
 
   --ds-list-item-active-bg: color-mix(in srgb, var(--ds-color-accent) 12%, transparent);
