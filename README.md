@@ -7,7 +7,7 @@ based on [Three JS](https://threejs.org).
 
 | Package | Purpose |
 | --- | --- |
-| `@schablone/3d-studio-ui` | Style tokens (`--ds-*`), `ThemeProvider`, slot registry, overlay primitives |
+| `@schablone/3d-studio-ui` | Style tokens (`--ds-*`), `ThemeProvider`, slot registry, 9-region overlay plus `bottom-bar`, Radix-based primitives (Switch, Checkbox, Slider, Select, Segmented, Stepper, Tabs, Accordion, List, ColorSelect, Loader, Button, …) |
 | `@schablone/3d-studio-core` | `<Viewer>`, viewer store, `defineFeature()`, `ProjectAdapter` |
 | `@schablone/3d-studio-feature-*` | `skybox`, `wireframe`, `camera-rotation`, `light-scenarios`, `animation`, `highlights` |
 | `@schablone/3d-studio` | `<Studio>`, `<ProjectList>`, `<ProjectDetail>`, REST adapter, default feature bundle |
@@ -41,3 +41,5 @@ Run `npm run build` to create a new build.
 ### New release
 Merging to the `main` branch will automatically create a new release via
 semantic-release.
+
+> Peer dependencies: `react`, `three`, `@react-three/fiber`, `@react-three/drei` and `lucide-react` (>=0.400). Try the theme playground in Storybook to tune tokens and copy a `createTheme` snippet.
