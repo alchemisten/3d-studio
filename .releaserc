@@ -13,7 +13,7 @@
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=example,docs,gltf-extension,gltf-extension-validator"
+        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=example,example-tanstack,docs,gltf-extension,gltf-extension-validator"
       }
     ],
     [

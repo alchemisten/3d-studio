@@ -15,7 +15,9 @@ based on [Three JS](https://threejs.org).
 Also in this repo: the glTF extension definition (`libs/gltf-extension`) and
 its validator (`libs/gltf-extension-validator`), the Storybook and demo site
 (`apps/docs`, published to GitHub Pages) and a minimal Vite app
-(`apps/example`).
+(`apps/example`) and a TanStack Start + Router app with SSR
+(`apps/example-tanstack`, `nx serve example-tanstack`). The Start example pins
+`@tanstack/react-start` 1.131 because newer versions require Vite 8.
 
 ## Quick start
 

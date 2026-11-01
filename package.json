@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve example",
-    "build": "nx run-many --target=build --exclude=example,docs,gltf-extension,gltf-extension-validator",
-    "build:dev": "nx run-many --target=build --configuration=development --exclude=example,docs,gltf-extension,gltf-extension-validator",
+    "build": "nx run-many --target=build --exclude=example,example-tanstack,docs,gltf-extension,gltf-extension-validator",
+    "build:dev": "nx run-many --target=build --configuration=development --exclude=example,example-tanstack,docs,gltf-extension,gltf-extension-validator",
     "test": "nx run-many --target=test --exclude=gltf-extension,gltf-extension-validator",
     "lint": "nx run-many --target=lint --exclude=gltf-extension,gltf-extension-validator"
   },
@@ -60,6 +60,8 @@
     "@storybook/react-vite": "^10.6.5",
     "@swc/cli": "0.6.0",
     "@swc/core": "1.5.7",
+    "@tanstack/react-router": "^1.131.50",
+    "@tanstack/react-start": "^1.131.50",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "16.1.0",
     "@types/dompurify": "^3.0.3",
