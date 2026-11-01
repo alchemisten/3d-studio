@@ -21,7 +21,7 @@ export interface SlotProviderProps {
  * except that they inherit nothing: put one provider per viewer / page.
  */
 export const SlotProvider = ({ slots, children }: SlotProviderProps) => {
-  const storeRef = useRef<SlotStore>();
+  const storeRef = useRef<SlotStore | undefined>(undefined);
   storeRef.current ??= new SlotStore();
   const value = useMemo(() => ({ store: storeRef.current as SlotStore, staticFills: slots ?? {} }), [slots]);
   return <SlotContext.Provider value={value}>{children}</SlotContext.Provider>;
