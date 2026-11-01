@@ -25,6 +25,24 @@ describe('ProjectList', () => {
     await waitFor(() => expect(screen.getByText('Nothing here')).toBeTruthy());
   });
 
+  it('filters with the search field and renders tags and overlay slots', async () => {
+    const many = [
+      { id: 'a', name: 'Alpha', source: 'a', tags: ['red'] },
+      { id: 'b', name: 'Beta', source: 'b' },
+      { id: 'c', name: 'Gamma', source: 'c' },
+      { id: 'd', name: 'Delta', source: 'd' },
+      { id: 'e', name: 'Epsilon', source: 'e' },
+    ];
+    render(<ProjectList adapter={createStaticAdapter(many)} slots={{ 'project-list.card.media.overlay': ({ project }) => <b>{`ov-${project.id}`}</b> }} />);
+    expect(await screen.findByText('red')).toBeTruthy();
+    expect(screen.getByText('ov-a')).toBeTruthy();
+    fireEvent.change(screen.getByTestId('ds-project-list-search'), { target: { value: 'gam' } });
+    expect(screen.queryByTestId('ds-project-card-a')).toBeNull();
+    expect(screen.getByTestId('ds-project-card-c')).toBeTruthy();
+    fireEvent.change(screen.getByTestId('ds-project-list-search'), { target: { value: 'zzz' } });
+    expect(screen.getByTestId('ds-project-list-no-results')).toBeTruthy();
+  });
+
   it('shows adapter errors', async () => {
     const adapter = { listProjects: () => Promise.reject(new Error('boom')), getProject: async () => undefined };
     render(<ProjectList adapter={adapter} />);

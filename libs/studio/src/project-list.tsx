@@ -1,14 +1,24 @@
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
+import { Box, Search } from 'lucide-react';
 import type { Project, ProjectAdapter } from '@schablone/3d-studio-core';
-import { Slot, SlotProvider, ThemeProvider, type SlotFillsInput, type Theme } from '@schablone/3d-studio-ui';
+import { Badge, Slot, SlotProvider, ThemeProvider, type SlotFillsInput, type Theme } from '@schablone/3d-studio-ui';
 import { useProjects } from './adapter-context';
 import './studio.css';
 
 declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
     'project-list.header': Record<string, never>;
+    /** Right side of the toolbar, next to the search field (filters, sort, view toggles). */
+    'project-list.toolbar': Record<string, never>;
     /** Whole card content. Replace to bring your own card. */
     'project-list.card': { project: Project };
+    /** The thumbnail area. Replace for custom previews, e.g. a live 3D preview. */
+    'project-list.card.media': { project: Project };
+    /** Overlay on the thumbnail: status badges, favorite buttons, … */
+    'project-list.card.media.overlay': { project: Project };
+    /** Below the description, e.g. tags or custom meta. Defaults to the project's tags. */
+    'project-list.card.meta': { project: Project };
+    /** Card footer, outside the clickable area, so it can hold buttons. */
     'project-list.card.footer': { project: Project };
     'project-list.empty': Record<string, never>;
     'project-list.loading': Record<string, never>;
@@ -23,18 +33,44 @@ export interface ProjectListProps {
   onSelect?: (project: Project) => void;
   /** Renders cards as links, e.g. `(p) => `/projects/${p.id}``. Takes precedence over `onSelect` for plain clicks. */
   getHref?: (project: Project) => string;
+  /** Show the search field. Defaults to true when the list has more than 4 projects. */
+  search?: boolean;
   theme?: Theme;
   slots?: SlotFillsInput;
   className?: string;
 }
 
+const matches = (project: Project, query: string) => {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return true;
+  return [project.name, project.description, ...(project.tags ?? [])].some((value) => value?.toLowerCase().includes(needle));
+};
+
 const Card = ({ project, onSelect, getHref }: Pick<ProjectListProps, 'onSelect' | 'getHref'> & { project: Project }) => {
   const content = (
     <Slot name="project-list.card" props={{ project }}>
-      {project.thumbnail && <img className="ds-project-card__thumbnail" src={project.thumbnail} alt="" loading="lazy" />}
+      <div className="ds-project-card__media">
+        <Slot name="project-list.card.media" props={{ project }}>
+          {project.thumbnail ? (
+            <img className="ds-project-card__thumbnail" src={project.thumbnail} alt="" loading="lazy" />
+          ) : (
+            <span className="ds-project-card__placeholder" aria-hidden="true">
+              <Box size={32} strokeWidth={1.5} />
+            </span>
+          )}
+        </Slot>
+        <div className="ds-project-card__overlay">
+          <Slot name="project-list.card.media.overlay" props={{ project }} />
+        </div>
+      </div>
       <div className="ds-project-card__body">
         <h3 className="ds-project-card__title">{project.name}</h3>
         {project.description && <p className="ds-project-card__description">{project.description}</p>}
+        <div className="ds-project-card__meta">
+          <Slot name="project-list.card.meta" props={{ project }}>
+            {project.tags?.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+          </Slot>
+        </div>
       </div>
     </Slot>
   );
@@ -60,8 +96,11 @@ const Card = ({ project, onSelect, getHref }: Pick<ProjectListProps, 'onSelect' 
   );
 };
 
-export const ProjectList = ({ adapter, onSelect, getHref, theme, slots, className }: ProjectListProps) => {
+export const ProjectList = ({ adapter, onSelect, getHref, search, theme, slots, className }: ProjectListProps) => {
   const { data, loading, error } = useProjects(adapter);
+  const [query, setQuery] = useState('');
+  const visible = useMemo(() => data?.filter((project) => matches(project, query)), [data, query]);
+  const showSearch = search ?? (data?.length ?? 0) > 4;
   let body: ReactNode;
   if (error) {
     body = (
@@ -83,10 +122,16 @@ export const ProjectList = ({ adapter, onSelect, getHref, theme, slots, classNam
         <Slot name="project-list.empty">No projects yet.</Slot>
       </div>
     );
+  } else if (!visible?.length) {
+    body = (
+      <div className="ds-project-list__message" data-testid="ds-project-list-no-results">
+        No projects match “{query}”.
+      </div>
+    );
   } else {
     body = (
       <ul className="ds-project-list__grid" data-testid="ds-project-list-grid">
-        {data.map((project) => (
+        {visible.map((project) => (
           <Card key={project.id} project={project} onSelect={onSelect} getHref={getHref} />
         ))}
       </ul>
@@ -99,6 +144,24 @@ export const ProjectList = ({ adapter, onSelect, getHref, theme, slots, classNam
           <header className="ds-project-list__header">
             <Slot name="project-list.header" />
           </header>
+          {(showSearch || slots?.['project-list.toolbar']) && (
+            <div className="ds-project-list__toolbar">
+              {showSearch && (
+                <label className="ds-project-list__search">
+                  <Search size={16} aria-hidden="true" />
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search projects"
+                    aria-label="Search projects"
+                    data-testid="ds-project-list-search"
+                  />
+                </label>
+              )}
+              <Slot name="project-list.toolbar" />
+            </div>
+          )}
           {body}
         </div>
       </SlotProvider>

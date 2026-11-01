@@ -146,6 +146,16 @@
   --ds-glass-shadow: var(--ds-menu-shadow);
 }
 
+/* Solid accent fills are not glass: drop the inner highlight so it doesn't read as a glitch. */
+.ds-checkbox[data-state='checked'],
+.ds-checkbox[data-state='indeterminate'],
+.ds-button[data-active],
+.ds-segmented__item[data-state='on'] {
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 /* Panel */
 .ds-panel {
   padding: var(--ds-panel-padding);
@@ -804,6 +814,7 @@
   background: var(--ds-glass-hover);
   color: var(--ds-color-text);
   font-size: var(--ds-font-size-1);
+  border: 1px solid var(--ds-glass-edge);
 }
 
 .ds-badge[data-tone='accent'] {

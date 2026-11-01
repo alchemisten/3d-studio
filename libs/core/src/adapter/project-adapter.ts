@@ -3,6 +3,8 @@ export interface Project {
   id: string;
   name: string;
   description?: string;
+  /** Short labels shown as badges on list cards and used by the list search. */
+  tags?: string[];
   /** Preview image URL for list cards. */
   thumbnail?: string;
   /** glTF/GLB URL for the viewer. */
