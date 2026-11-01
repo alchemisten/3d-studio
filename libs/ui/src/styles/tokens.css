@@ -115,7 +115,7 @@
   --ds-slider-track: var(--ds-color-neutral-300);
   --ds-slider-track-height: 4px;
   --ds-slider-thumb: var(--ds-color-surface);
-  --ds-slider-thumb-size: 1.25rem;
+  --ds-slider-thumb-size: 1rem;
 
   --ds-progress-track: var(--ds-color-neutral-300);
   --ds-progress-height: 0.375rem;

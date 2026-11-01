@@ -60,6 +60,16 @@ const DEFAULTS: PlaygroundSettings = {
   surfaceOpacity: 86,
 };
 
+const PRESETS: Array<{ name: string; settings: PlaygroundSettings }> = [
+  { name: 'Default', settings: DEFAULTS },
+  { name: 'Midnight', settings: { ...DEFAULTS, mode: 'dark', accent: '#00a3ff', radius: 10, surfaceOpacity: 80 } },
+  { name: 'Forest', settings: { ...DEFAULTS, accent: '#16a34a', radius: 12, gap: 10, panelPadding: 14 } },
+  { name: 'Sunset', settings: { ...DEFAULTS, mode: 'dark', accent: '#f59e0b', radius: 16, controlHeight: 40, iconButtonSize: 44, surfaceOpacity: 72 } },
+  { name: 'Violet', settings: { ...DEFAULTS, accent: '#a855f7', radius: 20, controlHeight: 40, panelPadding: 16 } },
+  { name: 'Compact', settings: { ...DEFAULTS, radius: 4, controlHeight: 30, iconButtonSize: 32, gap: 4, inset: 8, fontSize: 12, panelPadding: 8, surfaceOpacity: 94 } },
+  { name: 'Mono', settings: { ...DEFAULTS, mode: 'dark', accent: '#e5e7eb', radius: 0, surfaceOpacity: 92 } },
+];
+
 const toTokens = (s: PlaygroundSettings): TokenOverrides => ({
   'color-accent': s.accent,
   'color-focus': s.accent,
@@ -171,7 +181,7 @@ const Showcase = () => {
             )}
           </Row>
           <Row label="Stepper">{() => <Stepper label="Speed" value={step} onValueChange={setStep} min={0.25} max={4} step={0.25} format={(v) => `${v}×`} />}</Row>
-          <Row label="Color">{() => <ColorSelect label="Background" value={color} onValueChange={setColor} colors={SWATCHES} custom />}</Row>
+          <Field label="Color" orientation="vertical">{() => <ColorSelect label="Background" value={color} onValueChange={setColor} colors={SWATCHES} custom />}</Field>
         </div>
       </Panel>
 
@@ -228,6 +238,17 @@ const Playground = () => {
       <ThemeProvider mode="light" style={{ display: 'block', boxSizing: 'border-box', padding: 16, borderRight: '1px solid var(--ds-color-border)', overflow: 'auto', maxHeight: '100vh', minWidth: 0 }}>
         <h3 style={{ marginTop: 0 }}>Theme playground</h3>
         <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+          <Field label="Presets" orientation="vertical">
+            {() => (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="theme-presets">
+                {PRESETS.map((preset) => (
+                  <Button key={preset.name} active={JSON.stringify(preset.settings) === JSON.stringify(s)} onClick={() => setS(preset.settings)}>
+                    {preset.name}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </Field>
           <Field label="Mode" orientation="vertical">
             {() => (
               <SegmentedControl
