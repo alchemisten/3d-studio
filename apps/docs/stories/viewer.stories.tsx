@@ -3,6 +3,7 @@ import { Viewer } from '@schablone/3d-studio-core';
 import { IconButton, Overlay } from '@schablone/3d-studio-ui';
 import { skybox } from '@schablone/3d-studio-feature-skybox';
 import { wireframe } from '@schablone/3d-studio-feature-wireframe';
+import { lightScenarios } from '@schablone/3d-studio-feature-light-scenarios';
 import { cameraRotation } from '@schablone/3d-studio-feature-camera-rotation';
 
 const SOURCE = './models/milk-truck-draco/CesiumMilkTruck.gltf';
@@ -26,6 +27,20 @@ export const WithFeatures: Story = {
       skybox.use({ path: './environments/blurry', type: 'cube' }),
       wireframe,
       cameraRotation.use({ enabled: true, speed: 1 }),
+    ],
+  },
+};
+
+export const LightScenarios: Story = {
+  args: {
+    features: [
+      lightScenarios.use({
+        scenarios: [
+          { id: 'neutral', label: 'Neutral', lights: [{ type: 'ambient', intensity: 1.5 }, { type: 'directional', position: [5, 5, 5], intensity: 2 }] },
+          { id: 'warm', label: 'Warm', lights: [{ type: 'ambient', color: '#ffb36b', intensity: 1 }, { type: 'point', color: '#ff7a00', position: [-3, 2, 3], intensity: 60 }] },
+          { id: 'cold', label: 'Cold', lights: [{ type: 'ambient', color: '#6bb5ff', intensity: 1 }, { type: 'spot', color: '#3d7bff', position: [3, 5, 2], intensity: 120, angle: 0.8, penumbra: 0.5 }] },
+        ],
+      }),
     ],
   },
 };

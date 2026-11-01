@@ -105,3 +105,21 @@ export const MenuCheckboxItem = ({ label, checked, onChange, icon }: MenuCheckbo
     {label}
   </button>
 );
+
+export interface MenuRadioItemProps {
+  label: string;
+  checked: boolean;
+  onSelect: () => void;
+  icon?: ReactNode;
+}
+
+/** A single-choice row for `<Menu>` children. Keeps the menu open when selected. */
+export const MenuRadioItem = ({ label, checked, onSelect, icon }: MenuRadioItemProps) => (
+  <button type="button" role="menuitemradio" aria-checked={checked} className="ds-menu__item" onClick={onSelect}>
+    <span className="ds-menu__check" aria-hidden="true">
+      {checked ? '●' : ''}
+    </span>
+    {icon}
+    {label}
+  </button>
+);

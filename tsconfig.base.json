@@ -22,6 +22,7 @@
       "@schablone/3d-studio-feature-wireframe": ["libs/feature-wireframe/src/index.ts"],
       "@schablone/3d-studio-feature-camera-rotation": ["libs/feature-camera-rotation/src/index.ts"],
       "@schablone/3d-studio-feature-skybox": ["libs/feature-skybox/src/index.ts"],
+      "@schablone/3d-studio-feature-light-scenarios": ["libs/feature-light-scenarios/src/index.ts"],
       "@schablone/3d-studio-ui": ["libs/ui/src/index.ts"],
       "@schablone/3d-studio-react-website": ["libs/react-website/src/index.ts"],
       "@schablone/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"],

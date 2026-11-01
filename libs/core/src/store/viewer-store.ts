@@ -22,6 +22,8 @@ export interface ViewerState {
   gltf?: GLTF;
   /** On/off state of toggle features by feature id. */
   featureEnabled: Record<string, boolean>;
+  /** Free-form state of features by feature id, e.g. the active light scenario. */
+  featureState: Record<string, unknown>;
 }
 
 /**
@@ -29,7 +31,7 @@ export interface ViewerState {
  * `store.select$(s => s.status).subscribe(...)`, `store.on$('model:loaded')`.
  */
 export class ViewerStore {
-  private readonly stateSubject = new BehaviorSubject<ViewerState>({ status: 'idle', featureEnabled: {} });
+  private readonly stateSubject = new BehaviorSubject<ViewerState>({ status: 'idle', featureEnabled: {}, featureState: {} });
   private readonly eventSubject = new Subject<ViewerEvent>();
 
   public readonly state$: Observable<ViewerState> = this.stateSubject.asObservable();
@@ -50,6 +52,10 @@ export class ViewerStore {
     if (this.getState().featureEnabled[id] !== enabled) {
       this.setState({ featureEnabled: { ...this.getState().featureEnabled, [id]: enabled } });
     }
+  }
+
+  public setFeatureState(id: string, value: unknown): void {
+    this.setState({ featureState: { ...this.getState().featureState, [id]: value } });
   }
 
   public select$<T>(selector: (state: ViewerState) => T): Observable<T> {
