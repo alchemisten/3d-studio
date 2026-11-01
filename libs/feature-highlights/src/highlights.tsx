@@ -51,6 +51,7 @@ interface HighlightsState {
 
 const FEATURE_ID = 'highlights';
 const HIT_RADIUS = 16;
+const DRAG_LEAVE_PX = 8;
 const HIT_RADIUS_TOUCH = 28;
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
@@ -210,12 +211,35 @@ const HighlightsScene = () => {
   }, [enabled, focusedId, release]);
 
   useEffect(() => {
+    // Dragging past a small threshold leaves the focused highlight, like the old studio.
+    let origin: { x: number; y: number } | null = null;
     const cancel = () => {
       goal.current = null;
     };
+    const down = (event: PointerEvent) => {
+      origin = { x: event.clientX, y: event.clientY };
+    };
+    const move = (event: PointerEvent) => {
+      if (origin && latest.current.focusedId && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > DRAG_LEAVE_PX) {
+        origin = null;
+        release();
+      }
+    };
+    const up = () => {
+      origin = null;
+    };
+    const canvas = gl.domElement;
+    canvas.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
     controls?.addEventListener('start', cancel);
-    return () => controls?.removeEventListener('start', cancel);
-  }, [controls]);
+    return () => {
+      canvas.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      controls?.removeEventListener('start', cancel);
+    };
+  }, [controls, gl, release]);
 
   useEffect(() => {
     const currentTarget = () => controls?.target.clone() ?? new Vector3();
