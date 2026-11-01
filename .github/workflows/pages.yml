@@ -63,3 +63,13 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -m "pages: update $TARGETS ($GITHUB_SHA)"
           git push origin gh-pages
+      - name: Comment preview link
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: |
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          gh pr comment "$PR" --edit-last --create-if-none \
+            --body "Storybook preview: https://${owner}.github.io/${repo}/pr/${PR}/ (updated for ${GITHUB_SHA::7}, removed when the PR closes)"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
