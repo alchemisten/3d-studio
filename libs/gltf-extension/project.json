@@ -36,7 +36,7 @@
           "externalDependencies": ["jest"]
         }
       ],
-      "outputs": ["{workspaceRoot}/coverage/libs/gltf-extension", "{workspaceRoot}\\coverage\\libs\\viewer-core"],
+      "outputs": ["{workspaceRoot}/coverage/libs/gltf-extension"],
       "options": {
         "passWithNoTests": true
       },

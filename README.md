@@ -5,22 +5,31 @@ based on [Three JS](https://threejs.org).
 
 ## Packages
 
-This mono repo contains the following packages. See their individual READMEs 
-for more details:
-* [Viewer Core](libs/viewer-core/README.md): 
-  Contains the actual viewer and the core features.
-* [Viewer UI](libs/viewer-ui/README.md): 
-  Contains a UI for the viewer and the core features.
-* [React Website](libs/react-website/README.md): 
-  Contains a React Website which can be used with a single component with
-  minimal configuration.
-* [Example](apps/3d-studio-example/README.md): 
-  Contains an example application which is used mainly for development, but
-  also contains examples for the usage of the viewer and the viewer UI.
-* GLTF Extension: Contains the definition for the *.alcm file object which
-  extends the default *.gltf file definition with all configuration options
-  necessary for the viewer.
-* GLTF Extension Validator: TODO
+| Package | Purpose |
+| --- | --- |
+| `@schablone/3d-studio-ui` | Style tokens (`--ds-*`), `ThemeProvider`, slot registry, overlay primitives |
+| `@schablone/3d-studio-core` | `<Viewer>`, viewer store, `defineFeature()`, `ProjectAdapter` |
+| `@schablone/3d-studio-feature-*` | `skybox`, `wireframe`, `camera-rotation`, `light-scenarios`, `animation`, `highlights` |
+| `@schablone/3d-studio` | `<Studio>`, `<ProjectList>`, `<ProjectDetail>`, REST adapter, default feature bundle |
+
+Also in this repo: the glTF extension definition (`libs/gltf-extension`) and
+its validator (`libs/gltf-extension-validator`), the Storybook and demo site
+(`apps/docs`, published to GitHub Pages) and a minimal Vite app
+(`apps/example`).
+
+## Quick start
+
+```tsx
+import { Studio, createRestAdapter } from '@schablone/3d-studio';
+import '@schablone/3d-studio/style.css';
+
+<Studio adapter={createRestAdapter({ baseUrl: 'https://api.example.com' })} />;
+```
+
+Break out at any level: use `<ProjectList>` and `<ProjectDetail>` with your
+router, `<Viewer>` with your own `features`, or the primitives from `ui`.
+Customize with CSS variables, `ds-*` classes, `data-testid` hooks and slots.
+See `docs/v1-plan.md` for the design and `MIGRATION.md` for upgrading from 0.x.
 
 ## Development
 

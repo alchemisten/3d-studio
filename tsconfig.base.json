@@ -26,10 +26,7 @@
       "@schablone/3d-studio-feature-highlights": ["libs/feature-highlights/src/index.ts"],
       "@schablone/3d-studio-feature-animation": ["libs/feature-animation/src/index.ts"],
       "@schablone/3d-studio-feature-light-scenarios": ["libs/feature-light-scenarios/src/index.ts"],
-      "@schablone/3d-studio-ui": ["libs/ui/src/index.ts"],
-      "@schablone/3d-studio-react-website": ["libs/react-website/src/index.ts"],
-      "@schablone/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"],
-      "@schablone/3d-studio-viewer-ui": ["libs/viewer-ui/src/index.ts"]
+      "@schablone/3d-studio-ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

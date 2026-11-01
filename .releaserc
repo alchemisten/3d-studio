@@ -6,14 +6,14 @@
     [
       "@semantic-release/npm",
       {
-        "publish": false
+        "npmPublish": false
       }
     ],
     "@semantic-release/github",
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=3d-studio-example,gltf-extension,gltf-extension-validator"
+        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=example,docs,gltf-extension,gltf-extension-validator"
       }
     ],
     [

@@ -37,8 +37,7 @@
         }
       ],
       "outputs": [
-        "{workspaceRoot}/coverage/libs/gltf-extension-validator",
-        "{workspaceRoot}\\coverage\\libs\\viewer-core"
+        "{workspaceRoot}/coverage/libs/gltf-extension-validator"
       ],
       "options": {
         "passWithNoTests": true

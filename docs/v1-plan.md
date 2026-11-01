@@ -78,8 +78,8 @@ Registered through `<Viewer features={[...]}>`. Config precedence: props > adapt
 | 2 | `core`: `<Viewer>`, store, feature API, glTF config reader, adapter interface | package + tests |
 | 3 | **Check-in:** feature ports, one by one | `feature-*` packages |
 | 4 | `studio`: list, detail, REST adapter, `<Studio>` | package |
-| 5 | Example apps (Vite, TanStack Start + Router), Storybook docs | apps |
-| 6 | Remove `viewer-core`, `viewer-ui`, `react-website`; migration notes; fix release (`npmPublish: false`, trusted publishing) | v1.0.0 |
+| 5 | Example apps (Vite done; TanStack Start + Router open), Storybook docs | apps |
+| 6 | Remove `viewer-core`, `viewer-ui`, `react-website`; migration notes; fix release (`npmPublish: false`, trusted publishing) | v1.0.0 (old packages removed, `.releaserc` fixed; npmjs trusted publishing still to be configured by an owner) |
 
 ## Check-in points
 

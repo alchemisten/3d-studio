@@ -43,7 +43,7 @@
     "appsDir": "apps",
     "libsDir": "libs"
   },
-  "defaultProject": "3d-studio-example",
+  "defaultProject": "example",
   "generators": {
     "@nx/web:application": {
       "style": "css",
