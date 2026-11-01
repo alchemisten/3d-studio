@@ -1,0 +1,1 @@
+import{j as s}from"./iframe-CQ_7gAK7.js";import{a as i}from"./panel-C9VX04Zq.js";const m=({orientation:a="horizontal",label:o,className:r,...t})=>s.jsx("div",{...t,role:"toolbar","aria-label":o,"aria-orientation":a,className:i("ds-toolbar",r),"data-orientation":a});export{m as T};
