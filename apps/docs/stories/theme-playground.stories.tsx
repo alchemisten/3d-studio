@@ -49,7 +49,7 @@ interface PlaygroundSettings {
 
 const DEFAULTS: PlaygroundSettings = {
   mode: 'light',
-  accent: '#2f6fed',
+  accent: '',
   radius: 8,
   controlHeight: 36,
   gap: 8,
@@ -67,12 +67,11 @@ const PRESETS: Array<{ name: string; settings: PlaygroundSettings }> = [
   { name: 'Sunset', settings: { ...DEFAULTS, mode: 'dark', accent: '#f59e0b', radius: 16, controlHeight: 40, iconButtonSize: 44, surfaceOpacity: 72 } },
   { name: 'Violet', settings: { ...DEFAULTS, accent: '#a855f7', radius: 20, controlHeight: 40, panelPadding: 16 } },
   { name: 'Compact', settings: { ...DEFAULTS, radius: 4, controlHeight: 30, iconButtonSize: 32, gap: 4, inset: 8, fontSize: 12, panelPadding: 8, surfaceOpacity: 94 } },
-  { name: 'Mono', settings: { ...DEFAULTS, mode: 'dark', accent: '#e5e7eb', radius: 0, surfaceOpacity: 92 } },
+  { name: 'Mono', settings: { ...DEFAULTS, mode: 'dark', accent: '', radius: 0, surfaceOpacity: 92 } },
 ];
 
 const toTokens = (s: PlaygroundSettings): TokenOverrides => ({
-  'color-accent': s.accent,
-  'color-focus': s.accent,
+  ...(s.accent ? { 'color-accent': s.accent, 'color-focus': s.accent, 'color-accent-contrast': '#ffffff' } : {}),
   'radius-control': `${s.radius}px`,
   'radius-surface': `${s.radius + 4}px`,
   'control-height': `${s.controlHeight}px`,
@@ -263,7 +262,7 @@ const Playground = () => {
             )}
           </Field>
           <Field label="Accent" orientation="vertical">
-            {() => <ColorSelect label="Accent" value={s.accent} onValueChange={(v) => set('accent', v)} colors={SWATCHES} custom />}
+            {() => <ColorSelect label="Accent (empty = neutral)" value={s.accent} onValueChange={(v) => set('accent', v)} colors={SWATCHES} custom />}
           </Field>
           {slider('radius', 'Corner radius', 0, 24, 'px')}
           {slider('controlHeight', 'Control height', 28, 56, 'px')}
