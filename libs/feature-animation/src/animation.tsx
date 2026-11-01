@@ -212,6 +212,16 @@ const AnimationScene = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.seekRequest?.n]);
 
+  // Pause/play commands must take effect before the mixer advances this frame, not after React re-renders.
+  useFrame(() => {
+    const status = currentState(viewer).status;
+    Object.entries(actions).forEach(([name, action]) => {
+      if (action && status[name] && status[name] !== 'stopped') {
+        action.paused = status[name] === 'paused' || !enabled;
+      }
+    });
+  }, -1);
+
   useFrame(() => {
     const entries = Object.entries(actions).filter(([, a]) => a);
     const playingNow = (name: string) => (state.status[name] ?? 'stopped') === 'playing' && enabled;
