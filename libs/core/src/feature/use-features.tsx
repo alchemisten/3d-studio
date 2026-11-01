@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react';
-import { useOverlay, useSlotContext, type SlotFill, type SlotFillInput } from '@schablone/3d-studio-ui';
+import { useEffect, useMemo, type ReactNode } from 'react';
+import { useViewer as useViewerStore } from '../store';
+import { MenuCheckboxItem, useOverlay, useSlotContext, type SlotFill, type SlotFillInput } from '@schablone/3d-studio-ui';
 import { useViewer, useViewerState } from '../store';
 import { resolveFeatureConfig, toInstance, type FeatureContext, type FeatureInput } from './feature';
 
@@ -33,7 +34,7 @@ export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: R
         adapter: featureConfig?.[feature.id] as object | undefined,
         gltfExtensions: extensions,
       });
-      return { id: feature.id, instance, context: { config, viewer, overlay } };
+      return { id: feature.id, instance, context: { id: feature.id, config, viewer, overlay } };
     });
   }, [gltf, inputs, featureConfig, extensions, viewer, overlay]);
 
@@ -46,13 +47,27 @@ export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: R
         const normalized = normalize(input as SlotFillInput);
         cleanups.push(slotStore.add(name, { id: `feature:${id}`, ...normalized } as SlotFill));
       });
+      if (feature.toggle) {
+        const { label, icon, order } = feature.toggle;
+        if (!(id in viewer.getState().featureEnabled)) {
+          viewer.setFeatureEnabled(id, Boolean((context.config as { enabled?: boolean }).enabled));
+        }
+        cleanups.push(
+          slotStore.add('viewer.options', {
+            id: `toggle:${id}`,
+            mode: 'append',
+            order: order ?? 0,
+            content: <ToggleItem featureId={id} label={label} icon={icon} />,
+          }),
+        );
+      }
       const cleanup = feature.setup?.(context);
       if (cleanup) {
         cleanups.push(cleanup);
       }
     }
     return () => cleanups.forEach((fn) => fn());
-  }, [resolved, slotStore]);
+  }, [resolved, slotStore, viewer]);
 
   return resolved;
 };
@@ -61,3 +76,11 @@ const normalize = (input: SlotFillInput) =>
   typeof input === 'object' && input !== null && 'content' in input && !('$$typeof' in input)
     ? { mode: input.mode ?? 'append', order: input.order ?? 0, content: input.content }
     : { mode: 'append' as const, order: 0, content: input };
+
+const ToggleItem = ({ featureId, label, icon }: { featureId: string; label: string; icon?: ReactNode }) => {
+  const viewer = useViewerStore();
+  const checked = useViewerState((s) => s.featureEnabled[featureId] ?? false);
+  return (
+    <MenuCheckboxItem label={label} icon={icon} checked={checked} onChange={(v) => viewer.setFeatureEnabled(featureId, v)} />
+  );
+};

@@ -181,3 +181,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.ds-menu__check {
+  display: inline-block;
+  width: 1em;
+  color: var(--ds-color-accent);
+}

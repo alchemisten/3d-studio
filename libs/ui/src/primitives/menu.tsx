@@ -81,3 +81,27 @@ export const Menu = ({ label, icon, items, children, className, placement = 'bot
     </div>
   );
 };
+
+export interface MenuCheckboxItemProps {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  icon?: ReactNode;
+}
+
+/** A toggle row for `<Menu>` children. Keeps the menu open when toggled. */
+export const MenuCheckboxItem = ({ label, checked, onChange, icon }: MenuCheckboxItemProps) => (
+  <button
+    type="button"
+    role="menuitemcheckbox"
+    aria-checked={checked}
+    className="ds-menu__item"
+    onClick={() => onChange(!checked)}
+  >
+    <span className="ds-menu__check" aria-hidden="true">
+      {checked ? '✓' : ''}
+    </span>
+    {icon}
+    {label}
+  </button>
+);

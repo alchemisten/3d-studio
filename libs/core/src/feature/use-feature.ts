@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import { useViewerState } from '../store';
 import type { FeatureContext } from './feature';
 
 export const FeatureReactContext = createContext<FeatureContext<any> | null>(null);
@@ -10,4 +11,10 @@ export const useFeature = <C extends object = Record<string, unknown>>(): Featur
     throw new Error('useFeature must be used inside a feature scene.');
   }
   return ctx as FeatureContext<C>;
+};
+
+/** Reactive on/off state of the current feature (see `FeatureDefinition.toggle`). */
+export const useFeatureEnabled = (): boolean => {
+  const { id } = useFeature();
+  return useViewerState((s) => s.featureEnabled[id] ?? false);
 };

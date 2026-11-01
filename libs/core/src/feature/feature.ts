@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import type { OverlayApi, SlotFillsInput } from '@schablone/3d-studio-ui';
 import type { ViewerStore } from '../store';
 
@@ -8,6 +8,7 @@ export interface ConfigSchema<C> {
 }
 
 export interface FeatureContext<C> {
+  id: string;
   /** Resolved, validated config (props > adapter > glTF extension > defaults). */
   config: C;
   viewer: ViewerStore;
@@ -21,6 +22,8 @@ export interface FeatureDefinition<C extends object = Record<string, never>> {
   defaults?: Partial<C>;
   /** Name of the glTF extension this feature reads its config from (root `extensions`). */
   gltf?: { extension: string };
+  /** Makes the feature user-toggleable via the shared 'View options' menu. Initial state comes from `config.enabled`. */
+  toggle?: { label: string; icon?: ReactNode; order?: number };
   /** Rendered inside the `<Canvas>`. Use `useFeature()` to read config. */
   scene?: ComponentType;
   /** Fills for slots anywhere in the viewer (overlay regions, `viewer.loading`, ...). */

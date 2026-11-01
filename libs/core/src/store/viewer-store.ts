@@ -20,6 +20,8 @@ export interface ViewerState {
   status: 'idle' | 'loading' | 'ready' | 'error';
   error?: Error;
   gltf?: GLTF;
+  /** On/off state of toggle features by feature id. */
+  featureEnabled: Record<string, boolean>;
 }
 
 /**
@@ -27,7 +29,7 @@ export interface ViewerState {
  * `store.select$(s => s.status).subscribe(...)`, `store.on$('model:loaded')`.
  */
 export class ViewerStore {
-  private readonly stateSubject = new BehaviorSubject<ViewerState>({ status: 'idle' });
+  private readonly stateSubject = new BehaviorSubject<ViewerState>({ status: 'idle', featureEnabled: {} });
   private readonly eventSubject = new Subject<ViewerEvent>();
 
   public readonly state$: Observable<ViewerState> = this.stateSubject.asObservable();
@@ -42,6 +44,12 @@ export class ViewerStore {
 
   public setState(patch: Partial<ViewerState>): void {
     this.stateSubject.next({ ...this.stateSubject.value, ...patch });
+  }
+
+  public setFeatureEnabled(id: string, enabled: boolean): void {
+    if (this.getState().featureEnabled[id] !== enabled) {
+      this.setState({ featureEnabled: { ...this.getState().featureEnabled, [id]: enabled } });
+    }
   }
 
   public select$<T>(selector: (state: ViewerState) => T): Observable<T> {

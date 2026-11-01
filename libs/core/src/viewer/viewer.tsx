@@ -1,8 +1,11 @@
 import { Suspense, useEffect, useMemo, type CSSProperties, type ReactNode } from 'react';
 import { Canvas, type CanvasProps } from '@react-three/fiber';
 import {
+  Menu,
   Overlay,
   Slot,
+  useSlotFills,
+  type OverlayRegion,
   SlotProvider,
   ThemeProvider,
   type SlotFillsInput,
@@ -18,6 +21,8 @@ declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
     'viewer.loading': Record<string, never>;
     'viewer.error': { error: Error | undefined };
+    /** Rows of the 'View options' menu; toggle features add `MenuCheckboxItem`s here. */
+    'viewer.options': Record<string, never>;
   }
 }
 
@@ -42,6 +47,8 @@ export interface ViewerProps {
   canvasChildren?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** Where the shared 'View options' menu is placed (default top-right), or `false` to hide it. */
+  viewOptions?: { region?: OverlayRegion; order?: number; label?: string } | false;
   /** Overlay items, e.g. `<Overlay.TopRight>...</Overlay.TopRight>`. */
   children?: ReactNode;
 }
@@ -57,6 +64,30 @@ const ViewerError = () => {
   );
 };
 
+const ViewOptions = ({ region = 'top-right', order = 100, label = 'View options' }: { region?: OverlayRegion; order?: number; label?: string }) => {
+  const hasItems = useSlotFills('viewer.options').length > 0;
+  const Region = REGION_COMPONENTS[region];
+  return hasItems ? (
+    <Region id="viewer.options" order={order}>
+      <Menu label={label} icon="⚙" placement={region.endsWith('right') ? 'bottom-end' : 'bottom-start'}>
+        <Slot name="viewer.options" />
+      </Menu>
+    </Region>
+  ) : null;
+};
+
+const REGION_COMPONENTS = {
+  'top-left': Overlay.TopLeft,
+  'top-center': Overlay.TopCenter,
+  'top-right': Overlay.TopRight,
+  'middle-left': Overlay.MiddleLeft,
+  center: Overlay.Center,
+  'middle-right': Overlay.MiddleRight,
+  'bottom-left': Overlay.BottomLeft,
+  'bottom-center': Overlay.BottomCenter,
+  'bottom-right': Overlay.BottomRight,
+} satisfies Record<OverlayRegion, unknown>;
+
 const ViewerLayout = ({
   source,
   features,
@@ -65,6 +96,7 @@ const ViewerLayout = ({
   draco,
   controls,
   canvasChildren,
+  viewOptions,
   className,
   style,
   children,
@@ -104,7 +136,10 @@ const ViewerLayout = ({
           </ViewerContext.Provider>
         </Canvas>
       </ViewerErrorBoundary>
-      <Overlay>{children}</Overlay>
+      <Overlay>
+        {children}
+        {viewOptions !== false && <ViewOptions {...viewOptions} />}
+      </Overlay>
       {(status === 'idle' || status === 'loading') && (
         <div className="ds-viewer__message">
           <Slot name="viewer.loading">Loading…</Slot>

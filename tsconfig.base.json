@@ -19,6 +19,8 @@
     "baseUrl": ".",
     "paths": {
       "@schablone/3d-studio-core": ["libs/core/src/index.ts"],
+      "@schablone/3d-studio-feature-wireframe": ["libs/feature-wireframe/src/index.ts"],
+      "@schablone/3d-studio-feature-camera-rotation": ["libs/feature-camera-rotation/src/index.ts"],
       "@schablone/3d-studio-feature-skybox": ["libs/feature-skybox/src/index.ts"],
       "@schablone/3d-studio-ui": ["libs/ui/src/index.ts"],
       "@schablone/3d-studio-react-website": ["libs/react-website/src/index.ts"],
