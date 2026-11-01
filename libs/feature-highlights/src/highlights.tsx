@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { BufferGeometry, Color, Float32BufferAttribute, Line, LineBasicMaterial, Mesh, PerspectiveCamera, Vector3 } from 'three';
+import { BufferGeometry, Color, Float32BufferAttribute, Line, LineBasicMaterial, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three';
 import type { Material, Object3D } from 'three';
 import {
   defineFeature,
@@ -59,6 +59,9 @@ const HIT_RADIUS = 28;
 const PAUSE_RADIUS = 110;
 const DRAG_LEAVE_PX = 8;
 const HIT_RADIUS_TOUCH = 40;
+const OCCLUSION_INTERVAL = 0.1;
+// Stop the occlusion ray slightly short so anchors lying on a surface do not occlude themselves.
+const OCCLUSION_MARGIN = 0.98;
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
 const hotspotRegistry = new WeakMap<ViewerStore, Map<string, HTMLElement>>();
@@ -173,6 +176,7 @@ const HighlightsScene = () => {
   const pausedClips = useRef<string[]>([]);
   const nearId = useRef<string | null>(null);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
+  const occlusion = useRef({ raycaster: new Raycaster(), direction: new Vector3(), elapsed: Infinity, hidden: new Set<string>() });
   const gl = useThree((s) => s.gl);
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
   const pointer = useRef<{ x: number; y: number } | null>(null);
@@ -312,16 +316,36 @@ const HighlightsScene = () => {
     const animation = animationSnapshot(viewer);
     const { world, target } = tmp.current;
 
+    const occ = occlusion.current;
+    occ.elapsed += delta;
+    const recheck = occ.elapsed >= OCCLUSION_INTERVAL;
+    if (recheck) {
+      occ.elapsed = 0;
+    }
     const visiblePoints: Array<{ id: string; x: number; y: number }> = [];
     hotspotsOf(viewer).forEach((element, id) => {
       const highlight = config.highlights.find((h) => h.id === id);
       if (!highlight) {
         return;
       }
-      resolveAnchor(highlight.anchor, root, world).project(camera);
+      resolveAnchor(highlight.anchor, root, world);
+      if (recheck && root && enabled) {
+        const distance = world.distanceTo(camera.position);
+        occ.direction.copy(world).sub(camera.position).normalize();
+        occ.raycaster.set(camera.position, occ.direction);
+        occ.raycaster.far = distance * OCCLUSION_MARGIN;
+        const blocked = occ.raycaster.intersectObject(root, true).length > 0;
+        if (blocked) {
+          occ.hidden.add(id);
+        } else {
+          occ.hidden.delete(id);
+        }
+      }
+      world.project(camera);
       const hidden = !enabled || world.z > 1 || !isHighlightVisible(highlight, animation);
       element.toggleAttribute('data-hidden', hidden);
       element.setAttribute('data-positioned', '');
+      element.toggleAttribute('data-occluded', occ.hidden.has(id));
       const x = (world.x * 0.5 + 0.5) * size.width;
       const y = (-world.y * 0.5 + 0.5) * size.height;
       element.style.setProperty('--ds-hotspot-x', `${x}px`);

@@ -27,6 +27,12 @@
   --ds-hotspot-scale: 1.15;
 }
 
+/* Behind geometry: still visible and clickable, but dimmed */
+.ds-hotspot[data-occluded]:not([data-focused]) {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
 .ds-hotspot:focus-visible {
   pointer-events: auto;
   outline: 2px solid var(--ds-color-focus);
