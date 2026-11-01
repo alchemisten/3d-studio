@@ -12,8 +12,8 @@
   color: var(--ds-hotspot-color, var(--ds-color-accent));
   cursor: pointer;
   pointer-events: none;
-  transform: translate(var(--ds-hotspot-x, 0), var(--ds-hotspot-y, 0)) translate(-50%, -50%);
-  transition: background var(--ds-duration-fast), scale var(--ds-duration-fast);
+  transform: translate(var(--ds-hotspot-x, 0), var(--ds-hotspot-y, 0)) translate(-50%, -50%) scale(var(--ds-hotspot-scale, 1));
+  transition: background var(--ds-duration-fast);
   will-change: transform;
 }
 
@@ -24,7 +24,7 @@
 .ds-hotspot[data-hover],
 .ds-hotspot[data-focused] {
   background: color-mix(in srgb, var(--ds-hotspot-color, var(--ds-color-accent)) 55%, transparent);
-  scale: 1.15;
+  --ds-hotspot-scale: 1.15;
 }
 
 .ds-hotspot:focus-visible {
@@ -45,6 +45,11 @@
 
 .ds-highlight-detail {
   min-width: 14rem;
+}
+
+/* Centered across the whole overlay, independent of side panel widths */
+.ds-overlay__region[data-region='bottom-center'] {
+  grid-area: 4 / 1 / 5 / 4;
 }
 
 /* Prev/next selector with popover list */
@@ -127,6 +132,10 @@
 }
 
 @media (max-width: 40rem) {
+  /* Own row below the detail panel so the arrows are never covered */
+  .ds-overlay__region[data-region='bottom-center'] {
+    grid-area: 5 / 1 / 6 / 4;
+  }
   .ds-highlight-select__current {
     display: none;
   }
