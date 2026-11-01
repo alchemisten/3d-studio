@@ -293,7 +293,7 @@ const Playground = () => {
           </div>
         </div>
       </ThemeProvider>
-      <ThemeProvider theme={theme} style={{ display: 'block', padding: 24, background: 'var(--ds-color-surface-raised)', color: 'var(--ds-color-text)', fontSize: 'var(--ds-font-size-2)' }}>
+      <ThemeProvider theme={theme} style={{ display: 'block', padding: 24, background: 'radial-gradient(circle at 15% 10%, #7dd3fc 0, transparent 40%), radial-gradient(circle at 85% 30%, #f9a8d4 0, transparent 40%), radial-gradient(circle at 40% 90%, #fde68a 0, transparent 45%), var(--ds-color-surface-raised)', color: 'var(--ds-color-text)', fontSize: 'var(--ds-font-size-2)' }}>
         <Showcase />
       </ThemeProvider>
     </div>

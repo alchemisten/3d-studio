@@ -7,6 +7,7 @@ export type TokenName =
   | `radius-${string}`
   | `font-${string}`
   | `shadow-${string}`
+  | `glass-${string}`
   | `duration-${string}`
   | `icon-button-${string}`
   | `panel-${string}`
