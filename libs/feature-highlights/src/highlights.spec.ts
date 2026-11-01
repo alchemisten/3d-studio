@@ -1,7 +1,7 @@
 import { resolveFeatureConfig } from '@schablone/3d-studio-core';
 import { Group, Object3D, Vector3 } from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { highlightLabel, runCommand, highlights, isHighlightVisible, resolveAnchor, type Highlight } from './index';
+import { highlightLabel, pickHotspot, runCommand, highlights, isHighlightVisible, resolveAnchor, type Highlight } from './index';
 
 const base: Highlight = { id: 'h', anchor: { position: [0, 0, 0] }, camera: { position: [1, 1, 1] } };
 
@@ -73,6 +73,22 @@ describe('highlights feature', () => {
     expect(Object.keys(slots({ config }))).toEqual(['viewer.layer', 'overlay.bottom-left']);
     const without = resolveFeatureConfig({ feature: highlights, props: { detail: false } });
     expect(Object.keys(slots({ config: without }))).toEqual(['viewer.layer']);
+  });
+});
+
+describe('pickHotspot', () => {
+  const points = [
+    { id: 'a', x: 100, y: 100 },
+    { id: 'b', x: 130, y: 100 },
+  ];
+  it('picks the nearest point within the radius', () => {
+    expect(pickHotspot(points, { x: 120, y: 100 }, 16, null)).toBe('b');
+    expect(pickHotspot(points, { x: 300, y: 300 }, 16, null)).toBeNull();
+    expect(pickHotspot(points, null, 16, 'a')).toBeNull();
+  });
+  it('keeps the current hotspot while the pointer is just outside the radius', () => {
+    expect(pickHotspot(points, { x: 100, y: 120 }, 16, 'a')).toBe('a');
+    expect(pickHotspot(points, { x: 100, y: 130 }, 16, 'a')).toBeNull();
   });
 });
 

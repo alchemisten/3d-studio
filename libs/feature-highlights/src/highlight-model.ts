@@ -99,6 +99,32 @@ export const resolveAnchor = (anchor: Anchor, root: Object3D | undefined, out: V
   return node.localToWorld(out.set(...(anchor.offset ?? [0, 0, 0])));
 };
 
+/** Nearest point within `radius`; `sticky` keeps its point while still within `radius + hysteresis`. */
+export const pickHotspot = (
+  points: Array<{ id: string; x: number; y: number }>,
+  pointer: { x: number; y: number } | null,
+  radius: number,
+  sticky: string | null,
+  hysteresis = 6,
+): string | null => {
+  if (!pointer) {
+    return null;
+  }
+  const dist = (p: { x: number; y: number }) => Math.hypot(p.x - pointer.x, p.y - pointer.y);
+  const current = sticky ? points.find((p) => p.id === sticky) : undefined;
+  if (current && dist(current) <= radius + hysteresis) {
+    return current.id;
+  }
+  let best: { id: string; d: number } | null = null;
+  for (const point of points) {
+    const d = dist(point);
+    if (d <= radius && (!best || d < best.d)) {
+      best = { id: point.id, d };
+    }
+  }
+  return best?.id ?? null;
+};
+
 export const isHighlightVisible = (highlight: Highlight, animation: AnimationSnapshot | undefined): boolean => {
   const { visibility } = highlight;
   if (!visibility || !animation) {

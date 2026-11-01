@@ -11,7 +11,7 @@
   background: color-mix(in srgb, var(--ds-hotspot-color, var(--ds-color-accent)) 25%, transparent);
   color: var(--ds-hotspot-color, var(--ds-color-accent));
   cursor: pointer;
-  pointer-events: auto;
+  pointer-events: none;
   transform: translate(var(--ds-hotspot-x, 0), var(--ds-hotspot-y, 0)) translate(-50%, -50%);
   transition: background var(--ds-duration-fast), scale var(--ds-duration-fast);
   will-change: transform;
@@ -21,13 +21,14 @@
   border-radius: 25%;
 }
 
-.ds-hotspot:hover,
+.ds-hotspot[data-hover],
 .ds-hotspot[data-focused] {
   background: color-mix(in srgb, var(--ds-hotspot-color, var(--ds-color-accent)) 55%, transparent);
   scale: 1.15;
 }
 
 .ds-hotspot:focus-visible {
+  pointer-events: auto;
   outline: 2px solid var(--ds-color-focus);
   outline-offset: 2px;
 }

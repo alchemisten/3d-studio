@@ -12,7 +12,7 @@ import {
 } from '@schablone/3d-studio-core';
 import { IconButton, Panel, Slot } from '@schablone/3d-studio-ui';
 import './highlights.css';
-import { highlightLabel, isHighlightVisible, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
+import { highlightLabel, isHighlightVisible, pickHotspot, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
 
 declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
@@ -50,6 +50,8 @@ interface HighlightsState {
 }
 
 const FEATURE_ID = 'highlights';
+const HIT_RADIUS = 16;
+const HIT_RADIUS_TOUCH = 28;
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
 const hotspotRegistry = new WeakMap<ViewerStore, Map<string, HTMLElement>>();
@@ -159,6 +161,46 @@ const HighlightsScene = () => {
   const goal = useRef<Goal | null>(null);
   const saved = useRef<Pose | null>(null);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
+  const gl = useThree((s) => s.gl);
+  // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+  const points = useRef<Array<{ id: string; x: number; y: number }>>([]);
+  const hovered = useRef<string | null>(null);
+  const latest = useRef({ focusedId, config });
+  latest.current = { focusedId, config };
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const local = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      const onViewer = event.target === canvas || (event.target as Element | null)?.closest?.('.ds-hotspot');
+      return inside && onViewer ? { x: event.clientX - rect.left, y: event.clientY - rect.top } : null;
+    };
+    const move = (event: PointerEvent) => {
+      pointer.current = local(event);
+    };
+    const down = (event: PointerEvent) => {
+      const at = local(event);
+      pointer.current = at;
+      const radius = event.pointerType === 'touch' ? HIT_RADIUS_TOUCH : HIT_RADIUS;
+      const id = pickHotspot(points.current, at, radius, hovered.current);
+      if (id) {
+        viewer.emit('highlight:focus', { id: latest.current.focusedId === id ? null : id });
+      }
+    };
+    const leave = () => {
+      pointer.current = null;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerdown', down);
+    document.addEventListener('pointerleave', leave);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerdown', down);
+      document.removeEventListener('pointerleave', leave);
+    };
+  }, [gl, viewer]);
   const focused = config.highlights.find((h) => h.id === focusedId);
 
   useEffect(() => {
@@ -228,6 +270,7 @@ const HighlightsScene = () => {
     const animation = animationSnapshot(viewer);
     const { world, target } = tmp.current;
 
+    const visiblePoints: Array<{ id: string; x: number; y: number }> = [];
     hotspotsOf(viewer).forEach((element, id) => {
       const highlight = config.highlights.find((h) => h.id === id);
       if (!highlight) {
@@ -237,9 +280,18 @@ const HighlightsScene = () => {
       const hidden = !enabled || world.z > 1 || !isHighlightVisible(highlight, animation);
       element.toggleAttribute('data-hidden', hidden);
       element.setAttribute('data-positioned', '');
-      element.style.setProperty('--ds-hotspot-x', `${(world.x * 0.5 + 0.5) * size.width}px`);
-      element.style.setProperty('--ds-hotspot-y', `${(-world.y * 0.5 + 0.5) * size.height}px`);
+      const x = (world.x * 0.5 + 0.5) * size.width;
+      const y = (-world.y * 0.5 + 0.5) * size.height;
+      element.style.setProperty('--ds-hotspot-x', `${x}px`);
+      element.style.setProperty('--ds-hotspot-y', `${y}px`);
+      if (!hidden) {
+        visiblePoints.push({ id, x, y });
+      }
     });
+    points.current = visiblePoints;
+    hovered.current = pickHotspot(visiblePoints, pointer.current, HIT_RADIUS, hovered.current);
+    hotspotsOf(viewer).forEach((element, id) => element.toggleAttribute('data-hover', id === hovered.current));
+    gl.domElement.style.cursor = hovered.current ? 'pointer' : '';
 
     const current = goal.current;
     const followed = focused && (!focused.camera.target || 'node' in (focused.target ?? focused.anchor));
@@ -296,7 +348,12 @@ const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
             aria-label={highlightLabel(highlight, config.locale)}
             aria-pressed={focused}
             style={highlight.color ? ({ '--ds-hotspot-color': highlight.color } as React.CSSProperties) : undefined}
-            onClick={() => (focused ? release() : focus(highlight.id))}
+            onClick={(event) => {
+              // Pointer clicks are hit-tested in the scene; this handles keyboard activation.
+              if (event.detail === 0) {
+                focused ? release() : focus(highlight.id);
+              }
+            }}
           >
             <Slot name="highlights.hotspot" props={{ highlight, focused }}>
               <span className="ds-hotspot__content" />
