@@ -42,7 +42,8 @@ jobs:
         if: env.CLOSED != 'true' && env.TARGETS != ''
         run: |
           npm ci
-          npx nx run docs:build-storybook
+          # Vite's public-dir copy occasionally races with itself (EEXIST); a retry clears it.
+          npx nx run docs:build-storybook || { rm -rf dist/pages/storybook; npx nx run docs:build-storybook --skip-nx-cache; }
         env:
           CYPRESS_INSTALL_BINARY: '0'
       - name: Publish into target folders
