@@ -93,3 +93,7 @@ Embed builder port, non-glTF formats.
 
 Ported: skybox, wireframe, camera-rotation, light-scenarios, animation, highlights.
 Highlights anchors (`anchor` = click position, `target` = what it means) are either static world positions or attached to a node and follow animations. Hotspots are DOM buttons in the `viewer.layer` slot, positioned from the scene each frame.
+
+## Studio package
+
+`@schablone/3d-studio`: `<Studio>` (built-in or controlled selection), `<ProjectList>` (`onSelect` or `getHref`, router-agnostic), `<ProjectDetail>` (a `<Viewer>` with `defaultFeatures` and the project's `featureConfig`), `createRestAdapter`, `useProjects` / `useProject`, `ProjectAdapterProvider`. Slots: `project-list.{header,card,card.footer,empty,loading,error}`, `project-detail.{loading,not-found,error}`. Data loading is a small built-in hook instead of react-query, and labels are plain strings; react-intl is not wired in yet.
