@@ -102,6 +102,8 @@ interface Goal extends Pose {
   speed: { position: number; fov: number };
   /** Set when the highlight has no static camera target; the target follows the highlight target. */
   followTarget: boolean;
+  /** Leaving by dragging: ease target/distance/fov back but keep the user's viewing direction. */
+  keepDirection?: boolean;
 }
 
 const animationSnapshot = (viewer: ViewerStore): AnimationSnapshot | undefined => {
@@ -161,6 +163,7 @@ const HighlightsScene = () => {
   const size = useThree((s) => s.size);
   const goal = useRef<Goal | null>(null);
   const saved = useRef<Pose | null>(null);
+  const leftByDrag = useRef(false);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
   const gl = useThree((s) => s.gl);
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
@@ -222,6 +225,7 @@ const HighlightsScene = () => {
     const move = (event: PointerEvent) => {
       if (origin && latest.current.focusedId && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > DRAG_LEAVE_PX) {
         origin = null;
+        leftByDrag.current = true;
         release();
       }
     };
@@ -266,7 +270,13 @@ const HighlightsScene = () => {
         return () => clearTimeout(timer);
       }
     } else if (saved.current) {
-      goal.current = { ...saved.current, speed: { position: DEFAULT_SPEED.out, fov: DEFAULT_SPEED.fov }, followTarget: false };
+      goal.current = {
+        ...saved.current,
+        speed: { position: DEFAULT_SPEED.out, fov: DEFAULT_SPEED.fov },
+        followTarget: false,
+        keepDirection: leftByDrag.current,
+      };
+      leftByDrag.current = false;
       saved.current = null;
     }
     return undefined;
@@ -327,15 +337,28 @@ const HighlightsScene = () => {
         current.target.copy(target);
       }
       const k = 1 - Math.exp(-current.speed.position * delta);
-      camera.position.lerp(current.position, k);
-      controls?.target.lerp(current.target, k);
+      if (current.keepDirection && controls) {
+        const distance = current.position.distanceTo(current.target);
+        const offset = camera.position.clone().sub(controls.target);
+        const nextDistance = offset.length() + (distance - offset.length()) * k;
+        controls.target.lerp(current.target, k);
+        camera.position.copy(controls.target).add(offset.setLength(nextDistance));
+      } else {
+        camera.position.lerp(current.position, k);
+      }
+      if (!current.keepDirection) {
+        controls?.target.lerp(current.target, k);
+      }
       if (!controls) {
         camera.lookAt(current.target);
       }
       camera.fov += (current.fov - camera.fov) * (1 - Math.exp(-current.speed.fov * delta));
       camera.updateProjectionMatrix();
       controls?.update();
-      if (camera.position.distanceTo(current.position) < 0.001 && Math.abs(camera.fov - current.fov) < 0.01) {
+      const settled = current.keepDirection
+        ? Math.abs(camera.position.distanceTo(controls?.target ?? current.target) - current.position.distanceTo(current.target)) < 0.001
+        : camera.position.distanceTo(current.position) < 0.001;
+      if (settled && Math.abs(camera.fov - current.fov) < 0.01) {
         goal.current = null;
       }
     } else if (focused && controls && followed && 'node' in (focused.target ?? focused.anchor)) {
