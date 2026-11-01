@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useMemo, type CSSProperties, type ReactNode } from 'react';
+import { Settings } from 'lucide-react';
 import { Canvas, type CanvasProps } from '@react-three/fiber';
 import {
   Menu,
@@ -49,7 +50,7 @@ export interface ViewerProps {
   canvasChildren?: ReactNode;
   className?: string;
   style?: CSSProperties;
-  /** Where the shared 'View options' menu is placed (default top-right), or `false` to hide it. */
+  /** Where the shared 'View options' menu is placed (default bottom-right), or `false` to hide it. */
   viewOptions?: { region?: OverlayRegion; order?: number; label?: string } | false;
   /** Overlay items, e.g. `<Overlay.TopRight>...</Overlay.TopRight>`. */
   children?: ReactNode;
@@ -66,12 +67,12 @@ const ViewerError = () => {
   );
 };
 
-const ViewOptions = ({ region = 'top-right', order = 100, label = 'View options' }: { region?: OverlayRegion; order?: number; label?: string }) => {
+const ViewOptions = ({ region = 'bottom-right', order = 100, label = 'View options' }: { region?: OverlayRegion; order?: number; label?: string }) => {
   const hasItems = useSlotFills('viewer.options').length > 0;
   const Region = REGION_COMPONENTS[region];
   return hasItems ? (
     <Region id="viewer.options" order={order}>
-      <Menu label={label} icon="⚙" className="ds-view-options" testId="ds-view-options" placement={region.endsWith('right') ? 'bottom-end' : 'bottom-start'}>
+      <Menu label={label} icon={<Settings size={20} aria-hidden="true" />} className="ds-view-options" testId="ds-view-options" placement={`${region.startsWith('bottom') ? 'top' : 'bottom'}-${region.endsWith('right') ? 'end' : 'start'}`}>
         <Slot name="viewer.options" />
       </Menu>
     </Region>
@@ -88,6 +89,7 @@ const REGION_COMPONENTS = {
   'bottom-left': Overlay.BottomLeft,
   'bottom-center': Overlay.BottomCenter,
   'bottom-right': Overlay.BottomRight,
+  'bottom-bar': Overlay.BottomBar,
 } satisfies Record<OverlayRegion, unknown>;
 
 const ViewerLayout = ({

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Pause, Play } from 'lucide-react';
 import { useFrame } from '@react-three/fiber';
 import { useAnimations } from '@react-three/drei';
 import { LoopOnce, LoopPingPong, LoopRepeat } from 'three';
@@ -17,6 +18,8 @@ declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
     /** Default animation controls (play/pause and scrubber). Replace to bring your own UI. */
     'animation.controls': Record<string, never>;
+    /** Full-width timeline scrubber. */
+    'animation.scrubber': Record<string, never>;
   }
 }
 
@@ -42,7 +45,7 @@ export interface AnimationConfig {
   loop: 'repeat' | 'once' | 'pingpong';
   /** Mixer time scale. */
   speed: number;
-  /** Show the default controls in the overlay (bottom-center unless a region is given). */
+  /** Show the default controls in the overlay (bottom-left unless a region is given; the scrubber spans the bottom bar). */
   controls: boolean | { region?: OverlayRegion };
   /** Named points on the timeline. Crossing one while playing emits `animation:cue`. */
   cues: AnimationCue[];
@@ -257,8 +260,36 @@ const AnimationScene = () => {
   return null;
 };
 
+const formatTime = (value: number) => (Math.floor(value * 100) / 100).toFixed(2);
+
+/** Full-width timeline scrubber (bottom bar). */
+const Scrubber = () => {
+  const { clips, time, duration, seek } = useAnimation();
+  if (!clips.length) {
+    return null;
+  }
+  const progress = duration > 0 ? Math.min(time / duration, 1) * 100 : 0;
+  return (
+    <Slot name="animation.scrubber">
+      <input
+        type="range"
+        aria-label="Animation time"
+        className="ds-animation-scrubber"
+        data-testid="ds-animation-scrubber"
+        style={{ '--ds-scrubber-progress': `${progress}%` } as React.CSSProperties}
+        min={0}
+        max={duration}
+        step={0.01}
+        value={Math.min(time, duration)}
+        onChange={(e) => seek(Number(e.target.value))}
+      />
+    </Slot>
+  );
+};
+
+/** Play/pause, time readout and clip toggles. */
 const Controls = ({ config }: { config: AnimationConfig }) => {
-  const { clips, status, time, duration, play, pause, stop, seek } = useAnimation();
+  const { clips, status, time, duration, play, pause, stop } = useAnimation();
   if (!clips.length) {
     return null;
   }
@@ -271,20 +302,12 @@ const Controls = ({ config }: { config: AnimationConfig }) => {
           label={playing ? 'Pause' : 'Play'}
           className="ds-animation-controls__play"
           data-testid="ds-animation-play"
-          icon={<span aria-hidden="true">{playing ? '⏸' : '▶'}</span>}
+          icon={playing ? <Pause size={20} aria-hidden="true" /> : <Play size={20} aria-hidden="true" />}
           onClick={() => (playing ? pause() : play())}
         />
-        <input
-          type="range"
-          aria-label="Animation time"
-          className="ds-animation-controls__scrubber"
-          data-testid="ds-animation-scrubber"
-          min={0}
-          max={duration}
-          step={0.01}
-          value={Math.min(time, duration)}
-          onChange={(e) => seek(Number(e.target.value))}
-        />
+        <span className="ds-animation-controls__time" data-testid="ds-animation-time">
+          <span className="ds-animation-controls__current">{formatTime(time)}</span> / {formatTime(duration)}
+        </span>
         {visibleClips.length > 1 && (
           <div className="ds-animation-controls__clips" data-testid="ds-animation-clips">
             {visibleClips.map((name) => (
@@ -333,7 +356,10 @@ export const animation = defineFeature<AnimationConfig>({
     if (!config.controls) {
       return {};
     }
-    const region = typeof config.controls === 'object' ? (config.controls.region ?? 'bottom-center') : 'bottom-center';
-    return { [`overlay.${region}`]: { mode: 'append', order: 0, content: <Controls config={config} /> } };
+    const region = typeof config.controls === 'object' ? (config.controls.region ?? 'bottom-left') : 'bottom-left';
+    return {
+      'overlay.bottom-bar': { mode: 'append', order: 0, content: <Scrubber /> },
+      [`overlay.${region}`]: { mode: 'append', order: 0, content: <Controls config={config} /> },
+    };
   },
 });

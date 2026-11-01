@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { BufferGeometry, Color, Float32BufferAttribute, Line, LineBasicMaterial, Mesh, PerspectiveCamera, Vector3 } from 'three';
 import type { Material, Object3D } from 'three';
@@ -43,6 +44,8 @@ export interface HighlightsConfig {
   locale: string;
   /** Show the default detail panel (bottom-left) while a highlight is focused. */
   detail: boolean;
+  /** Show the prev/next selector with a popover list (bottom-center). */
+  select: boolean;
   /** Pause playing animations while the pointer is over a hotspot so moving hotspots are easy to hit. */
   pauseOnHover: boolean;
 }
@@ -448,7 +451,7 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
       className="ds-highlight-detail"
       data-testid="ds-highlight-detail"
       title={highlightLabel(highlight, config.locale)}
-      actions={<IconButton label="Close" icon="✕" data-testid="ds-highlight-detail-close" onClick={release} />}
+      actions={<IconButton label="Close" icon={<X size={18} aria-hidden="true" />} data-testid="ds-highlight-detail-close" onClick={release} />}
     >
       <Slot name="highlights.detail" props={{ highlight }}>
         {highlight.actions?.length ? (
@@ -471,18 +474,91 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
   );
 };
 
+/** Prev/next stepper with a popover list, like the old studio's highlight select box. */
+const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
+  const { focusedId, focus } = useHighlights();
+  const enabled = useViewerState((s) => s.featureEnabled[FEATURE_ID] ?? false);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const list = config.highlights;
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+    const outside = (e: PointerEvent) => !rootRef.current?.contains(e.target as Node) && setOpen(false);
+    const escape = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+
+  if (!enabled || list.length === 0) {
+    return null;
+  }
+  const index = Math.max(0, list.findIndex((h) => h.id === focusedId));
+  const step = (delta: number) => focus(list[(index + delta + list.length) % list.length].id);
+  const current = list[index];
+
+  return (
+    <div ref={rootRef} className="ds-highlight-select" data-open={open ? '' : undefined} data-testid="ds-highlight-select">
+      {open && (
+        <div className="ds-highlight-select__list" role="listbox" data-testid="ds-highlight-select-list">
+          {list.map((highlight) => (
+            <button
+              key={highlight.id}
+              type="button"
+              role="option"
+              aria-selected={highlight.id === focusedId}
+              className="ds-highlight-select__entry"
+              data-active={highlight.id === focusedId ? '' : undefined}
+              data-testid={`ds-highlight-select-entry-${highlight.id}`}
+              onClick={() => {
+                focus(highlight.id);
+                setOpen(false);
+              }}
+            >
+              {highlightLabel(highlight, config.locale)}
+            </button>
+          ))}
+        </div>
+      )}
+      <button type="button" aria-label="Previous highlight" className="ds-highlight-select__step ds-highlight-select__prev" data-testid="ds-highlight-prev" onClick={() => step(-1)}>
+        <ChevronLeft size={20} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="ds-highlight-select__current"
+        data-testid="ds-highlight-select-current"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {highlightLabel(current, config.locale)}
+      </button>
+      <button type="button" aria-label="Next highlight" className="ds-highlight-select__step ds-highlight-select__next" data-testid="ds-highlight-next" onClick={() => step(1)}>
+        <ChevronRight size={20} aria-hidden="true" />
+      </button>
+    </div>
+  );
+};
+
 /** glTF extension: `ALCM_highlights`. Hotspots are DOM buttons (`.ds-hotspot`), focus moves the camera. */
 export const highlights = defineFeature<HighlightsConfig>({
   id: FEATURE_ID,
-  defaults: { enabled: true, highlights: [], locale: 'en', detail: true, pauseOnHover: true },
+  defaults: { enabled: true, highlights: [], locale: 'en', detail: true, select: true, pauseOnHover: true },
   gltf: { extension: 'ALCM_highlights' },
   toggle: { label: 'Highlights' },
   scene: HighlightsScene,
   slots: ({ config }) => ({
     'viewer.layer': { mode: 'append', order: 0, content: <HotspotLayer config={config} /> },
     ...(config.detail
-      ? { 'overlay.bottom-left': { mode: 'append' as const, order: 0, content: <DetailPanel config={config} /> } }
+      ? { 'overlay.bottom-left': { mode: 'append' as const, order: -10, content: <DetailPanel config={config} /> } }
       : {}),
+    ...(config.select ? { 'overlay.bottom-center': { mode: 'append' as const, order: 0, content: <HighlightSelect config={config} /> } } : {}),
   }),
   setup: ({ viewer, config }) => {
     if (viewer.getState().featureState[FEATURE_ID] === undefined) {

@@ -1,4 +1,5 @@
 import { ClientOnly, Link, createFileRoute } from '@tanstack/react-router';
+import { ArrowLeft } from 'lucide-react';
 import { Overlay, IconButton } from '@schablone/3d-studio-ui';
 import { ProjectAdapterProvider, ProjectDetail } from '@schablone/3d-studio';
 import { adapter } from '../projects';
@@ -15,7 +16,7 @@ function Detail() {
           <ProjectDetail projectId={id} viewer={{ draco: '/draco/', canvasChildren: <ambientLight intensity={2} /> }}>
             <Overlay.TopLeft>
               <Link to="/">
-                <IconButton label="Back to projects" icon="←" />
+                <IconButton label="Back to projects" icon={<ArrowLeft size={20} aria-hidden="true" />} />
               </Link>
             </Overlay.TopLeft>
           </ProjectDetail>

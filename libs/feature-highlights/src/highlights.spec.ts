@@ -70,8 +70,8 @@ describe('highlights feature', () => {
   it('fills the hotspot layer and detail region', () => {
     const config = resolveFeatureConfig({ feature: highlights, props: { highlights: [base] } });
     const slots = highlights.slots as (ctx: { config: typeof config }) => Record<string, unknown>;
-    expect(Object.keys(slots({ config }))).toEqual(['viewer.layer', 'overlay.bottom-left']);
-    const without = resolveFeatureConfig({ feature: highlights, props: { detail: false } });
+    expect(Object.keys(slots({ config }))).toEqual(['viewer.layer', 'overlay.bottom-left', 'overlay.bottom-center']);
+    const without = resolveFeatureConfig({ feature: highlights, props: { detail: false, select: false } });
     expect(Object.keys(slots({ config: without }))).toEqual(['viewer.layer']);
   });
 });

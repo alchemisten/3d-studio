@@ -33,6 +33,7 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
+        'lucide-react',
         'rxjs',
         '@schablone/3d-studio-ui',
         '@react-three/fiber',

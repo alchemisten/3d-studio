@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { IconButton } from './icon-button';
 import { cx } from './cx';
+import { Switch } from './controls';
 
 export interface MenuItem {
   id: string;
@@ -97,22 +98,27 @@ export interface MenuCheckboxItemProps {
   testId?: string;
 }
 
-/** A toggle row for `<Menu>` children. Keeps the menu open when toggled. */
+/** A switch row (label left, switch right) for `<Menu>` children. Keeps the menu open when toggled. */
 export const MenuCheckboxItem = ({ label, checked, onChange, icon, className, testId }: MenuCheckboxItemProps) => (
-  <button
-    type="button"
+  // A div row: the Radix switch is itself a button and buttons cannot nest.
+  <div
     role="menuitemcheckbox"
     aria-checked={checked}
+    tabIndex={0}
     className={cx('ds-menu__item', 'ds-menu__item--checkbox', className)}
     data-testid={testId}
     onClick={() => onChange(!checked)}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onChange(!checked);
+      }
+    }}
   >
-    <span className="ds-menu__check" aria-hidden="true">
-      {checked ? '✓' : ''}
-    </span>
     {icon}
     <span className="ds-menu__label">{label}</span>
-  </button>
+    <Switch checked={checked} onCheckedChange={onChange} label={label} className="ds-menu__switch" decorative />
+  </div>
 );
 
 export interface MenuRadioItemProps {

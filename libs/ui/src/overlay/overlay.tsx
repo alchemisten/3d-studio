@@ -60,6 +60,7 @@ Overlay.MiddleRight = regionComponent('middle-right');
 Overlay.BottomLeft = regionComponent('bottom-left');
 Overlay.BottomCenter = regionComponent('bottom-center');
 Overlay.BottomRight = regionComponent('bottom-right');
+Overlay.BottomBar = regionComponent('bottom-bar');
 
 export interface OverlayItemBase {
   /** Stable id. Re-adding an id overwrites the previous item. */

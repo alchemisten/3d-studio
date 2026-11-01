@@ -13,6 +13,12 @@ export type TokenName =
   | `menu-${string}`
   | `tooltip-${string}`
   | `overlay-${string}`
+  | `control-${string}`
+  | `switch-${string}`
+  | `checkbox-${string}`
+  | `slider-${string}`
+  | `progress-${string}`
+  | `list-${string}`
   | 'gap';
 
 export type TokenOverrides = Partial<Record<TokenName, string>>;

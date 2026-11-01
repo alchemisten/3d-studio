@@ -8,6 +8,7 @@ export const OVERLAY_REGIONS = [
   'bottom-left',
   'bottom-center',
   'bottom-right',
+  'bottom-bar',
 ] as const;
 
 export type OverlayRegion = (typeof OVERLAY_REGIONS)[number];
@@ -25,5 +26,7 @@ declare module '../slots/types' {
     'overlay.bottom-left': Record<string, never>;
     'overlay.bottom-center': Record<string, never>;
     'overlay.bottom-right': Record<string, never>;
+    /** Full-width strip above the bottom row (e.g. a timeline scrubber). */
+    'overlay.bottom-bar': Record<string, never>;
   }
 }

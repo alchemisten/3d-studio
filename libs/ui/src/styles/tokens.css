@@ -98,6 +98,30 @@
   --ds-tooltip-color: var(--ds-color-neutral-50);
   --ds-tooltip-radius: var(--ds-radius-1);
 
+  --ds-control-height: 2.25rem;
+  --ds-control-radius: var(--ds-radius-control);
+  --ds-control-bg: var(--ds-color-surface);
+  --ds-control-color: var(--ds-color-text);
+  --ds-control-border: var(--ds-color-border);
+
+  --ds-switch-bg: var(--ds-color-neutral-500);
+  --ds-switch-bg-checked: var(--ds-color-accent);
+  --ds-switch-thumb: #fff;
+
+  --ds-checkbox-bg: var(--ds-color-surface);
+  --ds-checkbox-border: var(--ds-color-border);
+  --ds-checkbox-color: var(--ds-color-accent-contrast);
+
+  --ds-slider-track: var(--ds-color-neutral-300);
+  --ds-slider-track-height: 4px;
+  --ds-slider-thumb: var(--ds-color-surface);
+  --ds-slider-thumb-size: 1.25rem;
+
+  --ds-progress-track: var(--ds-color-neutral-300);
+  --ds-progress-height: 0.375rem;
+
+  --ds-list-item-active-bg: color-mix(in srgb, var(--ds-color-accent) 12%, transparent);
+
   --ds-overlay-inset: var(--ds-space-4);
   --ds-overlay-gap: var(--ds-gap);
 }
