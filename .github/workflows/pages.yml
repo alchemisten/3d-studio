@@ -25,12 +25,13 @@ jobs:
         run: |
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
             git fetch origin gh-pages --depth=1
-            git worktree add pages-branch origin/gh-pages
-            git -C pages-branch checkout -B gh-pages
+            git worktree add ../pages-branch origin/gh-pages
+            git -C ../pages-branch checkout -B gh-pages
           else
-            git worktree add --detach pages-branch
-            git -C pages-branch checkout --orphan gh-pages
-            git -C pages-branch rm -rf . >/dev/null
+            git worktree add --no-checkout --detach ../pages-branch
+            git -C ../pages-branch checkout --orphan gh-pages
+            git -C ../pages-branch rm -rf . >/dev/null
+            git -C ../pages-branch clean -fdxq
           fi
       - uses: actions/setup-node@v6
         if: env.CLOSED != 'true' && env.TARGETS != ''
@@ -48,16 +49,16 @@ jobs:
         if: env.TARGETS != ''
         run: |
           for target in $TARGETS; do
-            rm -rf "pages-branch/$target"
+            rm -rf "../pages-branch/$target"
             if [ "$CLOSED" != "true" ]; then
-              mkdir -p "pages-branch/$target"
-              cp -r dist/pages/storybook/. "pages-branch/$target/"
+              mkdir -p "../pages-branch/$target"
+              cp -r dist/pages/storybook/. "../pages-branch/$target/"
             fi
           done
-          cp apps/docs/landing/index.html pages-branch/index.html
-          touch pages-branch/.nojekyll
-          node tools/scripts/pages-versions.mjs pages-branch
-          cd pages-branch
+          cp apps/docs/landing/index.html ../pages-branch/index.html
+          touch ../pages-branch/.nojekyll
+          node tools/scripts/pages-versions.mjs ../pages-branch
+          cd ../pages-branch
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
