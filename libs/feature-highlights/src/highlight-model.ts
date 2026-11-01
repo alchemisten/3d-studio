@@ -47,7 +47,7 @@ export interface Highlight {
 export type ClipState = 'playing' | 'paused' | 'stopped';
 
 export type HighlightCommand =
-  | { seek: number }
+  | { seek: number; clip?: string }
   | { play: string | true }
   | { pause: string | true }
   | { stop: string | true }
@@ -74,7 +74,7 @@ const overallState = (status: Record<string, string>): ClipState => {
 /** Runs a declarative command against the viewer's event ports. */
 export const runCommand = (viewer: ViewerStore, command: HighlightCommand) => {
   if ('seek' in command) {
-    viewer.emit('animation:seek', { time: command.seek });
+    viewer.emit('animation:seek', { time: command.seek, clip: command.clip });
   } else if ('play' in command) {
     viewer.emit('animation:play', { clip: command.play === true ? undefined : command.play });
   } else if ('pause' in command) {

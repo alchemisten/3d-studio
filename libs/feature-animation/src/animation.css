@@ -5,6 +5,33 @@
   min-width: 15rem;
 }
 
+.ds-animation-controls {
+  flex-wrap: wrap;
+}
+
+.ds-animation-controls__clips {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1, 4px);
+}
+
+.ds-animation-controls__clip {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: var(--ds-radius-pill, 999px);
+  border: 1px solid var(--ds-color-border, currentColor);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ds-animation-controls__clip[data-active] {
+  background: var(--ds-color-accent);
+  color: var(--ds-color-accent-contrast, #fff);
+}
+
 .ds-animation-controls__scrubber {
   flex: 1;
   accent-color: var(--ds-color-accent);

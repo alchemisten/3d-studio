@@ -40,3 +40,14 @@ describe('cues', () => {
     expect(ids(2.9, 0.5)).toEqual(['b']);
   });
 });
+
+describe('per-clip config', () => {
+  it('reads clip overrides from the glTF extension and keeps global defaults', () => {
+    const config = resolveFeatureConfig({
+      feature: animation,
+      gltfExtensions: { ALCM_animation: { clips: { Door: { loop: 'once', speed: 2, label: 'Open door' } } } },
+    });
+    expect(config.clips['Door']).toEqual({ loop: 'once', speed: 2, label: 'Open door' });
+    expect(config.loop).toBe('repeat');
+  });
+});

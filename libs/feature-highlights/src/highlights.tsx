@@ -25,11 +25,11 @@ declare module '@schablone/3d-studio-ui' {
 
 declare module '@schablone/3d-studio-core' {
   interface ViewerEventMap {
-    'animation:seek': { time: number };
+    'animation:seek': { time: number; clip?: string };
     'animation:play': { clip?: string };
     'animation:pause': { clip?: string };
     'animation:stop': { clip?: string };
-    'animation:cue': { id: string; time: number };
+    'animation:cue': { id: string; time: number; clip?: string };
     /** Command and notification: focus a highlight, or release with `null`. */
     'highlight:focus': { id: string | null };
   }
@@ -191,7 +191,7 @@ const HighlightsScene = () => {
       if (anim) {
         const timer = setTimeout(() => {
           if (anim.targetTime !== undefined) {
-            viewer.emit('animation:seek', { time: anim.targetTime });
+            viewer.emit('animation:seek', { time: anim.targetTime, clip: anim.clip });
           }
           if (anim.state) {
             viewer.emit(anim.state === 'playing' ? 'animation:play' : 'animation:pause', { clip: anim.clip });
