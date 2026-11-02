@@ -22,7 +22,7 @@ export interface Highlight {
   /** Draw a pointer line from the anchor to the target. */
   hoverOutline?: boolean;
   pointer?: boolean | { color?: string };
-  camera: {
+  camera?: {
     position: Vec3;
     /** World-space look-at point. Defaults to following `target`. */
     target?: Vec3;

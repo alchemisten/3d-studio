@@ -1,6 +1,14 @@
-import { Mesh, Vector3 } from 'three';
+import { Mesh, PerspectiveCamera, Vector3 } from 'three';
 import { expect, it } from 'vitest';
-import { updatePointer } from './pointer';
+import { pointerTipRadius, updatePointer } from './pointer';
+
+it.each([0.3, 5])('projects the tip to five pixels at depth %s', (depth) => {
+  const camera = new PerspectiveCamera(45, 1, 0.01, 100);
+  const height = 800;
+  const radius = pointerTipRadius(depth, height, camera.projectionMatrix.elements[5]);
+  const edge = new Vector3(0, radius, -depth).project(camera);
+  expect(edge.y * height).toBeCloseTo(5);
+});
 
 it('places the ends of the leader at the anchor and target', () => {
   const line = new Mesh();

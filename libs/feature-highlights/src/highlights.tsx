@@ -16,7 +16,7 @@ import {
 import { IconButton, Panel, Slot, useSlotFills } from '@schablone/3d-studio-ui';
 import './highlights.css';
 import { HoverOutline } from './hover-outline';
-import { updatePointer } from './pointer';
+import { pointerTipRadius, updatePointer } from './pointer';
 import { highlightLabel, isHighlightVisible, pickHotspot, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
 
 declare module '@schablone/3d-studio-ui' {
@@ -158,6 +158,8 @@ const PointerLine = ({ highlight }: { highlight: Highlight }) => {
       const perspective = camera as PerspectiveCamera;
       const unitsPerPixel = 2 * camera.position.distanceTo(a.current) * Math.tan(perspective.fov * Math.PI / 360) / size.height;
       updatePointer(line.current, dot.current, a.current, b.current, isHighlightVisible(highlight, animationSnapshot(viewer)), unitsPerPixel * (active ? 1.8 : 0.8));
+      const viewDepth = perspective.isPerspectiveCamera ? Math.abs(b.current.applyMatrix4(camera.matrixWorldInverse).z) : 1;
+      dot.current.scale.setScalar(pointerTipRadius(viewDepth, size.height, camera.projectionMatrix.elements[5]));
     }
   });
 
@@ -172,7 +174,7 @@ const PointerLine = ({ highlight }: { highlight: Highlight }) => {
         </mesh>
       </mesh>
       <mesh ref={dot}>
-        <sphereGeometry args={[0.02, 12, 12]} />
+        <sphereGeometry args={[1, 12, 12]} />
         <meshBasicMaterial color={color} />
       </mesh>
     </>
@@ -279,15 +281,19 @@ const HighlightsScene = () => {
   useEffect(() => {
     const currentTarget = () => controls?.target.clone() ?? new Vector3();
     if (focused) {
-      saved.current ??= { position: camera.position.clone(), target: currentTarget(), fov: camera.fov };
-      const speed = { ...DEFAULT_SPEED, ...focused.speed };
-      goal.current = {
-        position: new Vector3(...focused.camera.position),
-        target: focused.camera.target ? new Vector3(...focused.camera.target) : currentTarget(),
-        fov: focused.camera.fov ?? camera.fov,
-        speed: { position: speed.in, fov: speed.fov },
-        followTarget: !focused.camera.target,
-      };
+      if (focused.camera) {
+        saved.current ??= { position: camera.position.clone(), target: currentTarget(), fov: camera.fov };
+        const speed = { ...DEFAULT_SPEED, ...focused.speed };
+        goal.current = {
+          position: new Vector3(...focused.camera.position),
+          target: focused.camera.target ? new Vector3(...focused.camera.target) : currentTarget(),
+          fov: focused.camera.fov ?? camera.fov,
+          speed: { position: speed.in, fov: speed.fov },
+          followTarget: !focused.camera.target,
+        };
+      } else {
+        goal.current = null;
+      }
       const anim = focused.animation;
       if (anim) {
         const timer = setTimeout(() => {
@@ -337,6 +343,45 @@ const HighlightsScene = () => {
     const root = gltf?.scene;
     const animation = animationSnapshot(viewer);
     const { world, target } = tmp.current;
+
+    const current = goal.current;
+    const followsNode = focused?.camera && !focused.camera.target && 'node' in (focused.target ?? focused.anchor);
+    if (focused && (current?.followTarget || followsNode)) {
+      resolveAnchor(focused.target ?? focused.anchor, root, target);
+    }
+    if (current) {
+      if (current.followTarget) {
+        current.target.copy(target);
+      }
+      const k = 1 - Math.exp(-current.speed.position * delta);
+      if (current.keepDirection && controls) {
+        const distance = current.position.distanceTo(current.target);
+        const offset = camera.position.clone().sub(controls.target);
+        const nextDistance = offset.length() + (distance - offset.length()) * k;
+        controls.target.lerp(current.target, k);
+        camera.position.copy(controls.target).add(offset.setLength(nextDistance));
+      } else {
+        camera.position.lerp(current.position, k);
+      }
+      if (!current.keepDirection) {
+        controls?.target.lerp(current.target, k);
+      }
+      if (!controls) {
+        camera.lookAt(current.target);
+      }
+      camera.fov += (current.fov - camera.fov) * (1 - Math.exp(-current.speed.fov * delta));
+      camera.updateProjectionMatrix();
+      controls?.update();
+      const settled = current.keepDirection
+        ? Math.abs(camera.position.distanceTo(controls?.target ?? current.target) - current.position.distanceTo(current.target)) < 0.001
+        : camera.position.distanceTo(current.position) < 0.001;
+      if (settled && (!controls || controls.target.distanceTo(current.target) < 0.001) && Math.abs(camera.fov - current.fov) < 0.01) {
+        goal.current = null;
+      }
+    } else if (controls && followsNode) {
+      controls.target.copy(target);
+    }
+    camera.updateWorldMatrix(true, false);
 
     const occ = occlusion.current;
     // One raycast per frame, round-robin over the hotspots, keeps the cost flat on heavy models.
@@ -412,43 +457,6 @@ const HighlightsScene = () => {
     }
     gl.domElement.style.cursor = hovered.current ? 'pointer' : '';
 
-    const current = goal.current;
-    const followed = focused && (!focused.camera.target || 'node' in (focused.target ?? focused.anchor));
-    if (focused && (current?.followTarget || followed)) {
-      resolveAnchor(focused.target ?? focused.anchor, root, target);
-    }
-    if (current) {
-      if (current.followTarget) {
-        current.target.copy(target);
-      }
-      const k = 1 - Math.exp(-current.speed.position * delta);
-      if (current.keepDirection && controls) {
-        const distance = current.position.distanceTo(current.target);
-        const offset = camera.position.clone().sub(controls.target);
-        const nextDistance = offset.length() + (distance - offset.length()) * k;
-        controls.target.lerp(current.target, k);
-        camera.position.copy(controls.target).add(offset.setLength(nextDistance));
-      } else {
-        camera.position.lerp(current.position, k);
-      }
-      if (!current.keepDirection) {
-        controls?.target.lerp(current.target, k);
-      }
-      if (!controls) {
-        camera.lookAt(current.target);
-      }
-      camera.fov += (current.fov - camera.fov) * (1 - Math.exp(-current.speed.fov * delta));
-      camera.updateProjectionMatrix();
-      controls?.update();
-      const settled = current.keepDirection
-        ? Math.abs(camera.position.distanceTo(controls?.target ?? current.target) - current.position.distanceTo(current.target)) < 0.001
-        : camera.position.distanceTo(current.position) < 0.001;
-      if (settled && Math.abs(camera.fov - current.fov) < 0.01) {
-        goal.current = null;
-      }
-    } else if (focused && controls && followed && 'node' in (focused.target ?? focused.anchor)) {
-      controls.target.copy(target);
-    }
   });
 
   return enabled ? <>{outline && gltf && <HoverOutline highlight={outline} model={gltf.scene} />}{config.highlights.filter((highlight) => highlight.pointer).map((highlight) => <PointerLine key={highlight.id} highlight={highlight} />)}</> : null;

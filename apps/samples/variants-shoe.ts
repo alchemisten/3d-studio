@@ -17,7 +17,6 @@ const highlights = {
       anchor: { position: [-0.11, 0.19, 0.02] },
       target: { node: 'Shoe', offset: [-0.28, 0.22, 0.19] },
       pointer: { color: '#39766e' },
-      camera: { position: [0.14, 0.16, 0.29], target: [0, 0.075, 0] },
     },
   ],
 } satisfies Partial<HighlightsConfig>;

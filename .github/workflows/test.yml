@@ -27,3 +27,4 @@ jobs:
       - run: pnpm run test
       - run: pnpm --dir libs/scene-preview exec playwright-core install --with-deps chromium
       - run: pnpm run test:consumer
+      - run: node tools/scripts/test-shoe-camera.mjs
