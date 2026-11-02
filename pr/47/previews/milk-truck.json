@@ -1,0 +1,6 @@
+{
+  "source": "../models/milk-truck-draco/CesiumMilkTruck.gltf",
+  "draco": "../draco/",
+  "environment": "../environments/studio-small-09.hdr",
+  "preview": { "floor": { "mode": "shadow" }, "background": "#e1e8e7", "camera": { "position": [-3.25, 2.0, 3.8], "target": [0, 1.0, 0] } }
+}

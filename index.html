@@ -15,7 +15,7 @@
     <p>React Three Fiber based viewer with style tokens, slots and an expandable overlay.</p>
     <p>
       <label>Version <select id="version"></select></label>
-      <button id="go">Open Storybook</button>
+      <a id="go">Open Storybook</a> · <a id="sample" hidden>Open live sample</a>
     </p>
     <p><a href="https://github.com/alchemisten/3d-studio">Source on GitHub</a></p>
     <script>
@@ -33,10 +33,16 @@
           add('Channels', v.channels);
           add('Releases', v.versions);
           add('Pull requests', v.previews);
+          const update = () => {
+            const sample = document.getElementById('sample');
+            document.getElementById('go').href = './' + select.value + '/';
+            sample.hidden = !v.samples?.includes(select.value);
+            sample.href = './' + select.value + '/sample/';
+          };
+          select.onchange = update;
+          update();
         });
-      document.getElementById('go').onclick = () => {
-        if (select.value) location.href = `./${select.value}/`;
-      };
+
     </script>
   </body>
 </html>

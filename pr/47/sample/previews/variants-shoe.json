@@ -1,0 +1,5 @@
+{
+  "source": "../models/variants-shoe/MaterialsVariantsShoe.glb",
+  "environment": "../environments/studio-small-09.hdr",
+  "preview": { "floor": { "mode": "shadow" }, "camera": { "position": [0.105, 0.147, 0.215], "target": [0, 0.075, 0] } }
+}
