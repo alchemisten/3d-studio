@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "../../dist/libs/scene-preview",
+    "rootDir": "src"
+  },
+  "include": ["src/index.ts", "src/descriptor.ts"]
+}

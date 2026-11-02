@@ -14,7 +14,7 @@ describe('animation feature', () => {
   it('puts the scrubber in the bottom bar and the controls into the configured overlay region', () => {
     const config = resolveFeatureConfig({ feature: animation, props: { controls: { region: 'top-center' } } });
     const slots = animation.slots as (ctx: { config: typeof config }) => Record<string, unknown>;
-    expect(Object.keys(slots({ config }))).toEqual(['overlay.bottom-bar', 'overlay.top-center']);
+    expect(Object.keys(slots({ config }))).toEqual(['viewer.options', 'overlay.bottom-bar', 'overlay.top-center']);
   });
 
   it('adds no overlay fill when controls are off', () => {

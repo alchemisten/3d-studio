@@ -1,3 +1,5 @@
+import { bodyPaint } from '../../../samples/sample-tints';
+import { milkTruckHighlights } from '../../../samples/milk-truck';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Viewer } from '@schablone/3d-studio-core';
 import { IconButton, Overlay } from '@schablone/3d-studio-ui';
@@ -119,5 +121,12 @@ export const CustomOverlay: Story = {
       </>
     ),
     slots: { 'viewer.loading': 'Fetching model…' },
+  },
+};
+
+export const MilkTruckHighlights: Story = {
+  args: {
+    features: [animation, bodyPaint, highlights.use(milkTruckHighlights)],
+    canvasChildren: <ambientLight intensity={2} />,
   },
 };

@@ -3,17 +3,32 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
-import { joinPathFragments } from '@nx/devkit';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   root: __dirname,
+  esbuild: { jsxDev: false },
   cacheDir: '../../node_modules/.vite/studio',
 
   plugins: [
     dts({
-      entryRoot: 'src',
-      tsconfigPath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
+      pathsToAliases: false,
+      entryRoot: resolve(__dirname, 'src'),
+      tsconfigPath: resolve(__dirname, 'tsconfig.lib.json'),
     }),
+    {
+      name: 'studio-default-styles',
+      apply: 'build',
+      generateBundle: {
+        order: 'post',
+        handler(_, bundle) {
+          const css = bundle['style.css'];
+          if (!css || css.type !== 'asset') throw new Error('Missing Studio stylesheet');
+          const packages = ['ui', 'core', 'feature-animation', 'feature-highlights'];
+          css.source = packages.map(name => `@import "@schablone/3d-studio-${name}/style.css";`).join('\n') + '\n' + css.source;
+        },
+      },
+    },
     react(),
     nxViteTsPaths(),
   ],
@@ -30,6 +45,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        'zod',
         'react',
         'react-dom',
         'react/jsx-runtime',

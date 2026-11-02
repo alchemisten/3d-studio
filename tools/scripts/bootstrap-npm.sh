@@ -13,8 +13,12 @@ WORKFLOW="release.yml"
 PACKAGES=(
   3d-studio
   3d-studio-ui
+  3d-studio-scene-preview
   3d-studio-core
   3d-studio-feature-skybox
+  3d-studio-feature-color-switcher
+  3d-studio-feature-material-variants
+  3d-studio-feature-floor
   3d-studio-feature-wireframe
   3d-studio-feature-camera-rotation
   3d-studio-feature-light-scenarios

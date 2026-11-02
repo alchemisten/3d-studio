@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Viewer, type FeatureInput, type ProjectAdapter, type ViewerProps } from '@schablone/3d-studio-core';
+import { SceneLoading, Viewer, type FeatureInput, type ProjectAdapter, type ViewerProps } from '@schablone/3d-studio-core';
 import { Slot, SlotProvider, ThemeProvider, type SlotFillsInput, type Theme } from '@schablone/3d-studio-ui';
 import { useProject } from './adapter-context';
 import { defaultFeatures } from './default-features';
@@ -48,7 +48,7 @@ export const ProjectDetail = ({
                 {error.message}
               </Slot>
             ) : loading ? (
-              <Slot name="project-detail.loading">Loading project…</Slot>
+              <Slot name="project-detail.loading"><SceneLoading /></Slot>
             ) : (
               <Slot name="project-detail.not-found" props={{ id: projectId }}>
                 Project not found.
@@ -64,6 +64,8 @@ export const ProjectDetail = ({
       {...viewer}
       className={['ds-project-detail', className].filter(Boolean).join(' ')}
       source={project.source}
+      loadingPreview={viewer?.loadingPreview ?? { name: project.name, description: project.description, thumbnail: project.thumbnail }}
+      openingCamera={viewer?.openingCamera ?? project.openingCamera}
       features={features}
       featureConfig={project.featureConfig}
       theme={theme}

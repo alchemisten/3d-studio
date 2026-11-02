@@ -42,7 +42,7 @@ export const Studio = ({
         {selected ? (
           <ProjectDetail projectId={selected} features={features} theme={theme} slots={slots} viewer={viewer}>
             <Overlay.TopLeft>
-              <IconButton label="Back to projects" icon={<ArrowLeft size={20} aria-hidden="true" />} data-testid="ds-studio-back" onClick={() => select(null)} />
+              <IconButton label="Back to scenes" icon={<ArrowLeft size={20} aria-hidden="true" />} data-testid="ds-studio-back" onClick={() => select(null)} />
             </Overlay.TopLeft>
             {children}
           </ProjectDetail>

@@ -10,22 +10,39 @@ export interface WireframeConfig {
 type WireframeMaterial = Material & { wireframe?: boolean };
 
 const WireframeScene = () => {
-  useFeature<WireframeConfig>();
+  const { viewer } = useFeature<WireframeConfig>();
   const enabled = useFeatureEnabled();
   const gltf = useViewerState((s) => s.gltf);
 
   useEffect(() => {
-    const touched: WireframeMaterial[] = [];
-    gltf?.scene.traverse((object) => {
-      const material = (object as { material?: WireframeMaterial | WireframeMaterial[] }).material;
-      [material].flat().forEach((m) => m && 'wireframe' in m && touched.push(m));
-    });
-    touched.forEach((m) => {
-      m.wireframe = enabled;
-      m.needsUpdate = true;
-    });
-    return () => touched.forEach((m) => (m.wireframe = false));
-  }, [gltf, enabled]);
+    const touched = new Map<WireframeMaterial, boolean>();
+    const restore = () => {
+      touched.forEach((original, material) => {
+        material.wireframe = original;
+        material.needsUpdate = true;
+      });
+      touched.clear();
+    };
+    const apply = () => {
+      restore();
+      if (!enabled) return;
+      gltf?.scene.traverse((object) => {
+        const materials = (object as { material?: WireframeMaterial | WireframeMaterial[] }).material;
+        for (const material of Array.isArray(materials) ? materials : [materials]) {
+          if (typeof material?.wireframe !== 'boolean' || touched.has(material)) continue;
+          touched.set(material, material.wireframe);
+          material.wireframe = true;
+          material.needsUpdate = true;
+        }
+      });
+    };
+    apply();
+    const sub = viewer.on$('model:materials-changed').subscribe(apply);
+    return () => {
+      sub.unsubscribe();
+      restore();
+    };
+  }, [gltf, enabled, viewer]);
 
   return null;
 };

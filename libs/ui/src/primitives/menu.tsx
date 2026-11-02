@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { Check } from 'lucide-react';
 import { IconButton } from './icon-button';
 import { cx } from './cx';
 import { Switch } from './controls';
@@ -88,6 +89,13 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
   );
 };
 
+export const MenuGroup = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div role="group" aria-label={label} className="ds-menu__group">
+    <div className="ds-menu__heading">{label}</div>
+    {children}
+  </div>
+);
+
 export interface MenuCheckboxItemProps {
   label: string;
   checked: boolean;
@@ -141,10 +149,8 @@ export const MenuRadioItem = ({ label, checked, onSelect, icon, className, testI
     data-testid={testId}
     onClick={onSelect}
   >
-    <span className="ds-menu__check" aria-hidden="true">
-      {checked ? '●' : ''}
-    </span>
     {icon}
     <span className="ds-menu__label">{label}</span>
+    {checked && <Check size={16} className="ds-menu__check" aria-hidden="true" />}
   </button>
 );

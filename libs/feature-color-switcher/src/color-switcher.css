@@ -1,0 +1,40 @@
+.ds-model-swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: inset 0 0 0 1px var(--ds-glass-edge);
+}
+
+.ds-inline-tints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  padding: 0 0 var(--ds-space-3);
+  margin: 0;
+  border: 0;
+}
+
+.ds-inline-tints legend {
+  margin-bottom: var(--ds-space-2);
+  font-weight: var(--ds-font-weight-strong);
+}
+
+.ds-inline-tints button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-2);
+  color: inherit;
+  font: inherit;
+  background: transparent;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-control);
+  cursor: pointer;
+}
+
+.ds-inline-tints button[aria-pressed='true'] {
+  border-color: var(--ds-color-accent);
+  background: var(--ds-color-surface-raised);
+}

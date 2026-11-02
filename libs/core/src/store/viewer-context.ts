@@ -1,4 +1,5 @@
-import { createContext, useContext, useSyncExternalStore } from 'react';
+import { createContext, useContext } from 'react';
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-selector';
 import type { ViewerState, ViewerStore } from './viewer-store';
 
 export const ViewerContext = createContext<ViewerStore | null>(null);
@@ -13,7 +14,7 @@ export const useViewer = (): ViewerStore => {
 };
 
 /** Subscribes a component to a slice of viewer state. */
-export const useViewerState = <T>(selector: (state: ViewerState) => T): T => {
+export const useViewerState = <T>(selector: (state: ViewerState) => T, equal: (a: T, b: T) => boolean = Object.is): T => {
   const store = useViewer();
-  return selector(useSyncExternalStore(store.subscribe, store.getState, store.getState));
+  return useSyncExternalStoreWithSelector(store.subscribe, store.getState, store.getState, selector, equal);
 };

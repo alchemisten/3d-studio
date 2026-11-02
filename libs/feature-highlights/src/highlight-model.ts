@@ -15,9 +15,12 @@ export interface Highlight {
   label?: string | Record<string, string>;
   /** Where the hotspot is shown and clicked. */
   anchor: Anchor;
+  description?: string;
+  tools?: readonly string[];
   /** What the highlight is about. Defaults to the anchor. */
   target?: Anchor;
-  /** Draw a pointer line from the anchor to the target while focused. */
+  /** Draw a pointer line from the anchor to the target. */
+  hoverOutline?: boolean;
   pointer?: boolean | { color?: string };
   camera: {
     position: Vec3;
@@ -54,6 +57,7 @@ export type HighlightCommand =
   | { focus: string };
 
 export interface HighlightAction {
+  requiresFeature?: string;
   id: string;
   label: string;
   /** A declarative command, or a function for anything else (it receives the viewer store). */

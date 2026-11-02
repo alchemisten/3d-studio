@@ -1,5 +1,5 @@
 import { useEffect, useMemo, type ReactNode } from 'react';
-import { useViewer as useViewerStore } from '../store';
+import { bindViewerQuery, choiceSetting, type QuerySetting, type ViewerQuery, useViewer as useViewerStore } from '../store';
 import { MenuCheckboxItem, useOverlay, useSlotContext, type SlotFill, type SlotFillInput } from '@schablone/3d-studio-ui';
 import { useViewer, useViewerState } from '../store';
 import { resolveFeatureConfig, toInstance, type FeatureContext, type FeatureInput } from './feature';
@@ -14,7 +14,7 @@ export interface ResolvedFeature {
  * Resolves the config of every feature once the model is loaded and wires
  * their slots and `setup` hooks. Must run in the DOM tree (outside `<Canvas>`).
  */
-export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: Record<string, unknown> | undefined): ResolvedFeature[] => {
+export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: Record<string, unknown> | undefined, query?: ViewerQuery): ResolvedFeature[] => {
   const viewer = useViewer();
   const overlay = useOverlay();
   const { store: slotStore } = useSlotContext();
@@ -40,6 +40,7 @@ export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: R
 
   useEffect(() => {
     const cleanups: Array<() => void> = [];
+    const settings: { featureId: string; setting: QuerySetting }[] = [];
     for (const { id, instance, context } of resolved) {
       const { feature } = instance;
       const slots = typeof feature.slots === 'function' ? feature.slots(context) : feature.slots;
@@ -49,6 +50,9 @@ export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: R
       });
       if (feature.toggle) {
         const { label, icon, order } = feature.toggle;
+        if (query) settings.push({ featureId: id, setting: choiceSetting(id, ['0', '1'], context.config.enabled ? '1' : '0',
+          () => viewer.getState().featureEnabled[id] ? '1' : '0',
+          value => viewer.setFeatureEnabled(id, value === '1')) });
         if (!(id in viewer.getState().featureEnabled)) {
           viewer.setFeatureEnabled(id, Boolean((context.config as { enabled?: boolean }).enabled));
         }
@@ -62,12 +66,14 @@ export const useFeatures = (inputs: FeatureInput[] | undefined, featureConfig: R
         );
       }
       const cleanup = feature.setup?.(context);
+      if (query) for (const setting of feature.querySettings?.(context) ?? []) settings.push({ featureId: id, setting });
       if (cleanup) {
         cleanups.push(cleanup);
       }
     }
-    return () => cleanups.forEach((fn) => fn());
-  }, [resolved, slotStore, viewer]);
+    const unbind = query && bindViewerQuery(viewer, settings, query);
+    return () => { unbind?.(); cleanups.forEach((fn) => fn()); };
+  }, [resolved, slotStore, viewer, query]);
 
   return resolved;
 };

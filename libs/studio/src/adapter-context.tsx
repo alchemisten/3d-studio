@@ -8,7 +8,8 @@ export const ProjectAdapterProvider = ({ adapter, children }: { adapter: Project
 );
 
 export const useProjectAdapter = (override?: ProjectAdapter): ProjectAdapter => {
-  const adapter = override ?? useContext(AdapterContext);
+  const provided = useContext(AdapterContext);
+  const adapter = override ?? provided;
   if (!adapter) {
     throw new Error('No ProjectAdapter: pass `adapter` or wrap in <ProjectAdapterProvider> / <Studio>.');
   }

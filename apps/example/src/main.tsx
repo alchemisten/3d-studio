@@ -1,33 +1,41 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createStaticAdapter } from '@schablone/3d-studio-core';
-import { Studio } from '@schablone/3d-studio';
+import { BrowserRouter, Route, Routes, useHref, useNavigate, useParams } from 'react-router-dom';
+import { PreviewLights } from '@schablone/3d-studio-core';
+import { ProjectList, Studio } from '@schablone/3d-studio';
 import '@schablone/3d-studio-ui';
+import { useSceneSettings } from './use-scene-settings';
+import { sampleFeatures, sampleScenes } from '../../samples/scenes';
 
-// Swap for `createRestAdapter({ baseUrl: 'https://api.example.com' })` to load real projects.
-const adapter = createStaticAdapter([
-  {
-    id: 'spinning-box',
-    name: 'Spinning box',
-    description: 'Animated demo with a node-attached highlight.',
-    source: './models/spinning-box/spinning-box.gltf',
-    featureConfig: {
-      highlights: {
-        highlights: [
-          {
-            id: 'corner',
-            label: 'Corner',
-            anchor: { node: 'Box', offset: [0.5, 0.5, 0.5] },
-            camera: { position: [1.6, 1.2, 1.6] },
-          },
-        ],
-      },
-    },
-  },
-]);
+const Gallery = () => {
+  const scenes = useHref('/scenes/');
+  return <ProjectList adapter={sampleScenes} getHref={(scene) => scenes + encodeURIComponent(scene.id)} />;
+};
+
+const Scene = () => {
+  const { sceneId } = useParams();
+  const navigate = useNavigate();
+  const query = useSceneSettings();
+  return (
+    <Studio
+      features={sampleFeatures}
+      adapter={sampleScenes}
+      key={sceneId}
+      projectId={sceneId}
+      onProjectChange={(id) => navigate(id ? '/scenes/' + encodeURIComponent(id) : '/scenes')}
+      viewer={{ query, modelTools: { region: 'middle-left' }, draco: './draco/', canvasChildren: <PreviewLights /> }}
+    />
+  );
+};
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
-    <Studio adapter={adapter} viewer={{ draco: './draco/', canvasChildren: <ambientLight intensity={2} /> }} />
+    <BrowserRouter basename={new URL(document.baseURI).pathname.replace(/\/$/, '') || '/'}>
+      <Routes>
+        <Route path="/" element={<Gallery />} />
+        <Route path="/scenes" element={<Gallery />} />
+        <Route path="/scenes/:sceneId" element={<Scene />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 );

@@ -14,6 +14,7 @@ export interface SkyboxConfig {
   type: SkyboxType;
   /** Light the model with the skybox, not only show it as background. */
   useAsEnvironment: boolean;
+  backgroundBlurriness?: number;
   /** Cube only: file names in the order +x, -x, +y, -y, +z, -z. */
   faces: [string, string, string, string, string, string];
 }
@@ -34,9 +35,9 @@ const SkyboxScene = () => {
   }
   const background = config.useAsEnvironment ? true : 'only';
   return config.type === 'cube' ? (
-    <Environment files={config.faces} path={`${config.path.replace(/\/$/, '')}/`} background={background} />
+    <Environment files={config.faces} path={`${config.path.replace(/\/$/, '')}/`} background={background} backgroundBlurriness={config.backgroundBlurriness} />
   ) : (
-    <Environment files={config.path} background={background} />
+    <Environment files={config.path} background={background} backgroundBlurriness={config.backgroundBlurriness} />
   );
 };
 

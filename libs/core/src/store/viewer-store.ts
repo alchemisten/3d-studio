@@ -6,6 +6,7 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
  * `declare module '@schablone/3d-studio-core' { interface ViewerEventMap { 'my:event': { ... } } }`
  */
 export interface ViewerEventMap {
+  'model:materials-changed': { gltf: GLTF };
   'model:loaded': { gltf: GLTF };
   'model:error': { error: Error };
 }

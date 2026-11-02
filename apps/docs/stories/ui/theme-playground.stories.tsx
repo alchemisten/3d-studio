@@ -1,3 +1,9 @@
+import { bodyPaint } from '../../../samples/sample-tints';
+import { Viewer } from '@schablone/3d-studio-core';
+import { animation } from '@schablone/3d-studio-feature-animation';
+import { highlights } from '@schablone/3d-studio-feature-highlights';
+import { milkTruck, milkTruckHighlights } from '../../../samples/milk-truck';
+import './theme-playground.css';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Box, Layers, Palette, Play, Settings } from 'lucide-react';
@@ -219,6 +225,8 @@ const Showcase = () => {
   );
 };
 
+const previewFeatures = [animation, bodyPaint, highlights.use(milkTruckHighlights)];
+
 const Playground = () => {
   const [s, setS] = useState<PlaygroundSettings>(DEFAULTS);
   const [copied, setCopied] = useState(false);
@@ -233,7 +241,7 @@ const Playground = () => {
   );
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '320px minmax(0, 1fr)', minHeight: '100vh' }}>
+    <div className="theme-playground">
       <ThemeProvider mode="light" style={{ display: 'block', boxSizing: 'border-box', padding: 16, borderRight: '1px solid var(--ds-color-border)', overflow: 'auto', maxHeight: '100vh', minWidth: 0 }}>
         <h3 style={{ marginTop: 0 }}>Theme playground</h3>
         <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'minmax(0, 1fr)' }}>
@@ -294,6 +302,9 @@ const Playground = () => {
         </div>
       </ThemeProvider>
       <ThemeProvider theme={theme} style={{ display: 'block', padding: 24, background: 'radial-gradient(circle at 15% 10%, #7dd3fc 0, transparent 40%), radial-gradient(circle at 85% 30%, #f9a8d4 0, transparent 40%), radial-gradient(circle at 40% 90%, #fde68a 0, transparent 45%), var(--ds-color-surface-raised)', color: 'var(--ds-color-text)', fontSize: 'var(--ds-font-size-2)' }}>
+        <div className="theme-playground__viewer">
+          <Viewer theme={theme} source={milkTruck.source} draco="./draco/" features={previewFeatures} canvasChildren={<ambientLight intensity={2} />} />
+        </div>
         <Showcase />
       </ThemeProvider>
     </div>

@@ -1,6 +1,7 @@
 import type { ComponentType, ReactNode } from 'react';
 import type { OverlayApi, SlotFillsInput } from '@schablone/3d-studio-ui';
-import type { ViewerStore } from '../store';
+import type { ModelTool } from './model-tools';
+import type { QuerySetting, ViewerStore } from '../store';
 
 /** Anything with a `parse` method works, including zod schemas. */
 export interface ConfigSchema<C> {
@@ -27,6 +28,8 @@ export interface FeatureDefinition<C extends object = Record<string, never>> {
   /** Rendered inside the `<Canvas>`. Use `useFeature()` to read config. */
   scene?: ComponentType;
   /** Fills for slots anywhere in the viewer (overlay regions, `viewer.loading`, ...). */
+  querySettings?: (ctx: FeatureContext<C>) => readonly QuerySetting[];
+  tools?: (ctx: FeatureContext<C>) => readonly ModelTool[];
   slots?: SlotFillsInput | ((ctx: FeatureContext<C>) => SlotFillsInput);
   /** Runs once the model is ready and the config is resolved. Return a cleanup function. */
   setup?: (ctx: FeatureContext<C>) => void | (() => void);

@@ -33,19 +33,27 @@ jobs:
             git -C ../pages-branch rm -rf . >/dev/null
             git -C ../pages-branch clean -fdxq
           fi
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         if: env.CLOSED != 'true' && env.TARGETS != ''
         with:
           node-version: 22
-          cache: npm
-      - name: Build Storybook
+          cache: pnpm
+      - name: Build Storybook and live sample
         if: env.CLOSED != 'true' && env.TARGETS != ''
         run: |
-          npm ci
+          pnpm install --frozen-lockfile
           # Vite's public-dir copy occasionally races with itself (EEXIST); a retry clears it.
-          npx nx run docs:build-storybook || { rm -rf dist/pages/storybook; npx nx run docs:build-storybook --skip-nx-cache; }
+          pnpm exec nx run docs:build-storybook || { rm -rf dist/pages/storybook; pnpm exec nx run docs:build-storybook --skip-nx-cache; }
+          pnpm exec vite build --config apps/example/vite.config.ts --base ./
+          node tools/scripts/pages-sample.mjs dist/apps/example
         env:
           CYPRESS_INSTALL_BINARY: '0'
+      - name: Verify static previews
+        if: env.CLOSED != 'true' && env.TARGETS != ''
+        run: |
+          pnpm --dir libs/scene-preview exec playwright-core install --with-deps chromium
+          pnpm run test:pages
       - name: Publish into target folders
         if: env.TARGETS != ''
         run: |
@@ -54,6 +62,7 @@ jobs:
             if [ "$CLOSED" != "true" ]; then
               mkdir -p "../pages-branch/$target"
               cp -r dist/pages/storybook/. "../pages-branch/$target/"
+              cp -r dist/apps/example "../pages-branch/$target/sample"
             fi
           done
           cp apps/docs/landing/index.html ../pages-branch/index.html
@@ -71,7 +80,7 @@ jobs:
           owner="${GITHUB_REPOSITORY%%/*}"
           repo="${GITHUB_REPOSITORY##*/}"
           gh pr comment "$PR" --edit-last --create-if-none \
-            --body "Storybook preview: https://${owner}.github.io/${repo}/pr/${PR}/ (updated for ${GITHUB_SHA::7}, removed when the PR closes)"
+            --body "Preview for ${GITHUB_SHA::7} · [Live sample](https://${owner}.github.io/${repo}/pr/${PR}/sample/) · [Storybook](https://${owner}.github.io/${repo}/pr/${PR}/). Removed when the PR closes."
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}

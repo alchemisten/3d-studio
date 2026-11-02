@@ -1,3 +1,5 @@
+import type { OpeningCamera } from '../viewer/opening-view';
+
 /** A viewable project, as returned by a `ProjectAdapter`. */
 export interface Project {
   id: string;
@@ -9,6 +11,7 @@ export interface Project {
   thumbnail?: string;
   /** glTF/GLB URL for the viewer. */
   source: string;
+  openingCamera?: OpeningCamera;
   /** Config per feature id; overrides what is embedded in the glTF. */
   featureConfig?: Record<string, unknown>;
   /** Free-form data for custom slots. */

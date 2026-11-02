@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { Box, Search } from 'lucide-react';
+import { ChevronRight, Box, Search } from 'lucide-react';
 import type { Project, ProjectAdapter } from '@schablone/3d-studio-core';
-import { Badge, Slot, SlotProvider, ThemeProvider, type SlotFillsInput, type Theme } from '@schablone/3d-studio-ui';
+import { Slot, SlotProvider, ThemeProvider, type SlotFillsInput, type Theme } from '@schablone/3d-studio-ui';
 import { useProjects } from './adapter-context';
 import './studio.css';
 
@@ -64,11 +64,11 @@ const Card = ({ project, onSelect, getHref }: Pick<ProjectListProps, 'onSelect' 
         </div>
       </div>
       <div className="ds-project-card__body">
-        <h3 className="ds-project-card__title">{project.name}</h3>
+        <h3 className="ds-project-card__title">{project.name}<ChevronRight className="ds-project-card__arrow" size={20} aria-hidden="true" /></h3>
         {project.description && <p className="ds-project-card__description">{project.description}</p>}
         <div className="ds-project-card__meta">
           <Slot name="project-list.card.meta" props={{ project }}>
-            {project.tags?.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+            {project.tags?.map((tag) => <span key={tag} className="ds-project-card__tag">{tag}</span>)}
           </Slot>
         </div>
       </div>
@@ -113,19 +113,19 @@ export const ProjectList = ({ adapter, onSelect, getHref, search, theme, slots, 
   } else if (loading && !data) {
     body = (
       <div className="ds-project-list__message" data-testid="ds-project-list-loading">
-        <Slot name="project-list.loading">Loading projects…</Slot>
+        <Slot name="project-list.loading">Loading scenes…</Slot>
       </div>
     );
   } else if (!data?.length) {
     body = (
       <div className="ds-project-list__message" data-testid="ds-project-list-empty">
-        <Slot name="project-list.empty">No projects yet.</Slot>
+        <Slot name="project-list.empty">No scenes yet.</Slot>
       </div>
     );
   } else if (!visible?.length) {
     body = (
       <div className="ds-project-list__message" data-testid="ds-project-list-no-results">
-        No projects match “{query}”.
+        No scenes match “{query}”.
       </div>
     );
   } else {
@@ -142,7 +142,7 @@ export const ProjectList = ({ adapter, onSelect, getHref, search, theme, slots, 
       <SlotProvider slots={slots}>
         <div data-testid="ds-project-list" className="ds-project-list__inner">
           <header className="ds-project-list__header">
-            <Slot name="project-list.header" />
+            <Slot name="project-list.header"><h1>Scenes</h1></Slot>
           </header>
           {(showSearch || slots?.['project-list.toolbar']) && (
             <div className="ds-project-list__toolbar">
@@ -153,8 +153,8 @@ export const ProjectList = ({ adapter, onSelect, getHref, search, theme, slots, 
                     type="search"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search projects"
-                    aria-label="Search projects"
+                    placeholder="Search scenes"
+                    aria-label="Search scenes"
                     data-testid="ds-project-list-search"
                   />
                 </label>

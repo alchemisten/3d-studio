@@ -1,0 +1,6 @@
+packages:
+  - libs/scene-preview
+onlyBuiltDependencies:
+  - esbuild
+  - nx
+  - '@swc/core'

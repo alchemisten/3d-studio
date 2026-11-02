@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Light } from 'three';
-import { defineFeature, useFeature, useViewer, useViewerState } from '@schablone/3d-studio-core';
+import { choiceSetting, defineFeature, useFeature, useViewer, useViewerState } from '@schablone/3d-studio-core';
 import { MenuRadioItem } from '@schablone/3d-studio-ui';
 
 type Vec3 = [number, number, number];
@@ -110,6 +110,7 @@ const Scene = () => {
 
 const ScenarioItems = ({ config }: { config: LightScenariosConfig }): ReactNode => {
   const { activeId, setActive } = useLightScenarios(config.scenarios);
+  if (!config.enabled) return null;
   return config.scenarios.map((scenario) => (
     <MenuRadioItem
       key={scenario.id}
@@ -131,6 +132,9 @@ export const lightScenarios = defineFeature<LightScenariosConfig>({
   slots: (ctx) => ({
     'viewer.options': { mode: 'append', order: 10, content: <ScenarioItems config={ctx.config} /> },
   }),
+  querySettings: ({ config, viewer }) => config.scenarios.length ? [choiceSetting('light', config.scenarios.map(s => s.id),
+    config.initial ?? config.scenarios[0].id, () => viewer.getState().featureState[FEATURE_ID] as string,
+    value => viewer.setFeatureState(FEATURE_ID, value))] : [],
   setup: ({ config, viewer }) => {
     if (viewer.getState().featureState[FEATURE_ID] === undefined) {
       viewer.setFeatureState(FEATURE_ID, config.initial ?? config.scenarios[0]?.id);

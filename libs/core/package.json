@@ -40,5 +40,8 @@
     "@vitejs/plugin-react": "5.0.1",
     "vite": "6.0.0",
     "vite-plugin-dts": "4.5.4"
+  },
+  "dependencies": {
+    "use-sync-external-store": "1.5.0"
   }
 }

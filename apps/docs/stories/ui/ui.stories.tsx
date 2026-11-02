@@ -1,39 +1,47 @@
+import '../shared/story-scene.css';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { IconButton, Menu, MenuCheckboxItem, Overlay, Panel, SlotProvider, Toolbar, createTheme } from '@schablone/3d-studio-ui';
+import { Eye, EyeOff, Pause, Play, RotateCcw, Settings, X } from 'lucide-react';
+import { Button, MenuGroup, MenuRadioItem } from '@schablone/3d-studio-ui';
 import { useState } from 'react';
 
 const meta: Meta = { title: 'UI/Primitives' };
 export default meta;
 
 export const Buttons: StoryObj = {
-  render: () => (
-    <Toolbar label="Demo">
-      <IconButton label="Home" icon="⌂" />
-      <IconButton label="Active" icon="★" active />
-      <IconButton label="Disabled" icon="✕" disabled />
-    </Toolbar>
-  ),
+  render: () => {
+    const [playing, setPlaying] = useState(false);
+    return <Toolbar label="Playback">
+      <IconButton label={playing ? 'Pause' : 'Play'} icon={playing ? <Pause size={18}/> : <Play size={18}/>} active={playing} onClick={() => setPlaying(!playing)}/>
+      <IconButton label="Stop" icon={<RotateCcw size={18}/>} disabled={!playing} onClick={() => setPlaying(false)}/>
+    </Toolbar>;
+  },
 };
 
 export const MenuWithToggles: StoryObj = {
   render: () => {
     const [wire, setWire] = useState(false);
-    return (
-      <div style={{ minHeight: 200 }}>
-        <Menu label="View options" icon="⚙">
-          <MenuCheckboxItem label="Wireframe" checked={wire} onChange={setWire} />
-        </Menu>
-      </div>
-    );
+    const [mode, setMode] = useState('Repeat');
+    return <div className="studio-example__stage">
+      <Menu label="View options" icon={<Settings size={18}/>}>
+        <MenuCheckboxItem label="Wireframe" checked={wire} onChange={setWire}/>
+        <MenuGroup label="Playback mode">{['Play once','Repeat','Ping-pong'].map(value=><MenuRadioItem key={value} label={value} checked={mode===value} onSelect={()=>setMode(value)}/>)}</MenuGroup>
+      </Menu>
+    </div>;
   },
 };
 
 export const PanelExample: StoryObj = {
-  render: () => (
-    <Panel title="Details" actions={<IconButton label="Close" icon="×" tooltip={false} />}>
-      Panel content
-    </Panel>
-  ),
+  render: () => {
+    const [open,setOpen]=useState(true);
+    const [visible,setVisible]=useState(true);
+    if (!open) return <Button onClick={()=>setOpen(true)}>Inspect front wheel</Button>;
+    return <Panel title="Front wheel" actions={<IconButton label="Close" icon={<X size={18}/>} onClick={()=>setOpen(false)}/>}>
+      <p>The marker follows a point on the rim as the wheel turns.</p>
+      <Button icon={visible?<EyeOff size={16}/>:<Eye size={16}/>} onClick={()=>setVisible(!visible)}>{visible?'Hide marker':'Show marker'}</Button>
+      {visible && <span aria-label="Wheel marker"> ②</span>}
+    </Panel>;
+  },
 };
 
 export const OverlayRegions: StoryObj = {

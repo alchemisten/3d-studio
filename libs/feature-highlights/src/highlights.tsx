@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { BufferGeometry, Color, Float32BufferAttribute, Line, LineBasicMaterial, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three';
+import { Color, GreaterDepth, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three';
 import type { Material, Object3D } from 'three';
 import {
   defineFeature,
+  useModelTools,
+  ModelToolControls,
   useFeature,
   useFeatureEnabled,
   useViewer,
   useViewerState,
   type ViewerStore,
 } from '@schablone/3d-studio-core';
-import { IconButton, Panel, Slot } from '@schablone/3d-studio-ui';
+import { IconButton, Panel, Slot, useSlotFills } from '@schablone/3d-studio-ui';
 import './highlights.css';
+import { HoverOutline } from './hover-outline';
+import { updatePointer } from './pointer';
 import { highlightLabel, isHighlightVisible, pickHotspot, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
 
 declare module '@schablone/3d-studio-ui' {
@@ -45,7 +49,7 @@ export interface HighlightsConfig {
   /** Show the default detail panel (bottom-left) while a highlight is focused. */
   detail: boolean;
   /** Show the prev/next selector with a popover list (bottom-center). */
-  select: boolean;
+  select: boolean | 'playback';
   /** Pause playing animations while the pointer is over a hotspot so moving hotspots are easy to hit. */
   pauseOnHover: boolean;
 }
@@ -73,6 +77,8 @@ const isShown = (object: Object3D | null): boolean => {
 };
 const DEFAULT_SPEED = { in: 3, out: 6, fov: 6 };
 
+const openLists = new WeakMap<ViewerStore, HTMLDivElement>();
+const previewIds = new WeakMap<ViewerStore, string>();
 const hotspotRegistry = new WeakMap<ViewerStore, Map<string, HTMLElement>>();
 const hotspotsOf = (viewer: ViewerStore) => {
   let map = hotspotRegistry.get(viewer);
@@ -137,35 +143,37 @@ const animationSnapshot = (viewer: ViewerStore): AnimationSnapshot | undefined =
 const PointerLine = ({ highlight }: { highlight: Highlight }) => {
   const { viewer } = useFeature<HighlightsConfig>();
   const gltf = useViewerState((s) => s.gltf);
-  const color = typeof highlight.pointer === 'object' ? highlight.pointer.color : undefined;
-  const line = useRef<Line>(null);
+  const color = (typeof highlight.pointer === 'object' && highlight.pointer.color) || highlight.color || '#ffffff';
+  const line = useRef<Mesh>(null);
   const dot = useRef<Mesh>(null);
   const a = useRef(new Vector3());
   const b = useRef(new Vector3());
-  const geometry = useRef(new BufferGeometry().setAttribute('position', new Float32BufferAttribute(6, 3)));
-  const lineObject = useRef<Line | null>(null);
-  lineObject.current ??= new Line(geometry.current, new LineBasicMaterial({ color: color ?? highlight.color ?? '#ffffff' }));
+  const { camera, size } = useThree();
 
   useFrame(() => {
     resolveAnchor(highlight.anchor, gltf?.scene, a.current);
     resolveAnchor(highlight.target ?? highlight.anchor, gltf?.scene, b.current);
-    const position = geometry.current.getAttribute('position');
-    position.setXYZ(0, a.current.x, a.current.y, a.current.z);
-    position.setXYZ(1, b.current.x, b.current.y, b.current.z);
-    position.needsUpdate = true;
-    geometry.current.computeBoundingSphere();
-    dot.current?.position.copy(b.current);
-    if (line.current) {
-      line.current.visible = isHighlightVisible(highlight, animationSnapshot(viewer));
+    if (line.current && dot.current) {
+      const active = hotspotsOf(viewer).get(highlight.id)?.hasAttribute('data-hover');
+      const perspective = camera as PerspectiveCamera;
+      const unitsPerPixel = 2 * camera.position.distanceTo(a.current) * Math.tan(perspective.fov * Math.PI / 360) / size.height;
+      updatePointer(line.current, dot.current, a.current, b.current, isHighlightVisible(highlight, animationSnapshot(viewer)), unitsPerPixel * (active ? 1.8 : 0.8));
     }
   });
 
   return (
     <>
-      <primitive ref={line} object={lineObject.current} />
+      <mesh ref={line} renderOrder={2}>
+        <cylinderGeometry args={[1, 1, 1, 8]} />
+        <meshBasicMaterial color={color} depthWrite={false} />
+        <mesh renderOrder={3}>
+          <cylinderGeometry args={[1, 1, 1, 8]} />
+          <meshBasicMaterial color={color} depthFunc={GreaterDepth} depthWrite={false} transparent opacity={0.4} />
+        </mesh>
+      </mesh>
       <mesh ref={dot}>
         <sphereGeometry args={[0.02, 12, 12]} />
-        <meshBasicMaterial color={color ?? highlight.color ?? '#ffffff'} />
+        <meshBasicMaterial color={color} />
       </mesh>
     </>
   );
@@ -190,6 +198,8 @@ const HighlightsScene = () => {
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const points = useRef<Array<{ id: string; x: number; y: number }>>([]);
+  const [outline, setOutline] = useState<Highlight | undefined>();
+  const lastOutline = useRef<Highlight | undefined>(undefined);
   const hovered = useRef<string | null>(null);
   const latest = useRef({ focusedId, config });
   latest.current = { focusedId, config };
@@ -307,17 +317,20 @@ const HighlightsScene = () => {
     if (!focused?.nodes?.length || !gltf) {
       return undefined;
     }
-    const touched: Array<{ material: Material & { emissive: Color }; original: Color }> = [];
+    const touched = new Map<Material & { emissive: Color }, Color>();
     focused.nodes.forEach((name) => {
       gltf.scene.getObjectByName(name)?.traverse((object: Object3D) => {
-        const material = (object as Mesh).material as (Material & { emissive?: Color }) | undefined;
-        if (material?.emissive) {
-          touched.push({ material: material as Material & { emissive: Color }, original: material.emissive.clone() });
-          material.emissive.set(focused.color ?? '#ffffff').multiplyScalar(0.4);
+        const materials = (object as Mesh).material;
+        for (const material of Array.isArray(materials) ? materials : [materials]) {
+          if (material && 'emissive' in material && material.emissive instanceof Color) {
+            const target = material as Material & { emissive: Color };
+            if (!touched.has(target)) touched.set(target, target.emissive.clone());
+            target.emissive.set(focused.color ?? '#ffffff').multiplyScalar(0.4);
+          }
         }
       });
     });
-    return () => touched.forEach(({ material, original }) => material.emissive.copy(original));
+    return () => touched.forEach((original, material) => material.emissive.copy(original));
   }, [focused, gltf]);
 
   useFrame((_, delta) => {
@@ -383,7 +396,20 @@ const HighlightsScene = () => {
         }
       }
     }
-    hotspotsOf(viewer).forEach((element, id) => element.toggleAttribute('data-hover', id === hovered.current));
+    const preview = previewIds.get(viewer) ?? hovered.current;
+    const nextOutline = enabled && preview && visiblePoints.some(point => point.id === preview)
+      ? config.highlights.find(highlight => highlight.id === preview && highlight.hoverOutline) : undefined;
+    if (lastOutline.current !== nextOutline) {
+      lastOutline.current = nextOutline;
+      setOutline(nextOutline);
+    }
+    hotspotsOf(viewer).forEach((element, id) => element.toggleAttribute('data-hover', id === preview));
+    const entries = openLists.get(viewer)?.children;
+    if (entries) {
+      for (const entry of Array.from(entries)) {
+        entry.toggleAttribute('data-hover', entry.getAttribute('data-highlight-id') === preview);
+      }
+    }
     gl.domElement.style.cursor = hovered.current ? 'pointer' : '';
 
     const current = goal.current;
@@ -425,7 +451,7 @@ const HighlightsScene = () => {
     }
   });
 
-  return focused?.pointer ? <PointerLine highlight={focused} /> : null;
+  return enabled ? <>{outline && gltf && <HoverOutline highlight={outline} model={gltf.scene} />}{config.highlights.filter((highlight) => highlight.pointer).map((highlight) => <PointerLine key={highlight.id} highlight={highlight} />)}</> : null;
 };
 
 const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
@@ -433,7 +459,7 @@ const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
   const { focusedId, focus, release } = useHighlights();
   return (
     <>
-      {config.highlights.map((highlight) => {
+      {config.highlights.map((highlight, index) => {
         const focused = highlight.id === focusedId;
         return (
           <button
@@ -453,6 +479,8 @@ const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
             data-testid={`ds-hotspot-${highlight.id}`}
             aria-label={highlightLabel(highlight, config.locale)}
             aria-pressed={focused}
+            onFocus={() => previewIds.set(viewer, highlight.id)}
+            onBlur={() => previewIds.delete(viewer)}
             style={highlight.color ? ({ '--ds-hotspot-color': highlight.color } as React.CSSProperties) : undefined}
             onClick={(event) => {
               // Pointer clicks are hit-tested in the scene; this handles keyboard activation.
@@ -462,7 +490,7 @@ const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
             }}
           >
             <Slot name="highlights.hotspot" props={{ highlight, focused }}>
-              <span className="ds-hotspot__content" />
+              <span className="ds-hotspot__content">{index + 1}</span>
             </Slot>
           </button>
         );
@@ -476,34 +504,74 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
   const { focusedId, release } = useHighlights();
   const enabled = useViewerState((s) => s.featureEnabled[FEATURE_ID] ?? false);
   const highlight = config.highlights.find((h) => h.id === focusedId);
-  if (!highlight || !enabled) {
+  const tools = useModelTools(highlight?.tools ?? []);
+  const features = useViewerState((s) => s.featureEnabled);
+  const actions = highlight?.actions?.filter((action) => !action.requiresFeature || features[action.requiresFeature]);
+  const fills = useSlotFills('highlights.detail');
+  const panel = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
+  if (!highlight || !enabled || (!highlight.description && !actions?.length && !fills.length && !tools.length)) {
     return null;
   }
   return (
+    <div ref={panel} className="ds-highlight-callout">
     <Panel
       className="ds-highlight-detail"
       data-testid="ds-highlight-detail"
-      title={highlightLabel(highlight, config.locale)}
+      title={<button type="button" className="ds-callout-handle" aria-label={`Move ${highlightLabel(highlight, config.locale)}`}
+        onKeyDown={(event) => {
+          const box = panel.current;
+          const parent = box?.offsetParent;
+          if (!box || !parent) return;
+          const directions: Record<string, [number, number]> = { ArrowLeft: [-8, 0], ArrowRight: [8, 0], ArrowUp: [0, -8], ArrowDown: [0, 8] };
+          const step = directions[event.key];
+          if (!step) return;
+          event.preventDefault();
+          box.style.left = Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, box.offsetLeft + step[0])) + 'px';
+          box.style.top = Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, box.offsetTop + step[1])) + 'px';
+        }}
+        onPointerDown={(event) => {
+          const box = panel.current;
+          if (!box) return;
+          drag.current = { x: event.clientX, y: event.clientY, left: box.offsetLeft, top: box.offsetTop };
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerUp={() => { drag.current = null; }}
+        onPointerCancel={() => { drag.current = null; }}
+        onPointerMove={(event) => {
+          const start = drag.current;
+          const box = panel.current;
+          const parent = box?.offsetParent;
+          if (!start || !box || !parent) return;
+          box.style.left = Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, start.left + event.clientX - start.x)) + 'px';
+          box.style.top = Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, start.top + event.clientY - start.y)) + 'px';
+        }}>
+          <span className="ds-callout-index">{String(config.highlights.indexOf(highlight) + 1).padStart(2, '0')} / {String(config.highlights.length).padStart(2, '0')}</span>
+          {highlightLabel(highlight, config.locale)}
+        </button>}
       actions={<IconButton label="Close" icon={<X size={18} aria-hidden="true" />} data-testid="ds-highlight-detail-close" onClick={release} />}
     >
       <Slot name="highlights.detail" props={{ highlight }}>
-        {highlight.actions?.length ? (
+        {highlight.description && <p>{highlight.description}</p>}
+        <ModelToolControls tools={tools} surface="inline" />
+        {actions?.length ? (
           <div className="ds-highlight-detail__actions" data-testid="ds-highlight-detail-actions">
-            {highlight.actions.map((action) => (
+            {actions.map((action) => (
               <button
                 key={action.id}
                 type="button"
-                className="ds-highlight-detail__action"
+                className="ds-highlight-detail__action" data-navigation={typeof action.run === 'object' && 'focus' in action.run ? '' : undefined}
                 data-testid={`ds-highlight-action-${highlight.id}-${action.id}`}
                 onClick={() => (typeof action.run === 'function' ? action.run(viewer) : runCommand(viewer, action.run))}
               >
-                {action.label}
+                {action.label}{typeof action.run === 'object' && 'focus' in action.run && <ArrowRight size={16} aria-hidden="true" />}
               </button>
             ))}
           </div>
         ) : null}
       </Slot>
     </Panel>
+    </div>
   );
 };
 
@@ -514,6 +582,8 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const list = config.highlights;
+  const viewer = useViewer();
+  useEffect(() => () => { previewIds.delete(viewer); }, [viewer, open, enabled]);
 
   useEffect(() => {
     if (!open) {
@@ -532,19 +602,24 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
   if (!enabled || list.length === 0) {
     return null;
   }
-  const index = Math.max(0, list.findIndex((h) => h.id === focusedId));
-  const step = (delta: number) => focus(list[(index + delta + list.length) % list.length].id);
+  const index = list.findIndex((h) => h.id === focusedId);
+  const step = (delta: number) => focus(list[index < 0 ? (delta > 0 ? 0 : list.length - 1) : (index + delta + list.length) % list.length].id);
   const current = list[index];
 
   return (
     <div ref={rootRef} className="ds-highlight-select" data-open={open ? '' : undefined} data-testid="ds-highlight-select">
       {open && (
-        <div className="ds-highlight-select__list" role="listbox" data-testid="ds-highlight-select-list">
-          {list.map((highlight) => (
+        <div ref={(element) => { if (element) openLists.set(viewer, element); else openLists.delete(viewer); }} className="ds-highlight-select__list" role="listbox" data-testid="ds-highlight-select-list">
+          {list.map((highlight, number) => (
             <button
               key={highlight.id}
               type="button"
+              data-highlight-id={highlight.id}
               role="option"
+              onPointerEnter={() => previewIds.set(viewer, highlight.id)}
+              onPointerLeave={() => previewIds.delete(viewer)}
+              onFocus={() => previewIds.set(viewer, highlight.id)}
+              onBlur={() => previewIds.delete(viewer)}
               aria-selected={highlight.id === focusedId}
               className="ds-highlight-select__entry"
               data-active={highlight.id === focusedId ? '' : undefined}
@@ -554,7 +629,9 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
                 setOpen(false);
               }}
             >
-              {highlightLabel(highlight, config.locale)}
+              <span className="ds-highlight-select__number">{number + 1}</span>
+              <span className="ds-highlight-select__label">{highlightLabel(highlight, config.locale)}</span>
+              {highlight.id === focusedId && <Check size={16} className="ds-highlight-select__check" aria-hidden="true" />}
             </button>
           ))}
         </div>
@@ -570,7 +647,7 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
         data-testid="ds-highlight-select-current"
         onClick={() => setOpen((o) => !o)}
       >
-        {highlightLabel(current, config.locale)}
+        {current ? `${index + 1} · ${highlightLabel(current, config.locale)}` : 'Highlights'}
       </button>
       <button type="button" aria-label="Next highlight" className="ds-highlight-select__step ds-highlight-select__next" data-testid="ds-highlight-next" onClick={() => step(1)}>
         <ChevronRight size={20} aria-hidden="true" />
@@ -580,6 +657,11 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
 };
 
 /** glTF extension: `ALCM_highlights`. Hotspots are DOM buttons (`.ds-hotspot`), focus moves the camera. */
+const StandaloneSelector = ({ config }: { config: HighlightsConfig }) => {
+  const playback = useViewerState((s) => s.featureEnabled.animation && Boolean((s.featureState.animation as { clips?: string[] } | undefined)?.clips?.length));
+  return playback ? null : <HighlightSelect config={config} />;
+};
+
 export const highlights = defineFeature<HighlightsConfig>({
   id: FEATURE_ID,
   defaults: { enabled: true, highlights: [], locale: 'en', detail: true, select: true, pauseOnHover: true },
@@ -591,7 +673,8 @@ export const highlights = defineFeature<HighlightsConfig>({
     ...(config.detail
       ? { 'overlay.bottom-left': { mode: 'append' as const, order: -10, content: <DetailPanel config={config} /> } }
       : {}),
-    ...(config.select ? { 'overlay.bottom-center': { mode: 'append' as const, order: 0, content: <HighlightSelect config={config} /> } } : {}),
+    ...(config.select === 'playback' ? { 'overlay.bottom-center': { mode: 'append' as const, order: 0, content: <StandaloneSelector config={config} /> } } : {}),
+    ...(config.select ? { [config.select === 'playback' ? 'animation.controls.middle' : 'overlay.bottom-center']: { mode: 'append' as const, order: 0, content: <HighlightSelect config={config} /> } } : {}),
   }),
   setup: ({ viewer, config }) => {
     if (viewer.getState().featureState[FEATURE_ID] === undefined) {

@@ -3,16 +3,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
-import { joinPathFragments } from '@nx/devkit';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   root: __dirname,
+  esbuild: { jsxDev: false },
   cacheDir: '../../node_modules/.vite/feature-light-scenarios',
 
   plugins: [
     dts({
-      entryRoot: 'src',
-      tsconfigPath: joinPathFragments(__dirname, 'tsconfig.lib.json'),
+      pathsToAliases: false,
+      entryRoot: resolve(__dirname, 'src'),
+      tsconfigPath: resolve(__dirname, 'tsconfig.lib.json'),
     }),
     react(),
     nxViteTsPaths(),
