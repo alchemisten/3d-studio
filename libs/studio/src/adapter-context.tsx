@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Project, ProjectAdapter } from '@schablone/3d-studio-core';
 
 const AdapterContext = createContext<ProjectAdapter | null>(null);
@@ -22,31 +22,30 @@ export interface Query<T> {
   error: Error | undefined;
 }
 
-const useAdapterQuery = <T,>(load: (signal: AbortSignal) => Promise<T>, deps: unknown[]): Query<T> => {
-  const [state, setState] = useState<Query<T>>({ data: undefined, loading: true, error: undefined });
+const useAdapterQuery = <T,>(load: (signal: AbortSignal) => Promise<T>): Query<T> => {
+  const [result, setResult] = useState<{ load: typeof load; query: Query<T> }>();
   useEffect(() => {
     const controller = new AbortController();
-    setState((s) => ({ ...s, loading: true, error: undefined }));
+    const settle = (data: T | undefined, error?: Error) => {
+      if (!controller.signal.aborted) setResult({ load, query: { data, loading: false, error } });
+    };
     load(controller.signal).then(
-      (data) => !controller.signal.aborted && setState({ data, loading: false, error: undefined }),
-      (error: unknown) =>
-        !controller.signal.aborted &&
-        setState({ data: undefined, loading: false, error: error instanceof Error ? error : new Error(String(error)) }),
+      data => settle(data),
+      (error: unknown) => settle(undefined, error instanceof Error ? error : new Error(String(error))),
     );
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-  return state;
+  }, [load]);
+  return result?.load === load ? result.query : { data: undefined, loading: true, error: undefined };
 };
 
 /** All projects from the adapter in context (or the one passed in). */
 export const useProjects = (adapter?: ProjectAdapter): Query<Project[]> => {
   const resolved = useProjectAdapter(adapter);
-  return useAdapterQuery((signal) => resolved.listProjects({ signal }), [resolved]);
+  return useAdapterQuery(useCallback((signal: AbortSignal) => resolved.listProjects({ signal }), [resolved]));
 };
 
 /** One project by id; `data` is `undefined` while loading or when it does not exist. */
 export const useProject = (id: string, adapter?: ProjectAdapter): Query<Project | undefined> => {
   const resolved = useProjectAdapter(adapter);
-  return useAdapterQuery((signal) => resolved.getProject(id, { signal }), [resolved, id]);
+  return useAdapterQuery(useCallback((signal: AbortSignal) => resolved.getProject(id, { signal }), [resolved, id]));
 };

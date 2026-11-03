@@ -18,6 +18,7 @@ PACKAGES=(
   3d-studio-feature-skybox
   3d-studio-feature-color-switcher
   3d-studio-feature-material-variants
+  3d-studio-feature-beauty-shot
   3d-studio-feature-floor
   3d-studio-feature-wireframe
   3d-studio-feature-camera-rotation

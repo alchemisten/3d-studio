@@ -30,6 +30,7 @@ export const variantsShoe: Project = {
   thumbnail: './previews/variants-shoe.png',
   openingCamera: openingCamera(descriptor.preview.camera),
   featureConfig: {
+    'beauty-shot': { enabled: true, layout: 'details', initial: 'standard' },
     highlights,
     skybox: previewSkybox(descriptor.environment),
     [materialVariants.id]: { initial: 'midnight' },

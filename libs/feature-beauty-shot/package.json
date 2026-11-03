@@ -1,0 +1,48 @@
+{
+  "name": "@schablone/3d-studio-feature-beauty-shot",
+  "description": "On-demand WebGPU still image feature for 3D Studio.",
+  "keywords": [
+    "react",
+    "three",
+    "react-three-fiber",
+    "3d",
+    "viewer",
+    "gltf"
+  ],
+  "author": "Alchemisten AG",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    "./style.css": "./style.css",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "peerDependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@schablone/3d-studio-core": "__root_version__",
+    "@schablone/3d-studio-ui": "__root_version__",
+    "lucide-react": ">=0.400.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "^7.8.1",
+    "three": ">=0.187.0"
+  },
+  "dependencies": {
+    "three-gpu-pathtracer": "0.0.28",
+    "three-mesh-bvh": "^0.9.17",
+    "xatlas-web": "^0.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@nx/devkit": "21.4.1",
+    "@nx/vite": "21.4.1",
+    "@vitejs/plugin-react": "5.0.1",
+    "vite": "6.0.0",
+    "vite-plugin-dts": "4.5.4"
+  }
+}

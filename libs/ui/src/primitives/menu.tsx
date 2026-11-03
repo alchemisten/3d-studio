@@ -29,6 +29,7 @@ export interface MenuProps {
 export const Menu = ({ label, icon, items, children, className, testId, placement = 'bottom-start' }: MenuProps) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   const popupId = useId();
 
   useEffect(() => {
@@ -40,7 +41,22 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
         setOpen(false);
       }
     };
-    const onKeyDown = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onKeyDown = (e: KeyboardEvent) => {
+      const root = rootRef.current;
+      if (!root || !root.contains(document.activeElement)) return;
+      if (e.key === 'Escape') {
+        setOpen(false);
+        requestAnimationFrame(() => trigger.current?.focus());
+      }
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      if (e.target instanceof HTMLElement && e.target.closest('input, select, textarea, [role="slider"]')) return;
+      const items = Array.from(root.querySelectorAll<HTMLElement>('[role^="menuitem"]:not(:disabled):not([aria-disabled="true"])'));
+      if (!items.length) return;
+      e.preventDefault();
+      const index = items.indexOf(document.activeElement as HTMLElement);
+      const next = e.key === 'ArrowDown' ? index + 1 : index < 0 ? items.length - 1 : index - 1;
+      items[(next + items.length) % items.length].focus();
+    };
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
     return () => {
@@ -50,21 +66,26 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
   }, [open]);
 
   return (
-    <div ref={rootRef} className={cx('ds-menu', className)} data-placement={placement} data-open={open ? '' : undefined}>
+    <div ref={rootRef} className={cx('ds-menu', className)} data-placement={placement} data-open={open ? '' : undefined}
+      onBlur={(event) => {
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}>
       <IconButton
+        ref={trigger}
         label={label}
         icon={icon}
         className="ds-menu__trigger"
         data-testid={testId}
         active={open}
-        tooltip={!open}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? popupId : undefined}
         onClick={() => setOpen((o) => !o)}
       />
       {open && (
-        <div id={popupId} className="ds-menu__popup" role="menu" data-testid={testId && `${testId}-popup`}>
+        <div id={popupId} className="ds-menu__popup" role="menu" onClick={(event) => {
+          if (event.target instanceof Element && event.target.closest('[role="menuitem"]')) setOpen(false);
+        }} data-testid={testId && `${testId}-popup`}>
           {items?.map((item) => (
             <button
               key={item.id}

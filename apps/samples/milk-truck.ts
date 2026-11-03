@@ -65,5 +65,10 @@ export const milkTruck: Project = {
   tags: ['Cesium', 'CC BY 4.0'],
   description: 'Inspect the headlamp and animated front wheel.',
   source: './models/milk-truck-draco/CesiumMilkTruck.gltf',
-  featureConfig: { [bodyTint.id]: bodyPaint.config, highlights: milkTruckHighlights, skybox: previewSkybox(descriptor.environment) },
+  featureConfig: {
+    'beauty-shot': { enabled: true, layout: 'details', initial: 'standard' },
+    [bodyTint.id]: bodyPaint.config,
+    highlights: milkTruckHighlights,
+    skybox: previewSkybox(descriptor.environment),
+  },
 };

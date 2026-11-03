@@ -1,0 +1,123 @@
+.ds-beauty-dialog {
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: min(25rem, calc(100vw - 1.5rem));
+  max-width: none;
+  max-height: calc(100dvh - 1.5rem);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid var(--ds-color-border);
+  border-radius: 1rem;
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface);
+  box-shadow: 0 1.5rem 5rem #0004;
+  font: inherit;
+}
+.ds-beauty-dialog[data-preview] {
+  width: min(48rem, calc(100vw - 1.5rem));
+}
+.ds-beauty-dialog::backdrop {
+  background: #13191c78;
+  backdrop-filter: blur(5px);
+}
+.ds-beauty-header,
+.ds-beauty-footer,
+.ds-beauty-status-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.ds-beauty-header,
+.ds-beauty-settings,
+.ds-beauty-status,
+.ds-beauty-footer {
+  padding: 1rem 1.25rem;
+}
+.ds-beauty-header {
+  border-bottom: 1px solid var(--ds-color-border);
+}
+.ds-beauty-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font: inherit;
+  font-size: 1.12rem;
+  font-weight: 650;
+  margin: 0;
+}
+.ds-beauty-header span,
+.ds-beauty-status small {
+  color: var(--ds-color-text-muted);
+  font-size: 0.8rem;
+}
+.ds-beauty-settings {
+  display: grid;
+  gap: 1rem;
+}
+.ds-beauty-quality {
+  display: grid;
+  gap: 0.5rem;
+}
+.ds-beauty-quality .ds-segmented {
+  display: flex;
+  flex-wrap: wrap;
+}
+.ds-beauty-quality .ds-segmented__item {
+  flex: 1;
+}
+.ds-beauty-settings details {
+  border-top: 1px solid var(--ds-color-border);
+  padding-top: 0.75rem;
+}
+.ds-beauty-settings summary {
+  cursor: pointer;
+  color: var(--ds-color-text-muted);
+}
+.ds-beauty-settings details[open] summary {
+  margin-bottom: 0.75rem;
+}
+.ds-beauty-settings input[type='number'] {
+  width: 6rem;
+  border: 1px solid var(--ds-color-border);
+  border-radius: 0.5rem;
+  background: var(--ds-color-surface);
+  color: inherit;
+  padding: 0.4rem;
+  font: inherit;
+}
+.ds-beauty-stage:not([hidden]) {
+  display: grid;
+  place-items: center;
+  background: #202423;
+}
+.ds-beauty-stage img,
+.ds-beauty-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 55dvh;
+  object-fit: contain;
+}
+.ds-beauty-status {
+  display: grid;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.ds-beauty-status progress {
+  width: 100%;
+  height: 0.5rem;
+  accent-color: var(--ds-color-accent);
+}
+.ds-beauty-footer {
+  border-top: 1px solid var(--ds-color-border);
+}
+.ds-beauty-footer a {
+  text-decoration: none;
+}
+.ds-beauty-footer .ds-button[data-variant='solid'],
+.ds-beauty-footer a.ds-button {
+  background: var(--ds-color-accent);
+  border-color: var(--ds-color-accent);
+  color: var(--ds-color-accent-contrast);
+}

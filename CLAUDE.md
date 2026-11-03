@@ -11,3 +11,5 @@ Features register model tools by ID through the core contract. Customize and hig
 Authored variants belong to the material-variants package. After an atomic swap it emits `model:materials-changed`; material effects rebind to the active viewer-local instances. Tints, highlights, and URL adapters do not load variant textures.
 
 Feature packages own query codecs. The viewer binds them after feature setup; the host owns router navigation and parameter names. Changes to public packages must pass the external packed-consumer fixture in addition to workspace gates.
+
+Beauty Shot captures the current camera and model for an optional WebGPU still. Keep the tracer and WebGPU renderer behind the render action. Features contribute actions to viewer.output. The host places the Output menu through outputMenu.region; scenes own their rendering presets.

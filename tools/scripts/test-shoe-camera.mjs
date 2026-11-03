@@ -1,3 +1,4 @@
+import { checkViewerRecovery } from './check-viewer-recovery.mjs';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createServer } from 'vite';
@@ -13,6 +14,11 @@ try {
   await server.listen();
   const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL });
   try {
+    await checkViewerRecovery(browser, server.resolvedUrls.local[0]);
+    if (process.env.STUDIO_TEST_WEBGPU === '1') {
+      const { checkRenderedOutput } = await import('./check-rendered-output.mjs');
+      await checkRenderedOutput(browser, server.resolvedUrls.local[0]);
+    }
     const page = await browser.newPage();
     await page.goto(new URL('scenes/variants-shoe', server.resolvedUrls.local[0]).href);
     const marker = page.getByTestId('ds-hotspot-upper');
@@ -44,7 +50,7 @@ try {
       return Math.max(...window.markerPositions.map(([left, top]) => Math.hypot(left - x, top - y)));
     });
     assert.ok(drift < 0.5, `Upper finish moved ${drift} CSS pixels`);
-    console.log(`Upper finish → Street: ${drift} CSS pixels of marker drift`);
+    console.log(`Upper finish to Street: ${drift} CSS pixels of marker drift`);
     await page.getByTestId('ds-highlight-detail-close').click();
     await marker.evaluate(async (element) => {
       const fiber = performance.getEntriesByType('resource').find(({ name }) => name.includes('@react-three_fiber.js'));

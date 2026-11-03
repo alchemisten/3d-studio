@@ -115,3 +115,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ds-viewer__message--loading[data-leaving] { animation-duration: 1ms; }
 }
+
+.ds-viewer__message--error { flex-direction: column; gap: .75rem; padding: 1rem; text-align: center; }
+.ds-viewer__message--error button { pointer-events: auto; }

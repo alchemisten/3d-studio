@@ -20,6 +20,7 @@
     "paths": {
       "@schablone/3d-studio-feature-color-switcher": ["libs/feature-color-switcher/src/index.ts"],
       "@schablone/3d-studio-feature-material-variants": ["libs/feature-material-variants/src/index.ts"],
+      "@schablone/3d-studio-feature-beauty-shot": ["libs/feature-beauty-shot/src/index.ts"],
       "@schablone/3d-studio-feature-floor": ["libs/feature-floor/src/index.ts"],
       "@schablone/3d-studio-core": ["libs/core/src/index.ts"],
       "@schablone/3d-studio-feature-wireframe": ["libs/feature-wireframe/src/index.ts"],
