@@ -6,26 +6,13 @@
       "inputs": ["production", "^production"],
       "cache": true
     },
-    "@nx/vite:test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+    "@nx/vitest:test": {
+      "inputs": ["default", "^production"],
       "cache": true
-    },
-    "@nx/jest:jest": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "cache": true,
-      "options": {
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
     },
     "@nx/eslint:lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/tools/eslint-rules/**/*"]
+      "inputs": ["default", "{workspaceRoot}/eslint.config.cjs", "{workspaceRoot}/tools/eslint-rules/**/*"]
     }
   },
   "namedInputs": {
@@ -34,21 +21,20 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": ["{workspaceRoot}/tools/vite/**/*", "{workspaceRoot}/README.md", "{workspaceRoot}/LICENSE.md"]
   },
   "workspaceLayout": {
     "appsDir": "apps",
     "libsDir": "libs"
   },
-  "defaultProject": "3d-studio-example",
+  "defaultProject": "example",
   "generators": {
     "@nx/web:application": {
       "style": "css",
       "linter": "eslint",
-      "unitTestRunner": "jest",
+      "unitTestRunner": "vitest",
       "e2eTestRunner": "none"
     },
     "@nx/react": {
@@ -61,7 +47,7 @@
       "library": {
         "style": "scss",
         "linter": "eslint",
-        "unitTestRunner": "jest"
+        "unitTestRunner": "vitest"
       },
       "component": {
         "style": "scss"
@@ -74,13 +60,8 @@
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      }
+      },
+      "include": ["libs/**"]
     },
     {
       "plugin": "@nx/vite/plugin",
@@ -88,10 +69,15 @@
         "buildTargetName": "build",
         "serveTargetName": "serve",
         "previewTargetName": "preview",
-        "testTargetName": "test",
         "serveStaticTargetName": "serve-static",
         "devTargetName": "dev",
         "typecheckTargetName": "typecheck"
+      }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test"
       }
     }
   ]

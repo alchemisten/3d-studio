@@ -1,38 +1,45 @@
 {
-  "branches": "main",
+  "branches": [
+    "main",
+    {
+      "name": "develop",
+      "prerelease": "rc",
+      "channel": "next"
+    }
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     [
       "@semantic-release/npm",
       {
-        "publish": false
+        "npmPublish": false
       }
     ],
     "@semantic-release/github",
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=3d-studio-example,gltf-extension,gltf-extension-validator"
+        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --tag=${nextRelease.channel || 'latest'} --exclude=example,example-tanstack,docs"
       }
     ],
     [
       "@semantic-release/git",
       {
-        "assets": [
-          "package.json",
-          "package-lock.json"
-        ],
+        "assets": ["package.json", "pnpm-lock.yaml"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
     [
       "@saithodev/semantic-release-backmerge",
       {
-        "branches": [
-          "develop"
-        ],
-        "backmergeStrategy": "merge"
+        "backmergeStrategy": "merge",
+        "backmergeBranches": [
+          {
+            "from": "main",
+            "to": "develop"
+          }
+        ]
       }
     ]
   ]

@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "types": ["node", "vite/client", "vitest/globals"],
+    "noEmit": true
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "apps/**/*.mts",
+    "apps/docs/.storybook/*.ts",
+    "apps/docs/.storybook/*.tsx",
+    "libs/*/src/**/*.ts",
+    "libs/*/src/**/*.tsx",
+    "tools/scripts/*.ts",
+    "tools/vite/*.ts"
+  ],
+  "exclude": ["**/node_modules", "**/*.spec.ts", "**/*.spec.tsx"]
+}

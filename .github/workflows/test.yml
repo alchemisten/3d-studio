@@ -1,5 +1,5 @@
 name: Test
-"on":
+'on':
   push:
     branches:
       - develop
@@ -15,11 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: npm
-      - run: npm install -g npm@latest
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit
+      - run: pnpm run typecheck
+      - run: pnpm run lint
+      - run: pnpm run build
+      - run: pnpm run test
+      - run: pnpm --dir libs/scene-preview exec playwright-core install --with-deps chromium
+      - run: pnpm run test:consumer
+      - run: node tools/scripts/test-shoe-camera.mjs
+      - run: node tools/scripts/test-tanstack-example.mjs

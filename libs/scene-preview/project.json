@@ -1,0 +1,38 @@
+{
+  "name": "3d-studio-scene-preview",
+  "projectType": "library",
+  "sourceRoot": "libs/scene-preview/src",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --root libs/scene-preview"
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-scene-preview {args.ver} {args.tag}"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/scene-preview"],
+      "options": {
+        "parallel": false,
+        "outDir": "dist/libs/scene-preview",
+        "commands": [
+          {
+            "command": "node libs/scene-preview/build.mjs",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "tsc -p libs/scene-preview/tsconfig.types.json",
+            "forwardAllArgs": false
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+name: Pages
+'on':
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      TARGETS: ${{ github.event_name == 'pull_request' && format('pr/{0}', github.event.pull_request.number) || (startsWith(github.ref, 'refs/tags/') && format('{0} {1}', github.ref_name, contains(github.ref_name, '-rc.') && 'next' || 'latest') || (github.ref_name == 'main' && 'latest' || (github.ref_name == 'develop' && 'next' || ''))) }}
+      CLOSED: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Prepare gh-pages branch
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
+            git fetch origin gh-pages --depth=1
+            git worktree add ../pages-branch origin/gh-pages
+            git -C ../pages-branch checkout -B gh-pages
+          else
+            git worktree add --no-checkout --detach ../pages-branch
+            git -C ../pages-branch checkout --orphan gh-pages
+            git -C ../pages-branch rm -rf . >/dev/null
+            git -C ../pages-branch clean -fdxq
+          fi
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        if: env.CLOSED != 'true' && env.TARGETS != ''
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Build Storybook and live sample
+        if: env.CLOSED != 'true' && env.TARGETS != ''
+        run: |
+          pnpm install --frozen-lockfile
+          # Vite's public-dir copy occasionally races with itself (EEXIST); a retry clears it.
+          pnpm exec nx run docs:build-storybook || { rm -rf dist/pages/storybook; pnpm exec nx run docs:build-storybook --skip-nx-cache; }
+          pnpm exec vite build --config apps/example/vite.config.ts --base ./
+          node tools/scripts/pages-sample.mjs dist/apps/example
+        env:
+          CYPRESS_INSTALL_BINARY: '0'
+      - name: Verify static previews
+        if: env.CLOSED != 'true' && env.TARGETS != ''
+        run: |
+          pnpm --dir libs/scene-preview exec playwright-core install --with-deps chromium
+          pnpm run test:pages
+      - name: Publish into target folders
+        if: env.TARGETS != ''
+        run: |
+          for target in $TARGETS; do
+            rm -rf "../pages-branch/$target"
+            if [ "$CLOSED" != "true" ]; then
+              mkdir -p "../pages-branch/$target"
+              cp -r dist/pages/storybook/. "../pages-branch/$target/"
+              cp -r dist/apps/example "../pages-branch/$target/sample"
+            fi
+          done
+          cp apps/docs/landing/index.html ../pages-branch/index.html
+          touch ../pages-branch/.nojekyll
+          node tools/scripts/pages-versions.mjs ../pages-branch
+          cd ../pages-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "pages: update $TARGETS ($GITHUB_SHA)"
+          git push origin gh-pages
+      - name: Comment preview link
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: |
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          gh pr comment "$PR" --edit-last --create-if-none \
+            --body "Preview for ${GITHUB_SHA::7} · [Live sample](https://${owner}.github.io/${repo}/pr/${PR}/sample/) · [Storybook](https://${owner}.github.io/${repo}/pr/${PR}/). Removed when the PR closes."
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}

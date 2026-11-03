@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "dependencyDashboard": true,
+  "packageRules": [
+    { "matchPackageNames": ["nx", "@nx/**"], "groupName": "Nx" },
+    { "matchPackageNames": ["vitest", "@vitest/**"], "groupName": "Vitest" },
+    { "matchPackageNames": ["@tanstack/**"], "groupName": "TanStack" },
+    {
+      "matchPackageNames": ["three", "@types/three", "@react-three/**", "three-gpu-pathtracer", "three-mesh-bvh"],
+      "groupName": "3D rendering"
+    },
+    { "matchPackageNames": ["nx", "eslint-plugin-react", "eslint-plugin-jsx-a11y"], "automerge": false }
+  ]
+}

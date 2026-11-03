@@ -1,0 +1,159 @@
+/* Layer 1: primitives. Raw scale values; never referenced by components directly. */
+:where(.ds-theme) {
+  --ds-color-neutral-0: #ffffff;
+  --ds-color-neutral-50: #f6f7f9;
+  --ds-color-neutral-100: #eceef2;
+  --ds-color-neutral-300: #c2c7d0;
+  --ds-color-neutral-500: #6b7280;
+  --ds-color-neutral-700: #343a46;
+  --ds-color-neutral-900: #14171d;
+  --ds-color-blue-500: #2f6fed;
+  --ds-color-blue-600: #1f58c9;
+  --ds-color-red-500: #d93f3f;
+
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-6: 1.5rem;
+
+  --ds-radius-1: 0.25rem;
+  --ds-radius-2: 0.5rem;
+  --ds-radius-3: 0.75rem;
+  --ds-radius-full: 999px;
+
+  --ds-font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ds-font-size-1: 0.75rem;
+  --ds-font-size-2: 0.875rem;
+  --ds-font-size-3: 1rem;
+  --ds-font-weight-regular: 400;
+  --ds-font-weight-strong: 600;
+
+  --ds-shadow-1: 0 1px 2px rgb(0 0 0 / 18%);
+  --ds-shadow-2: 0 6px 20px rgb(0 0 0 / 24%);
+  --ds-duration-fast: 120ms;
+}
+
+/* Layer 2: semantic tokens. Meaning-based; what themes override. */
+:where(.ds-theme),
+:where(.ds-theme[data-ds-theme='light']) {
+  --ds-color-text: var(--ds-color-neutral-900);
+  --ds-color-text-muted: var(--ds-color-neutral-500);
+  --ds-color-surface: var(--ds-color-neutral-0);
+  --ds-color-surface-raised: var(--ds-color-neutral-50);
+  --ds-color-surface-overlay: rgb(255 255 255 / 86%);
+  --ds-color-border: var(--ds-color-neutral-300);
+  --ds-glass-bg: rgb(255 255 255 / 52%);
+  --ds-glass-border: rgb(255 255 255 / 65%);
+  --ds-glass-edge: rgb(20 23 29 / 20%);
+  --ds-glass-highlight: rgb(255 255 255 / 70%);
+  --ds-glass-control-bg: rgb(255 255 255 / 35%);
+  --ds-glass-hover: rgb(255 255 255 / 55%);
+  --ds-color-accent: var(--ds-color-neutral-900);
+  --ds-color-accent-hover: var(--ds-color-neutral-700);
+  --ds-color-accent-contrast: var(--ds-color-neutral-0);
+  --ds-color-danger: var(--ds-color-red-500);
+  --ds-color-focus: var(--ds-color-neutral-900);
+
+  --ds-radius-control: var(--ds-radius-2);
+  --ds-radius-surface: var(--ds-radius-3);
+  --ds-gap: var(--ds-space-2);
+}
+
+:where(.ds-theme[data-ds-theme='dark']) {
+  --ds-color-text: var(--ds-color-neutral-50);
+  --ds-color-text-muted: var(--ds-color-neutral-300);
+  --ds-color-surface: var(--ds-color-neutral-900);
+  --ds-color-surface-raised: var(--ds-color-neutral-700);
+  --ds-color-surface-overlay: rgb(20 23 29 / 82%);
+  --ds-color-border: var(--ds-color-neutral-700);
+  --ds-glass-bg: rgb(24 27 34 / 48%);
+  --ds-glass-border: rgb(255 255 255 / 16%);
+  --ds-glass-edge: rgb(0 0 0 / 35%);
+  --ds-glass-highlight: rgb(255 255 255 / 22%);
+  --ds-glass-control-bg: rgb(255 255 255 / 8%);
+  --ds-glass-hover: rgb(255 255 255 / 16%);
+  --ds-color-accent: var(--ds-color-neutral-50);
+  --ds-color-accent-hover: var(--ds-color-neutral-300);
+  --ds-color-accent-contrast: var(--ds-color-neutral-900);
+  --ds-color-focus: var(--ds-color-neutral-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(.ds-theme[data-ds-theme='auto']) {
+    --ds-color-text: var(--ds-color-neutral-50);
+    --ds-color-text-muted: var(--ds-color-neutral-300);
+    --ds-color-surface: var(--ds-color-neutral-900);
+    --ds-color-surface-raised: var(--ds-color-neutral-700);
+    --ds-color-surface-overlay: rgb(20 23 29 / 82%);
+    --ds-color-border: var(--ds-color-neutral-700);
+    --ds-glass-bg: rgb(24 27 34 / 48%);
+    --ds-glass-border: rgb(255 255 255 / 16%);
+    --ds-glass-edge: rgb(0 0 0 / 35%);
+    --ds-glass-highlight: rgb(255 255 255 / 22%);
+    --ds-glass-control-bg: rgb(255 255 255 / 8%);
+    --ds-glass-hover: rgb(255 255 255 / 16%);
+  --ds-glass-control-bg: rgb(255 255 255 / 8%);
+  --ds-glass-hover: rgb(255 255 255 / 16%);
+    --ds-color-accent: var(--ds-color-neutral-50);
+    --ds-color-accent-hover: var(--ds-color-neutral-300);
+    --ds-color-accent-contrast: var(--ds-color-neutral-900);
+    --ds-color-focus: var(--ds-color-neutral-50);
+  }
+}
+
+/* Layer 3: component tokens. Default to semantic tokens; override per component. */
+:where(.ds-theme) {
+  --ds-icon-button-size: 2.5rem;
+  --ds-icon-button-radius: var(--ds-radius-control);
+  --ds-glass-blur: 16px;
+  --ds-glass-saturate: 160%;
+
+  --ds-icon-button-bg: var(--ds-glass-bg);
+  --ds-icon-button-bg-hover: var(--ds-glass-hover);
+  --ds-icon-button-color: var(--ds-color-text);
+  --ds-icon-button-border: var(--ds-glass-border);
+
+  --ds-panel-bg: var(--ds-glass-bg);
+  --ds-panel-color: var(--ds-color-text);
+  --ds-panel-radius: var(--ds-radius-surface);
+  --ds-panel-padding: var(--ds-space-3);
+  --ds-panel-shadow: var(--ds-shadow-1);
+
+  --ds-menu-bg: var(--ds-glass-bg);
+  --ds-menu-radius: var(--ds-radius-control);
+  --ds-menu-shadow: var(--ds-shadow-2);
+  --ds-menu-item-hover: var(--ds-glass-hover);
+
+  --ds-tooltip-bg: var(--ds-color-neutral-900);
+  --ds-tooltip-color: var(--ds-color-neutral-50);
+  --ds-tooltip-radius: var(--ds-radius-1);
+
+  --ds-control-height: 2.25rem;
+  --ds-control-radius: var(--ds-radius-control);
+  --ds-control-bg: var(--ds-glass-control-bg);
+  --ds-control-color: var(--ds-color-text);
+  --ds-control-border: var(--ds-glass-border);
+
+  --ds-switch-bg: var(--ds-color-neutral-500);
+  --ds-switch-bg-checked: var(--ds-color-accent);
+  --ds-switch-thumb: #fff;
+
+  --ds-checkbox-bg: var(--ds-glass-control-bg);
+  --ds-checkbox-border: var(--ds-glass-edge);
+  --ds-checkbox-color: var(--ds-color-accent-contrast);
+
+  --ds-slider-track: var(--ds-glass-edge);
+  --ds-slider-track-height: 4px;
+  --ds-slider-thumb: rgb(255 255 255 / 14%);
+  --ds-slider-thumb-size: 1.5rem;
+  --ds-slider-thumb-outline: color-mix(in srgb, var(--ds-color-text) 55%, transparent);
+
+  --ds-progress-track: var(--ds-glass-edge);
+  --ds-progress-height: 0.375rem;
+
+  --ds-list-item-active-bg: color-mix(in srgb, var(--ds-color-accent) 12%, transparent);
+
+  --ds-overlay-inset: var(--ds-space-4);
+  --ds-overlay-gap: var(--ds-gap);
+}

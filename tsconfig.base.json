@@ -18,9 +18,27 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@schablone/3d-studio-react-website": ["libs/react-website/src/index.ts"],
-      "@schablone/3d-studio-viewer-core": ["libs/viewer-core/src/index.ts"],
-      "@schablone/3d-studio-viewer-ui": ["libs/viewer-ui/src/index.ts"]
+      "@schablone/3d-studio-feature-animation/style.css": ["libs/feature-animation/src/animation.css"],
+      "@schablone/3d-studio-feature-beauty-shot/style.css": ["libs/feature-beauty-shot/src/beauty-shot.css"],
+      "@schablone/3d-studio-feature-color-switcher/style.css": ["libs/feature-color-switcher/src/color-switcher.css"],
+      "@schablone/3d-studio-feature-material-variants/style.css": [
+        "libs/feature-material-variants/src/material-variants.css"
+      ],
+      "@schablone/3d-studio-ui/style.css": ["libs/ui/src/style.css"],
+      "@schablone/3d-studio-core/style.css": ["libs/core/src/viewer/viewer.css"],
+      "@schablone/3d-studio-feature-color-switcher": ["libs/feature-color-switcher/src/index.ts"],
+      "@schablone/3d-studio-feature-material-variants": ["libs/feature-material-variants/src/index.ts"],
+      "@schablone/3d-studio-feature-beauty-shot": ["libs/feature-beauty-shot/src/index.ts"],
+      "@schablone/3d-studio-feature-floor": ["libs/feature-floor/src/index.ts"],
+      "@schablone/3d-studio-core": ["libs/core/src/index.ts"],
+      "@schablone/3d-studio-feature-wireframe": ["libs/feature-wireframe/src/index.ts"],
+      "@schablone/3d-studio-feature-camera-rotation": ["libs/feature-camera-rotation/src/index.ts"],
+      "@schablone/3d-studio": ["libs/studio/src/index.ts"],
+      "@schablone/3d-studio-feature-skybox": ["libs/feature-skybox/src/index.ts"],
+      "@schablone/3d-studio-feature-highlights": ["libs/feature-highlights/src/index.ts"],
+      "@schablone/3d-studio-feature-animation": ["libs/feature-animation/src/index.ts"],
+      "@schablone/3d-studio-feature-light-scenarios": ["libs/feature-light-scenarios/src/index.ts"],
+      "@schablone/3d-studio-ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
