@@ -27,15 +27,48 @@ PACKAGES=(
   3d-studio-feature-highlights
 )
 dry="${1:-}"
+if [[ $# -gt 1 || ( -n "$dry" && "$dry" != "--dry-run" ) ]]; then
+  echo "Usage: bash tools/scripts/bootstrap-npm.sh [--dry-run]" >&2
+  exit 2
+fi
+if [[ "$dry" == "--dry-run" ]]; then
+  for name in "${PACKAGES[@]}"; do
+    echo "@schablone/$name: create 0.0.1 under bootstrap if missing; configure $REPO / $WORKFLOW"
+  done
+  echo "Dry run only: no login, registry checks, publishing, or trust changes performed."
+  exit 0
+fi
 
-npm whoami >/dev/null 2>&1 || npm login
+export npm_config_registry="https://registry.npmjs.org/"
+export npm_config_fetch_timeout=30000
+IFS=. read -r npm_major npm_minor npm_patch <<< "$(npm --version)"
+if (( npm_major < 11 || (npm_major == 11 && npm_minor < 15) )); then
+  echo "npm >=11.15.0 is required. Run: npm install -g 'npm@^11.15.0'" >&2
+  exit 1
+fi
+if ! npm whoami; then
+  echo "Authentication required. Run: npm login --auth-type=web" >&2
+  echo "Complete the browser login, then run npm whoami. Retry this script only when it prints your username." >&2
+  exit 1
+fi
+
+dir="$(mktemp -d)"
+cleanup() {
+  rm -f -- "$dir/package.json" "$dir/registry-error"
+  rmdir -- "$dir"
+}
+trap cleanup EXIT
 
 for name in "${PACKAGES[@]}"; do
   pkg="@schablone/$name"
-  if npm view "$pkg" version >/dev/null 2>&1; then
+  if npm view "$pkg@*" version >/dev/null 2>"$dir/registry-error"; then
     echo "$pkg exists, skipping placeholder publish"
   else
-    dir="$(mktemp -d)"
+    if [[ "$(<"$dir/registry-error")" != *E404* ]]; then
+      cat "$dir/registry-error" >&2
+      echo "Registry lookup failed for $pkg; no placeholder published." >&2
+      exit 1
+    fi
     cat > "$dir/package.json" <<JSON
 {
   "name": "$pkg",
@@ -46,8 +79,7 @@ for name in "${PACKAGES[@]}"; do
   "publishConfig": { "access": "public" }
 }
 JSON
-    (cd "$dir" && npm publish --access public --tag bootstrap ${dry:+--dry-run})
-    rm -rf "$dir"
+    (cd "$dir" && npm publish --access public --tag bootstrap)
   fi
-  [ -n "$dry" ] || npm trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes
+  npm trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes
 done

@@ -12,7 +12,7 @@
     "start:https": "node tools/scripts/start-example-https.mjs",
     "build": "nx run-many --target=build --exclude=example,example-tanstack,docs",
     "build:dev": "nx run-many --target=build --configuration=development --exclude=example,example-tanstack,docs",
-    "test": "node tools/scripts/test-publish.mjs && node tools/scripts/test-release-channels.mjs && nx run-many --target=test",
+    "test": "node tools/scripts/test-publish.mjs && node tools/scripts/test-bootstrap.mjs && node tools/scripts/test-release-channels.mjs && nx run-many --target=test",
     "lint": "node tools/scripts/test-lint-config.mjs && nx run-many --target=lint",
     "prepare": "husky"
   },
@@ -53,6 +53,7 @@
     "@babel/core": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@eslint/compat": "2.1.1",
+    "@eslint/js": "10.0.1",
     "@nx/devkit": "24.0.3",
     "@nx/eslint": "24.0.3",
     "@nx/eslint-plugin": "24.0.3",
@@ -93,8 +94,10 @@
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
+    "husky": "9.1.7",
     "jiti": "2.4.2",
     "jsdom": "22.1.0",
+    "lint-staged": "17.6.0",
     "nx": "24.0.3",
     "prettier": "^3.9.10",
     "sass": "^1.107.1",
@@ -105,9 +108,7 @@
     "typescript-eslint": "8.72.1",
     "vite": "8.3.5",
     "vite-plugin-dts": "4.5.4",
-    "vitest": "4.1.12",
-    "husky": "9.1.7",
-    "lint-staged": "17.6.0"
+    "vitest": "4.1.12"
   },
   "pnpm": {
     "overrides": {

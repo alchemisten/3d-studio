@@ -126,6 +126,9 @@ importers:
       '@eslint/compat':
         specifier: 2.1.1
         version: 2.1.1(eslint@10.14.0(jiti@2.4.2))
+      '@eslint/js':
+        specifier: 10.0.1
+        version: 10.0.1(eslint@10.14.0(jiti@2.4.2))
       '@nx/devkit':
         specifier: 24.0.3
         version: 24.0.3(nx@24.0.3(patch_hash=a7ea120522f979e1bada259548adfbe41aa9b4b928d44ee2207e221834a6bacb)(@swc/core@1.16.21(@swc/helpers@0.5.17)))
@@ -1145,6 +1148,15 @@ packages:
   '@eslint/core@1.2.1':
     resolution: {integrity: sha512-MwcE1P+AZ4C6DWlpin/OmOA54mmIZ/+xZuJiQd4SyB29oAJjN30UW9wkKNptW2ctp4cEsvhlLY/CsQ1uoHDloQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@eslint/js@10.0.1':
+    resolution: {integrity: sha512-zeR9k5pd4gxjZ0abRoIaxdc7I3nDktoXZk2qOv9gCNWx3mVwEn32VRhyLaRsDiJjTs0xq/T8mfPtyuXu7GWBcA==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+    peerDependencies:
+      eslint: ^10.0.0
+    peerDependenciesMeta:
+      eslint:
+        optional: true
 
   '@eslint/object-schema@3.0.5':
     resolution: {integrity: sha512-vqTaUEgxzm+YDSdElad6PiRoX4t8VGDjCtt05zn4nU810UIx/uNEV7/lZJ6KwFThKZOzOxzXy48da+No7HZaMw==}
@@ -8878,6 +8890,10 @@ snapshots:
   '@eslint/core@1.2.1':
     dependencies:
       '@types/json-schema': 7.0.15
+
+  '@eslint/js@10.0.1(eslint@10.14.0(jiti@2.4.2))':
+    optionalDependencies:
+      eslint: 10.14.0(jiti@2.4.2)
 
   '@eslint/object-schema@3.0.5': {}
 
