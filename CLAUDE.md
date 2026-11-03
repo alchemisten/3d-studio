@@ -1,5 +1,7 @@
 # Workspace conventions
 
+Public packages intentionally use `@schablone/3d-studio*` and publish to npmjs. Other `@schablone` packages may use GitLab. Bootstrap and release commands must override both the default and scoped registries without modifying the user's saved npm configuration.
+
 The Nx workspace uses pnpm. The example and Studio stories share their Scenes adapter under `apps/samples`. Scene terminology is user-facing. Existing Project types, adapters, and slot names remain public APIs.
 
 Nx 24 uses the separate `@nx/vitest` plugin for test targets. Runtime schemas use Zod 4; use `prefault` when nested defaults must be parsed. Vite 8 builds with Rolldown and Oxc. The TanStack Start example exports `getRouter`. Unused legacy glTF extension packages, their submodule, and Jest scaffolding are removed. Root pnpm overrides upgrade modern glob/minimatch consumers to patched APIs; review them when upgrading their owners.

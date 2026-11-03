@@ -10,6 +10,10 @@ set -euo pipefail
 
 REPO="alchemisten/3d-studio"
 WORKFLOW="release.yml"
+REGISTRY="https://registry.npmjs.org/"
+npm_public() {
+  npm "$@" "--registry=$REGISTRY" "--@schablone:registry=$REGISTRY"
+}
 PACKAGES=(
   3d-studio
   3d-studio-ui
@@ -33,35 +37,36 @@ if [[ $# -gt 1 || ( -n "$dry" && "$dry" != "--dry-run" ) ]]; then
 fi
 if [[ "$dry" == "--dry-run" ]]; then
   for name in "${PACKAGES[@]}"; do
-    echo "@schablone/$name: create 0.0.1 under bootstrap if missing; configure $REPO / $WORKFLOW"
+    echo "@schablone/$name: create 0.0.1 under bootstrap if missing on $REGISTRY; configure $REPO / $WORKFLOW"
   done
   echo "Dry run only: no login, registry checks, publishing, or trust changes performed."
   exit 0
 fi
 
-export npm_config_registry="https://registry.npmjs.org/"
 export npm_config_fetch_timeout=30000
-IFS=. read -r npm_major npm_minor npm_patch <<< "$(npm --version)"
+IFS=. read -r npm_major npm_minor npm_patch <<< "$(npm_public --version)"
 if (( npm_major < 11 || (npm_major == 11 && npm_minor < 15) )); then
   echo "npm >=11.15.0 is required. Run: npm install -g 'npm@^11.15.0'" >&2
   exit 1
 fi
-if ! npm whoami; then
-  echo "Authentication required. Run: npm login --auth-type=web" >&2
+if ! npm_public whoami; then
+  echo "Authentication required. Run in PowerShell: npm.cmd login --auth-type=web --registry=$REGISTRY" >&2
   echo "Complete the browser login, then run npm whoami. Retry this script only when it prints your username." >&2
   exit 1
 fi
 
 dir="$(mktemp -d)"
+mkdir "$dir/package"
 cleanup() {
-  rm -f -- "$dir/package.json" "$dir/registry-error"
+  rm -f -- "$dir/package/package.json" "$dir/registry-error"
+  rmdir -- "$dir/package"
   rmdir -- "$dir"
 }
 trap cleanup EXIT
 
 for name in "${PACKAGES[@]}"; do
   pkg="@schablone/$name"
-  if npm view "$pkg@*" version >/dev/null 2>"$dir/registry-error"; then
+  if npm_public view "$pkg@*" version >/dev/null 2>"$dir/registry-error"; then
     echo "$pkg exists, skipping placeholder publish"
   else
     if [[ "$(<"$dir/registry-error")" != *E404* ]]; then
@@ -69,17 +74,18 @@ for name in "${PACKAGES[@]}"; do
       echo "Registry lookup failed for $pkg; no placeholder published." >&2
       exit 1
     fi
-    cat > "$dir/package.json" <<JSON
+    cat > "$dir/package/package.json" <<JSON
 {
   "name": "$pkg",
   "version": "0.0.1",
   "description": "Placeholder to enable trusted publishing. The real release follows.",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/$REPO.git" },
-  "publishConfig": { "access": "public" }
+  "repository": { "type": "git", "url": "git+https://github.com/$REPO.git" },
+  "files": ["package.json"],
+  "publishConfig": { "access": "public", "registry": "$REGISTRY" }
 }
 JSON
-    (cd "$dir" && npm publish --access public --tag bootstrap)
+    (cd "$dir/package" && npm_public publish --access public --tag bootstrap)
   fi
-  npm trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes
+  npm_public trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes
 done

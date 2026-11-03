@@ -59,6 +59,7 @@ try {
   json.version = version;
   json.publishConfig = {
     access: 'public',
+    registry: 'https://registry.npmjs.org/',
     tag,
   };
   json.author = 'Alchemisten AG';
@@ -67,7 +68,7 @@ try {
   };
   json.repository = {
     type: 'git',
-    url: 'https://github.com/alchemisten/3d-studio.git',
+    url: 'git+https://github.com/alchemisten/3d-studio.git',
     directory: projectRoot.replaceAll('\\', '/'),
   };
   json.homepage = `https://github.com/alchemisten/3d-studio/tree/v${version}/${projectRoot.replaceAll('\\', '/')}`;
@@ -80,4 +81,7 @@ try {
 }
 
 // Publish
-execSync(`npm publish --provenance --tag ${tag}`, { stdio: 'inherit', timeout: 300000 });
+execSync(
+  `npm publish --provenance --tag ${tag} --registry=https://registry.npmjs.org/ --@schablone:registry=https://registry.npmjs.org/`,
+  { stdio: 'inherit', timeout: 300000 },
+);

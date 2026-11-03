@@ -25,6 +25,14 @@ pnpm add @schablone/3d-studio@next react react-dom three @react-three/fiber @rea
 
 After 1.0.0 is published from `main`, omit `@next` for the stable release. Use `@next` for optional feature packages during RC testing too. The `bootstrap` tag contains placeholders, not usable viewer builds.
 
+These packages are hosted on npmjs. If your user configuration routes `@schablone` to GitLab, use a command-specific override:
+
+```sh
+pnpm '--config.@schablone:registry=https://registry.npmjs.org/' add @schablone/3d-studio@next react react-dom three @react-three/fiber @react-three/drei lucide-react rxjs
+```
+
+This leaves your saved GitLab configuration unchanged. The override applies to every `@schablone` dependency resolved by that invocation; npm scopes do not provide per-package registry routing.
+
 Use matching versions of all `@schablone/3d-studio*` packages. pnpm installs the internal peer packages automatically with its default settings; if your package manager disables automatic peers, install the dependencies listed in the Studio package manifest explicitly. The validated renderer baseline is Three r187. Beauty Shot requires r187 or later and WebGPU; the regular viewer uses WebGL.
 
 ```tsx
@@ -83,6 +91,8 @@ Pages keeps Storybook at the existing version or PR root. The live sample lives 
 Run `pnpm run build` to create a new build.
 
 ### New release
+
+For one-time package creation, first authenticate to npmjs with `npm login --auth-type=web --registry=https://registry.npmjs.org/` and verify `npm whoami --registry=https://registry.npmjs.org/`. On Windows, use PowerShell if Git Bash exits before browser approval is saved. Run `bash tools/scripts/bootstrap-npm.sh --dry-run` to inspect the offline plan, then omit `--dry-run` to create missing placeholders and configure trusted publishing. The script explicitly overrides both the default and `@schablone` registries for each operation; it does not change saved npm settings.
 
 Releases use two branches: `develop` publishes release candidates (`-rc.N`) to npm's `next` tag; `main` publishes stable versions to `latest`. Both run the same quality gates. Release jobs are serialized, and successful stable releases merge back into `develop` without rewriting history.
 

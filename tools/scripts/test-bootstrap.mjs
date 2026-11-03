@@ -21,7 +21,10 @@ case "$1" in
     if [[ "$BOOTSTRAP_TEST_CASE" == registry ]]; then echo E401 >&2; exit 1; fi
     if [[ "$BOOTSTRAP_TEST_CASE" == missing ]]; then echo E404 >&2; exit 1; fi
     echo 0.0.1 ;;
-  publish|trust) exit 0 ;;
+  publish)
+    [[ ! -e registry-error ]] || exit 98
+    cp package.json "$BOOTSTRAP_TEST_MANIFEST" ;;
+  trust) exit 0 ;;
   *) echo "Unexpected npm invocation: $*" >&2; exit 99 ;;
 esac
 `,
@@ -37,6 +40,7 @@ const run = (scenario, args = []) => {
       PATH: root + delimiter + process.env.PATH,
       BOOTSTRAP_TEST_CASE: scenario,
       BOOTSTRAP_TEST_LOG: log.replaceAll('\\', '/'),
+      BOOTSTRAP_TEST_MANIFEST: resolve(root, 'published-manifest.json').replaceAll('\\', '/'),
     },
   });
   assert.ifError(result.error);
@@ -59,6 +63,15 @@ for (const scenario of ['existing', 'missing']) {
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.calls.filter((call) => call.startsWith('publish ')).length, scenario === 'missing' ? 14 : 0);
   assert.equal(result.calls.filter((call) => call.startsWith('trust github ')).length, 14);
+  for (const call of result.calls) {
+    assert.ok(call.includes('--registry=https://registry.npmjs.org/'), call);
+    assert.ok(call.includes('--@schablone:registry=https://registry.npmjs.org/'), call);
+  }
+  if (scenario === 'missing') {
+    const manifest = JSON.parse(readFileSync(resolve(root, 'published-manifest.json'), 'utf8'));
+    assert.deepEqual(manifest.files, ['package.json']);
+    assert.equal(manifest.publishConfig.registry, 'https://registry.npmjs.org/');
+  }
 }
 console.log(
   'Bootstrap checks passed: offline dry-run, authentication/registry failures, existing/missing packages. All npm calls mocked.',

@@ -82,6 +82,10 @@ for (const version of ['1.2.3', '1.2.3-rc.1+build.4']) {
   assert.equal(result.events[0].repository.directory, 'libs/core');
   assert.equal(result.events[0].homepage, `https://github.com/alchemisten/3d-studio/tree/v${version}/libs/core`);
   assert.equal(result.events[0].publishConfig.tag, tag);
-  assert.equal(result.events[1], `npm publish --provenance --tag ${tag}`);
+  assert.equal(result.events[0].publishConfig.registry, 'https://registry.npmjs.org/');
+  assert.equal(
+    result.events[1],
+    `npm publish --provenance --tag ${tag} --registry=https://registry.npmjs.org/ --@schablone:registry=https://registry.npmjs.org/`,
+  );
 }
 process.stdout.write('Publish validation passed; npm publishing was mocked.\n');
