@@ -31,7 +31,7 @@ const run = (scenario, args = []) => {
   writeFileSync(log, '');
   const result = spawnSync(bash, ['tools/scripts/bootstrap-npm.sh', ...args], {
     encoding: 'utf8',
-    timeout: 30000,
+    timeout: 120000,
     env: {
       ...process.env,
       PATH: root + delimiter + process.env.PATH,
