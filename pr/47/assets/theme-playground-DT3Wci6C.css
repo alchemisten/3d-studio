@@ -1,0 +1,1 @@
+.theme-playground{grid-template-columns:minmax(16rem,20rem) minmax(0,1fr);min-height:100vh;display:grid}.theme-playground__viewer{height:clamp(20rem,55vh,35rem);margin-bottom:var(--ds-gap)}@media (width<=48rem){.theme-playground{grid-template-columns:minmax(0,1fr)}.theme-playground>:first-child{max-height:40vh!important}}
