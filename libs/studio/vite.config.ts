@@ -1,16 +1,18 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
+import { packageManifest } from '../../tools/vite/package-manifest';
 import react from '@vitejs/plugin-react';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
 import { resolve } from 'node:path';
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   root: __dirname,
-  esbuild: { jsxDev: false },
+  oxc: { jsx: { development: false } },
   cacheDir: '../../node_modules/.vite/studio',
 
   plugins: [
+    packageManifest(__dirname),
     dts({
       pathsToAliases: false,
       entryRoot: resolve(__dirname, 'src'),
@@ -25,12 +27,12 @@ export default defineConfig({
           const css = bundle['style.css'];
           if (!css || css.type !== 'asset') throw new Error('Missing Studio stylesheet');
           const packages = ['ui', 'core', 'feature-animation', 'feature-highlights'];
-          css.source = packages.map(name => `@import "@schablone/3d-studio-${name}/style.css";`).join('\n') + '\n' + css.source;
+          css.source =
+            packages.map((name) => `@import "@schablone/3d-studio-${name}/style.css";`).join('\n') + '\n' + css.source;
         },
       },
     },
     react(),
-    nxViteTsPaths(),
   ],
 
   build: {
@@ -43,7 +45,7 @@ export default defineConfig({
       fileName: 'index',
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         'zod',
         'react',
@@ -59,7 +61,8 @@ export default defineConfig({
         /^three(\/.*)?$/,
       ],
       output: {
-        assetFileNames: (asset) => (asset.names?.some((n) => n.endsWith('.css')) ? 'style.css' : 'assets/[name][extname]'),
+        assetFileNames: (asset) =>
+          asset.names?.some((n) => n.endsWith('.css')) ? 'style.css' : 'assets/[name][extname]',
       },
     },
   },

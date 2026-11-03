@@ -1,23 +1,24 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
+import { packageManifest } from '../../tools/vite/package-manifest';
 import react from '@vitejs/plugin-react';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
 import { resolve } from 'node:path';
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   root: __dirname,
-  esbuild: { jsxDev: false },
+  oxc: { jsx: { development: false } },
   cacheDir: '../../node_modules/.vite/ui',
 
   plugins: [
+    packageManifest(__dirname),
     dts({
       pathsToAliases: false,
       entryRoot: resolve(__dirname, 'src'),
       tsconfigPath: resolve(__dirname, 'tsconfig.lib.json'),
     }),
     react(),
-    nxViteTsPaths(),
   ],
 
   build: {
@@ -30,10 +31,11 @@ export default defineConfig({
       fileName: 'index',
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime', 'lucide-react', /^@radix-ui\//],
       output: {
-        assetFileNames: (asset) => (asset.names?.some((n) => n.endsWith('.css')) ? 'style.css' : 'assets/[name][extname]'),
+        assetFileNames: (asset) =>
+          asset.names?.some((n) => n.endsWith('.css')) ? 'style.css' : 'assets/[name][extname]',
       },
     },
   },

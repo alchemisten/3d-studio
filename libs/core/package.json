@@ -35,10 +35,10 @@
     "three": ">=0.162.0"
   },
   "devDependencies": {
-    "@nx/devkit": "21.4.1",
-    "@nx/vite": "21.4.1",
-    "@vitejs/plugin-react": "5.0.1",
-    "vite": "6.0.0",
+    "@nx/devkit": "24.0.3",
+    "@nx/vite": "24.0.3",
+    "@vitejs/plugin-react": "6.2.1",
+    "vite": "8.3.5",
     "vite-plugin-dts": "4.5.4"
   },
   "dependencies": {

@@ -3,20 +3,22 @@
   "projectType": "library",
   "sourceRoot": "libs/scene-preview/src",
   "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --root libs/scene-preview"
+      }
+    },
     "publish": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "options": {
         "command": "ts-node tools/scripts/publish.ts 3d-studio-scene-preview {args.ver} {args.tag}"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/dist/libs/scene-preview"
-      ],
+      "outputs": ["{workspaceRoot}/dist/libs/scene-preview"],
       "options": {
         "parallel": false,
         "outDir": "dist/libs/scene-preview",

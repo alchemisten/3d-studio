@@ -36,13 +36,13 @@
     "three-gpu-pathtracer": "0.0.28",
     "three-mesh-bvh": "^0.9.17",
     "xatlas-web": "^0.1.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@nx/devkit": "21.4.1",
-    "@nx/vite": "21.4.1",
-    "@vitejs/plugin-react": "5.0.1",
-    "vite": "6.0.0",
+    "@nx/devkit": "24.0.3",
+    "@nx/vite": "24.0.3",
+    "@vitejs/plugin-react": "6.2.1",
+    "vite": "8.3.5",
     "vite-plugin-dts": "4.5.4"
   }
 }

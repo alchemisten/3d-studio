@@ -26,3 +26,4 @@ for (const name of ['index', 'cli']) {
 }
 await copyFile('libs/scene-preview/package.json', dir + '/package.json');
 await copyFile('libs/scene-preview/README.md', dir + '/README.md');
+await copyFile('LICENSE.md', dir + '/LICENSE.md');

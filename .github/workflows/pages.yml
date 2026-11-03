@@ -1,5 +1,5 @@
 name: Pages
-"on":
+'on':
   push:
     branches: [main, develop]
     tags: ['v*']
@@ -17,7 +17,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
-      TARGETS: ${{ github.event_name == 'pull_request' && format('pr/{0}', github.event.pull_request.number) || (startsWith(github.ref, 'refs/tags/') && format('{0} latest', github.ref_name) || (github.ref_name == 'main' && 'latest' || (github.ref_name == 'develop' && 'next' || ''))) }}
+      TARGETS: ${{ github.event_name == 'pull_request' && format('pr/{0}', github.event.pull_request.number) || (startsWith(github.ref, 'refs/tags/') && format('{0} {1}', github.ref_name, contains(github.ref_name, '-rc.') && 'next' || 'latest') || (github.ref_name == 'main' && 'latest' || (github.ref_name == 'develop' && 'next' || ''))) }}
       CLOSED: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     steps:
       - uses: actions/checkout@v6
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v6
         if: env.CLOSED != 'true' && env.TARGETS != ''
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - name: Build Storybook and live sample
         if: env.CLOSED != 'true' && env.TARGETS != ''

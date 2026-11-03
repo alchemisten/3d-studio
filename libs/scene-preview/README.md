@@ -1,5 +1,7 @@
 # Scene previews
 
+This package runs in Node, not in a browser bundle. Install `@schablone/3d-studio-scene-preview`; TypeScript consumers also need `@types/node`. If your tsconfig restricts `compilerOptions.types`, include `node` in the server configuration. Keep this package out of browser entry points.
+
 Build the Node renderer and its browser bundle with `pnpm exec nx build 3d-studio-scene-preview`. Install a Chromium browser with the package's Playwright Core CLI, or set `SCENE_BROWSER_CHANNEL=msedge` to use installed Edge.
 
 From the repository root:
@@ -13,11 +15,14 @@ When installed as a package, the command is `scene-preview descriptor.json outpu
 ```ts
 import { renderScene } from '@schablone/3d-studio-scene-preview';
 
-const png = await renderScene({
-  source: './truck.gltf',
-  draco: './draco/',
-  preview: { width: 640, height: 360, background: '#e1e8e7' },
-}, { baseDir: assetDirectory, channel: 'msedge' });
+const png = await renderScene(
+  {
+    source: './truck.gltf',
+    draco: './draco/',
+    preview: { width: 640, height: 360, background: '#e1e8e7' },
+  },
+  { baseDir: assetDirectory, channel: 'msedge' },
+);
 ```
 
 The CLI resolves local paths against the descriptor directory. The API defaults to the current working directory. Model sidecars resolve relative to the model. A URL source must permit browser CORS. Use local decoder files for offline Draco rendering.

@@ -12,7 +12,7 @@ function Home() {
       <ProjectList
         getHref={(p) => `/projects/${p.id}`}
         onSelect={(p) => void navigate({ to: '/projects/$id', params: { id: p.id } })}
-        slots={{ 'project-list.header': <h1>Projects</h1> }}
+        slots={{ 'project-list.header': <h1>Scenes</h1> }}
       />
     </ProjectAdapterProvider>
   );

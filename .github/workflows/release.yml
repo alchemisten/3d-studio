@@ -1,8 +1,12 @@
 name: Release
-"on":
+'on':
   push:
     branches:
       - main
+      - develop
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
 permissions:
   id-token: write
   contents: write
@@ -13,15 +17,22 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           token: ${{ secrets.GH_TOKEN_TECHUSER }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit
+      - run: pnpm run typecheck
+      - run: pnpm run lint
+      - run: pnpm run build
       - run: pnpm run test
+      - run: pnpm --dir libs/scene-preview exec playwright-core install --with-deps chromium
+      - run: pnpm run test:consumer
       - run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER }}

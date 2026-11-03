@@ -10,10 +10,15 @@ export const sceneDescriptor = z.object({
   preview: z
     .object({
       width: dimension.default(960),
-      floor: z.object({
-        mode: z.enum(['off', 'shadow', 'matte']).default('shadow'),
-        color: z.string().regex(/^#[0-9a-f]{6}$/i).default('#aaa7a2'),
-      }).optional(),
+      floor: z
+        .object({
+          mode: z.enum(['off', 'shadow', 'matte']).default('shadow'),
+          color: z
+            .string()
+            .regex(/^#[0-9a-f]{6}$/i)
+            .default('#aaa7a2'),
+        })
+        .optional(),
       height: dimension.default(540),
       background: z
         .string()
@@ -22,7 +27,7 @@ export const sceneDescriptor = z.object({
       camera: z.object({ position: point, target: point }).optional(),
       animation: z.object({ clip: z.string().min(1), time: z.number().finite().nonnegative().default(0) }).optional(),
     })
-    .default({}),
+    .prefault({}),
 });
 
 export type SceneDescriptor = z.input<typeof sceneDescriptor>;

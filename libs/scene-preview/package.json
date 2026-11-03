@@ -3,8 +3,25 @@
   "version": "0.2.1",
   "type": "module",
   "license": "MIT",
-  "files": ["capture.js", "index.js", "index.d.ts", "descriptor.d.ts", "cli.js", "README.md"],
-  "exports": { ".": { "types": "./index.d.ts", "import": "./index.js" } },
-  "bin": { "scene-preview": "./cli.js" },
-  "dependencies": { "playwright-core": "1.56.1", "zod": "3.25.76" }
+  "files": [
+    "capture.js",
+    "index.js",
+    "index.d.ts",
+    "descriptor.d.ts",
+    "cli.js",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "bin": {
+    "scene-preview": "./cli.js"
+  },
+  "dependencies": {
+    "playwright-core": "1.56.1",
+    "zod": "^4.6.7"
+  }
 }

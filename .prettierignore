@@ -2,6 +2,10 @@
 
 /dist
 /coverage
+**/.tanstack/
+**/routeTree.gen.ts
+pnpm-lock.yaml
+patches/
 
 /.nx/cache
 /.nx/workspace-data

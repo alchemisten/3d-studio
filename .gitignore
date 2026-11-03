@@ -36,6 +36,7 @@ testem.log
 /typings
 .vite
 .vitest
+.tanstack/
 .env
 
 # System Files

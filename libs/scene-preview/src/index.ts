@@ -1,9 +1,10 @@
+import { Buffer } from 'node:buffer';
 import { readFile, realpath } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep, basename } from 'node:path';
 import { chromium } from 'playwright-core';
-import { sceneDescriptor, type SceneDescriptor } from './descriptor';
+import { sceneDescriptor, type SceneDescriptor } from './descriptor.js';
 
-export type { SceneDescriptor } from './descriptor';
+export type { SceneDescriptor } from './descriptor.js';
 
 export interface RenderOptions {
   baseDir?: string;

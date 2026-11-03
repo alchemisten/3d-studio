@@ -9,6 +9,16 @@
     "types": ["node", "vite/client", "vitest/globals"],
     "noEmit": true
   },
-  "include": ["apps/**/*.ts", "apps/**/*.tsx", "apps/**/*.mts", "apps/docs/.storybook/*.ts", "apps/docs/.storybook/*.tsx", "libs/*/src/**/*.ts", "libs/*/src/**/*.tsx", "tools/scripts/*.ts"],
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "apps/**/*.mts",
+    "apps/docs/.storybook/*.ts",
+    "apps/docs/.storybook/*.tsx",
+    "libs/*/src/**/*.ts",
+    "libs/*/src/**/*.tsx",
+    "tools/scripts/*.ts",
+    "tools/vite/*.ts"
+  ],
   "exclude": ["**/node_modules", "**/*.spec.ts", "**/*.spec.tsx"]
 }

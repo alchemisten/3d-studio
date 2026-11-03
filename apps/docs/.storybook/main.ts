@@ -1,5 +1,4 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -8,8 +7,10 @@ const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(ts|tsx)'],
   staticDirs: ['../public'],
   typescript: { reactDocgen: false },
-  viteFinal: (viteConfig) => mergeConfig(viteConfig, {
-      plugins: [react({ babel: { configFile: false, babelrc: false } }), nxViteTsPaths()],
+  viteFinal: (viteConfig) =>
+    mergeConfig(viteConfig, {
+      resolve: { tsconfigPaths: true },
+      plugins: [react()],
     }),
 };
 

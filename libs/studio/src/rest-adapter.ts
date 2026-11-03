@@ -11,8 +11,8 @@ const projectSchema = z
     thumbnail: z.string().optional(),
     tags: z.array(z.string()).optional(),
     openingCamera: z.object({ position: coordinate, target: coordinate }).optional(),
-    featureConfig: z.record(z.unknown()).optional(),
-    meta: z.record(z.unknown()).optional(),
+    featureConfig: z.record(z.string(), z.unknown()).optional(),
+    meta: z.record(z.string(), z.unknown()).optional(),
   })
   .passthrough();
 const listSchema = z.union([

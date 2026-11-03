@@ -1,5 +1,12 @@
 {
-  "branches": "main",
+  "branches": [
+    "main",
+    {
+      "name": "develop",
+      "prerelease": "rc",
+      "channel": "next"
+    }
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -13,26 +20,26 @@
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --exclude=example,example-tanstack,docs,gltf-extension,gltf-extension-validator"
+        "publishCmd": "nx run-many --target=publish --ver=${nextRelease.version} --tag=${nextRelease.channel || 'latest'} --exclude=example,example-tanstack,docs"
       }
     ],
     [
       "@semantic-release/git",
       {
-        "assets": [
-          "package.json",
-          "pnpm-lock.yaml"
-        ],
+        "assets": ["package.json", "pnpm-lock.yaml"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
     [
       "@saithodev/semantic-release-backmerge",
       {
-        "branches": [
-          "develop"
-        ],
-        "backmergeStrategy": "merge"
+        "backmergeStrategy": "merge",
+        "backmergeBranches": [
+          {
+            "from": "main",
+            "to": "develop"
+          }
+        ]
       }
     ]
   ]
