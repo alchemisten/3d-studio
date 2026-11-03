@@ -1,10 +1,5 @@
 import type { Preview } from '@storybook/react-vite';
-import '@schablone/3d-studio-ui/style.css';
-import '@schablone/3d-studio-core/style.css';
-import '@schablone/3d-studio-feature-animation/style.css';
-import '@schablone/3d-studio-feature-beauty-shot/style.css';
-import '@schablone/3d-studio-feature-color-switcher/style.css';
-import '@schablone/3d-studio-feature-material-variants/style.css';
+import '../../samples/styles';
 import { ThemeProvider } from '@schablone/3d-studio-ui';
 
 const preview: Preview = {

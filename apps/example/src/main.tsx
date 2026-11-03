@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes, useHref, useNavigate, useParams } from 'react-router-dom';
 import { PreviewLights } from '@schablone/3d-studio-core';
 import { ProjectList, Studio } from '@schablone/3d-studio';
-import '@schablone/3d-studio-ui';
+import '../../samples/styles';
 import { useSceneSettings } from './use-scene-settings';
 import { sampleFeatures, sampleScenes } from '../../samples/scenes';
 

@@ -64,6 +64,24 @@ try {
     await page.locator('[data-status=ready]').waitFor();
     await page.reload();
     await page.locator('[data-status=ready]').waitFor();
+    await page.locator('.ds-scene-loading').waitFor({ state: 'hidden' });
+    for (const testId of ['ds-model-tools', 'ds-output', 'ds-view-options', 'ds-highlight-select-current']) {
+      const control = page.getByTestId(testId);
+      const bounds = await control.boundingBox();
+      assert.ok(
+        bounds && bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= 1100 && bounds.y + bounds.height <= 760,
+        testId,
+      );
+    }
+    assert.equal(
+      await page
+        .locator('.ds-overlay')
+        .first()
+        .evaluate((element) => getComputedStyle(element).position),
+      'absolute',
+    );
+    await mkdir('dist/pages-check', { recursive: true });
+    await page.screenshot({ path: 'dist/pages-check/shoe-controls.png' });
     await page.getByTestId('ds-model-tools').click();
     for (const name of ['Street', 'Sage'])
       assert.equal(await page.getByRole('menuitemradio', { name, exact: true }).getAttribute('aria-checked'), 'true');
