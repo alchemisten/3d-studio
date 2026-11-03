@@ -52,7 +52,12 @@ try {
     const escaped = [];
     page.on('request', (r) => {
       const u = new URL(r.url());
-      if (u.protocol === 'http:' && u.origin === new URL(root).origin && !u.pathname.startsWith(prefix) && u.pathname !== '/favicon.ico')
+      if (
+        u.protocol === 'http:' &&
+        u.origin === new URL(root).origin &&
+        !u.pathname.startsWith(prefix) &&
+        u.pathname !== '/favicon.ico'
+      )
         escaped.push(u.pathname);
     });
     await page.goto(root + 'sample/scenes/variants-shoe?variant=street&color=sage');
@@ -87,6 +92,22 @@ try {
             document.querySelector('[data-testid=ds-highlight-detail] button[aria-pressed=true]')?.textContent ===
             'Street',
         );
+        const styles = await page
+          .locator('.ds-overlay')
+          .first()
+          .evaluate((element) => {
+            const style = getComputedStyle(element);
+            return { position: style.position, display: style.display, font: style.fontFamily };
+          });
+        assert.equal(styles.position, 'absolute');
+        assert.equal(styles.display, 'grid');
+        assert.ok(styles.font.includes('system-ui'), styles.font);
+        assert.equal(
+          await page.locator('.ds-variant-options').evaluate((element) => getComputedStyle(element).display),
+          'flex',
+        );
+        await page.locator('[data-status=ready]').waitFor();
+        await page.locator('.ds-scene-loading').waitFor({ state: 'hidden' });
         await page.screenshot({ path: 'dist/pages-check/variants-story.png' });
       } else if (id.includes('wheel-inspection')) await page.getByRole('button', { name: 'Freeze wheel' }).waitFor();
       else if (id.includes('disabled-with-highlights')) {

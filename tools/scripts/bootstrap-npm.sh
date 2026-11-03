@@ -87,5 +87,5 @@ for name in "${PACKAGES[@]}"; do
 JSON
     (cd "$dir/package" && npm_public publish --access public --tag bootstrap)
   fi
-  npm_public trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes
+  npm trust github "$pkg" --file "$WORKFLOW" --repo "$REPO" --allow-publish --yes "--registry=$REGISTRY"
 done

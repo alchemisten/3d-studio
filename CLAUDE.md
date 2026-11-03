@@ -1,6 +1,6 @@
 # Workspace conventions
 
-Public packages intentionally use `@schablone/3d-studio*` and publish to npmjs. Other `@schablone` packages may use GitLab. Bootstrap and release commands must override both the default and scoped registries without modifying the user's saved npm configuration.
+Public packages intentionally use `@schablone/3d-studio*` and publish to npmjs. Other `@schablone` packages may use GitLab. Package lookup and publication must override both the default and scoped registries without modifying the user's saved npm configuration. npm trust rejects scoped registry flags; use its explicit default registry override for the trust endpoint.
 
 The Nx workspace uses pnpm. The example and Studio stories share their Scenes adapter under `apps/samples`. Scene terminology is user-facing. Existing Project types, adapters, and slot names remain public APIs.
 

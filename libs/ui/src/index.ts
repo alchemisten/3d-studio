@@ -1,5 +1,4 @@
-import './styles/tokens.css';
-import './styles/components.css';
+import './style.css';
 
 export * from './theme';
 export * from './slots';

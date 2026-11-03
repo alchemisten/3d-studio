@@ -1,4 +1,10 @@
 import type { Preview } from '@storybook/react-vite';
+import '@schablone/3d-studio-ui/style.css';
+import '@schablone/3d-studio-core/style.css';
+import '@schablone/3d-studio-feature-animation/style.css';
+import '@schablone/3d-studio-feature-beauty-shot/style.css';
+import '@schablone/3d-studio-feature-color-switcher/style.css';
+import '@schablone/3d-studio-feature-material-variants/style.css';
 import { ThemeProvider } from '@schablone/3d-studio-ui';
 
 const preview: Preview = {
@@ -11,7 +17,10 @@ const preview: Preview = {
   initialGlobals: { themeMode: 'light' },
   decorators: [
     (Story, { globals }) => (
-      <ThemeProvider mode={globals.themeMode} style={{ display: 'block', padding: '1rem', background: 'var(--ds-color-surface)', minHeight: '100vh' }}>
+      <ThemeProvider
+        mode={globals.themeMode}
+        style={{ display: 'block', padding: '1rem', background: 'var(--ds-color-surface)', minHeight: '100vh' }}
+      >
         <Story />
       </ThemeProvider>
     ),

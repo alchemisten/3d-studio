@@ -24,7 +24,10 @@ case "$1" in
   publish)
     [[ ! -e registry-error ]] || exit 98
     cp package.json "$BOOTSTRAP_TEST_MANIFEST" ;;
-  trust) exit 0 ;;
+  trust)
+    for arg in "$@"; do
+      if [[ "$arg" == --@schablone:registry=* ]]; then echo 'Unknown flag: --@schablone:registry' >&2; exit 1; fi
+    done ;;
   *) echo "Unexpected npm invocation: $*" >&2; exit 99 ;;
 esac
 `,
@@ -65,7 +68,7 @@ for (const scenario of ['existing', 'missing']) {
   assert.equal(result.calls.filter((call) => call.startsWith('trust github ')).length, 14);
   for (const call of result.calls) {
     assert.ok(call.includes('--registry=https://registry.npmjs.org/'), call);
-    assert.ok(call.includes('--@schablone:registry=https://registry.npmjs.org/'), call);
+    assert.equal(call.includes('--@schablone:registry=https://registry.npmjs.org/'), !call.startsWith('trust '), call);
   }
   if (scenario === 'missing') {
     const manifest = JSON.parse(readFileSync(resolve(root, 'published-manifest.json'), 'utf8'));

@@ -92,7 +92,7 @@ Run `pnpm run build` to create a new build.
 
 ### New release
 
-For one-time package creation, first authenticate to npmjs with `npm login --auth-type=web --registry=https://registry.npmjs.org/` and verify `npm whoami --registry=https://registry.npmjs.org/`. On Windows, use PowerShell if Git Bash exits before browser approval is saved. Run `bash tools/scripts/bootstrap-npm.sh --dry-run` to inspect the offline plan, then omit `--dry-run` to create missing placeholders and configure trusted publishing. The script explicitly overrides both the default and `@schablone` registries for each operation; it does not change saved npm settings.
+For one-time package creation, first authenticate to npmjs with `npm login --auth-type=web --registry=https://registry.npmjs.org/` and verify `npm whoami --registry=https://registry.npmjs.org/`. On Windows, use PowerShell if Git Bash exits before browser approval is saved. Run `bash tools/scripts/bootstrap-npm.sh --dry-run` to inspect the offline plan, then omit `--dry-run` to create missing placeholders and configure trusted publishing. Package lookup and publication override both the default and `@schablone` registries. The trust command accepts only the default registry override and sends its request directly there. Saved npm settings stay unchanged.
 
 Releases use two branches: `develop` publishes release candidates (`-rc.N`) to npm's `next` tag; `main` publishes stable versions to `latest`. Both run the same quality gates. Release jobs are serialized, and successful stable releases merge back into `develop` without rewriting history.
 
