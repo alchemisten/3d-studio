@@ -52,7 +52,7 @@ const run = (scenario, args = []) => {
 const dry = run('auth', ['--dry-run']);
 assert.equal(dry.status, 0, dry.stderr);
 assert.equal(dry.calls.length, 0);
-assert.equal((dry.stdout.match(/create 0\.0\.1/g) ?? []).length, 14);
+assert.equal((dry.stdout.match(/create 0\.0\.1/g) ?? []).length, 18);
 const invalid = run('auth', ['--unknown']);
 assert.equal(invalid.status, 2);
 assert.equal(invalid.calls.length, 0);
@@ -64,8 +64,8 @@ for (const scenario of ['auth', 'registry']) {
 for (const scenario of ['existing', 'missing']) {
   const result = run(scenario);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.calls.filter((call) => call.startsWith('publish ')).length, scenario === 'missing' ? 14 : 0);
-  assert.equal(result.calls.filter((call) => call.startsWith('trust github ')).length, 14);
+  assert.equal(result.calls.filter((call) => call.startsWith('publish ')).length, scenario === 'missing' ? 18 : 0);
+  assert.equal(result.calls.filter((call) => call.startsWith('trust github ')).length, 18);
   for (const call of result.calls) {
     assert.ok(call.includes('--registry=https://registry.npmjs.org/'), call);
     assert.equal(call.includes('--@schablone:registry=https://registry.npmjs.org/'), !call.startsWith('trust '), call);

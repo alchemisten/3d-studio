@@ -1,0 +1,36 @@
+{
+  "name": "3d-studio-feature-ar",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature-ar/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "outputs": ["{workspaceRoot}/dist/libs/feature-ar"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outDir": "../../dist/libs/feature-ar"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node tools/scripts/publish.ts 3d-studio-feature-ar {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    }
+  }
+}

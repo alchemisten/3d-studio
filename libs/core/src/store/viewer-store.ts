@@ -1,5 +1,6 @@
 import { BehaviorSubject, Subject, distinctUntilChanged, filter, map, type Observable } from 'rxjs';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { initialQualityState, type QualityState, type QualityTier } from '../quality/quality-monitor';
 
 /**
  * Augment to declare events your feature emits:
@@ -8,7 +9,11 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 export interface ViewerEventMap {
   'model:materials-changed': { gltf: GLTF };
   'model:loaded': { gltf: GLTF };
+  /** The model was changed in place (see `ViewerStore.notifyModelChanged`); `fit` asks for the camera to be refitted. */
+  'model:changed': { gltf: GLTF; fit: boolean };
   'model:error': { error: Error };
+  /** The quality monitor moved to another tier; `fps` is the average that caused it. */
+  'quality:tier-changed': { tier: QualityTier; previous: QualityTier; fps?: number };
 }
 
 export type ViewerEventType = keyof ViewerEventMap;
@@ -21,10 +26,14 @@ export interface ViewerState {
   status: 'idle' | 'loading' | 'ready' | 'error';
   error?: Error;
   gltf?: GLTF;
+  /** Counts the in-place changes of the model announced with `notifyModelChanged`; depend on it for what is derived from the model's content. */
+  modelRevision: number;
   /** On/off state of toggle features by feature id. */
   featureEnabled: Record<string, boolean>;
   /** Free-form state of features by feature id, e.g. the active light scenario. */
   featureState: Record<string, unknown>;
+  /** What the device affords, measured from rendered frames (see `QualityOptions`). Starts at `off`. */
+  quality: QualityState;
 }
 
 /**
@@ -32,7 +41,13 @@ export interface ViewerState {
  * `store.select$(s => s.status).subscribe(...)`, `store.on$('model:loaded')`.
  */
 export class ViewerStore {
-  private readonly stateSubject = new BehaviorSubject<ViewerState>({ status: 'idle', featureEnabled: {}, featureState: {} });
+  private readonly stateSubject = new BehaviorSubject<ViewerState>({
+    status: 'idle',
+    modelRevision: 0,
+    featureEnabled: {},
+    featureState: {},
+    quality: initialQualityState,
+  });
   private readonly eventSubject = new Subject<ViewerEvent>();
 
   public readonly state$: Observable<ViewerState> = this.stateSubject.asObservable();
@@ -57,6 +72,19 @@ export class ViewerStore {
 
   public setFeatureState(id: string, value: unknown): void {
     this.setState({ featureState: { ...this.getState().featureState, [id]: value } });
+  }
+
+  /**
+   * Tells the viewer that the shown model was changed in place: nodes added, removed, moved, hidden or given
+   * other materials. Bounds, floor, shadows, outlines and material effects are derived again and a frame is
+   * drawn. The camera stays where it is unless `fit` is set.
+   */
+  public notifyModelChanged({ fit = false }: { fit?: boolean } = {}): void {
+    const { gltf, modelRevision } = this.getState();
+    if (!gltf) return;
+    this.setState({ modelRevision: modelRevision + 1 });
+    this.emit('model:changed', { gltf, fit });
+    this.emit('model:materials-changed', { gltf });
   }
 
   public select$<T>(selector: (state: ViewerState) => T): Observable<T> {

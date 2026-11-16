@@ -9,7 +9,7 @@ based on [Three JS](https://threejs.org).
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@schablone/3d-studio-ui`            | Style tokens (`--ds-*`), `ThemeProvider`, slot registry, 9-region overlay plus `bottom-bar`, Radix-based primitives (Switch, Checkbox, Slider, Select, Segmented, Stepper, Tabs, Accordion, List, ColorSelect, Loader, Button, â€¦) |
 | `@schablone/3d-studio-core`          | `<Viewer>`, viewer store, `defineFeature()`, `ProjectAdapter`                                                                                                                                                                       |
-| `@schablone/3d-studio-feature-*`     | `skybox`, `wireframe`, `camera-rotation`, `light-scenarios`, `animation`, `highlights`, `floor`, `color-switcher`, `material-variants`, `beauty-shot`                                                                               |
+| `@schablone/3d-studio-feature-*`     | `skybox`, `wireframe`, `camera-rotation`, `light-scenarios`, `animation`, `highlights`, `floor`, `color-switcher`, `material-variants`, `beauty-shot`, `ar`, `ambient-occlusion`                                                    |
 | `@schablone/3d-studio-scene-preview` | Node API and CLI for PNG thumbnails; separate from browser packages                                                                                                                                                                 |
 | `@schablone/3d-studio`               | `<Studio>`, `<ProjectList>`, `<ProjectDetail>`, REST adapter, default feature bundle                                                                                                                                                |
 
@@ -55,6 +55,25 @@ router, `<Viewer>` with your own `features`, or the primitives from `ui`.
 Customize with CSS variables, `ds-*` classes, `data-testid` hooks and slots.
 See `CLAUDE.md` for architecture conventions and `MIGRATION.md` for upgrading from 0.x.
 
+### A model the host owns
+
+`<Viewer>` shows either a `source` it loads or a `model` the host built and keeps changing, never both:
+
+```tsx
+const store = useMemo(() => new ViewerStore(), []);
+const model = useMemo(() => ({ scene: configurator.scene, animations: configurator.clips }), [configurator]);
+
+<Viewer model={model} store={store} features={features} featureConfig={featureConfig} />;
+
+configurator.onChange(() => store.notifyModelChanged());
+```
+
+The scene is added as it is: the viewer neither clones nor disposes it, takes it out of its scene graph when another scene is passed or the viewer unmounts, and shows no loading state. It is published as `gltf` in the store like a loaded model (`model:loaded`), so features work on it unchanged. Passing the same `scene` and `animations` again changes nothing; a new `animations` array publishes the model anew.
+
+After changing the scene in place (nodes added, removed, moved, hidden, other materials) call `store.notifyModelChanged()`. It raises `modelRevision` in the store and emits `model:changed` and `model:materials-changed`: floor and shadow, ambient occlusion, highlight outlines, wireframe and tints are derived again and a frame is drawn. The camera stays where it is; `notifyModelChanged({ fit: true })` fits it to the new bounds. Highlight anchors and their occlusion follow node names every frame and need no notification beyond the frame. The same call works for a loaded `source` whose `gltf.scene` the host changes.
+
+A supplied model has no glTF document: feature config comes from `featureConfig` or `feature.use(...)` only, and authored `KHR_materials_variants` are not available. Animation clips are bound to the nodes present when the model is published.
+
 ### Beauty Shot
 
 Add the optional `@schablone/3d-studio-feature-beauty-shot` package to a viewer using Three r187 or later and import its `style.css`. The Toy Car example enables the feature. Rendering requires WebGPU on a secure origin (HTTPS or localhost). The interactive viewer uses WebGL. The WebGPU renderer and tracer load when rendering begins.
@@ -69,6 +88,49 @@ beautyShot.use({
 ```
 
 Output actions appear in the top-right menu. Set `viewer.outputMenu.region` to move it. Features can append actions to `viewer.output`. Use `direct` for a single action, `quality` for a preset picker, or `details` to expose samples and grain reduction. Scenes can supply the same settings in `featureConfig['beauty-shot']`. Capture uses the current camera, model materials, environment and viewport size. Grain reduction applies an edge-preserving filter to the finished image.
+
+### AR
+
+Add the optional `@schablone/3d-studio-feature-ar` package and import its `style.css`. It adds a "View in AR" action ("In AR ansehen" with `locale: 'de'`) to the Output menu; set `placement: 'button'` for a button of its own in the top-right region instead. iOS opens Quick Look with the USDZ, Android opens Scene Viewer with the GLB, a desktop shows a QR code of the landing page with a copy-link, and in-app browsers get the copy-link.
+
+```tsx
+ar.use({
+  enabled: true,
+  slug: 'tray',
+  stageUrl: 'https://stage.example/',
+  locale: 'en',
+  glb: 'projects/tray/model.glb',
+  usdz: 'projects/tray/model.usdz',
+  landingUrl: 'app/viewer/index.html?project=tray',
+  isLanding: isArLanding(location.search),
+});
+```
+
+Urls may be relative to `stageUrl`. Without `usdz`, set `bakeUrl` to a POST endpoint that prepares one on demand. With `isLanding` the dialog opens straight away; once it is closed or has launched the viewer emits `ar:landing-consumed`, so the host can drop its parameter with `removeArLandingParam`. Emit `ar:open` to start AR from your own control. Override single strings with `labels`.
+
+### Ambient occlusion
+
+Add the optional `@schablone/3d-studio-feature-ambient-occlusion` package (Three r187 or later; no stylesheet). It darkens creases, ribs and pockets of the model and nothing else: the scene is drawn as always and the occlusion is multiplied onto the pixels the model covers, so the background, tone mapping, colour space, antialiasing and a transparent canvas stay exactly as they are without it. Helpers, sprites and other blended objects are drawn after it and are not darkened.
+
+```tsx
+import { ambientOcclusion } from '@schablone/3d-studio-feature-ambient-occlusion';
+
+<Viewer
+  source="/tray.glb"
+  features={[ambientOcclusion.use({ mode: 'auto', intensity: 1, radius: 0.06, whenResting: true, locale: 'de' })]}
+  quality={{ promoteFps: 50, reducedFps: 40, offFps: 30 }}
+/>;
+```
+
+`mode` is `auto` (default), `on` or `off`; the view options offer the same three choices ("Ambient occlusion: Auto / On / Off", German with `locale: 'de'`, single texts through `labels`) and the choice is shareable as the `ao` query setting. `radius` is the reach as a share of the model's size. With `whenResting` (default) the effect is left out while the camera moves or a pointer is down and fades in once the view rests, so interaction keeps its frame rate. `enabled: false` removes the effect and its menu entry.
+
+`auto` follows the quality tier of the viewer: `high` renders the full effect, `reduced` renders it at half resolution with fewer samples, `off` mounts nothing. Transparent, transmissive, alpha-tested and wireframe materials, lines, points and sprites neither cast nor receive occlusion; set `userData.ambientOcclusion = false` on a mesh to leave it out too.
+
+### Quality tier
+
+Every `<Viewer>` measures the frame rate of the frames it really renders and keeps `quality` in its store: `{ tier: 'high' | 'reduced' | 'off', fps, demoted, fixed }`. Frames before the model is shown, frames of a hidden tab and the first frame after an idle refresh do not count, so a canvas with `frameloop: 'demand'` is measured only while it renders. The tier starts at `off`, rises to `high` after one whole window (`windowMs`, 1 s) at `promoteFps` (50) or more, drops to `reduced` below `reducedFps` (40) and to `off` below `offFps` (30), and never rises again after a drop. Devices with a coarse pointer stay `off` unless `coarsePointer: 'measure'` is set. `quality={{ tier: 'high' }}` fixes the tier, `quality={false}` keeps it `off`.
+
+Read it with `useViewerState((state) => state.quality.tier)` or `store.on$('quality:tier-changed')`. The monitor never requests frames. A feature that depends on the tier calls `useQualityProbe(isActive)` in its scene to keep an on-demand canvas rendering until the tier is decided (at most 180 frames). `createQualityMonitor` is the same logic without React.
 
 ## Development
 

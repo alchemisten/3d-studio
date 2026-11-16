@@ -1,4 +1,4 @@
-import { PreviewLights, Viewer, type Project, type ViewerProps } from '@schablone/3d-studio-core';
+import { PreviewLights, Viewer, type Project, type ViewerOptions } from '@schablone/3d-studio-core';
 import type { ReactNode } from 'react';
 import { sampleFeatures } from '../../../samples/scenes';
 import './story-scene.css';
@@ -13,7 +13,7 @@ export const Example = ({ title, hint, children }: { title: string; hint: string
   </section>
 );
 
-export const StoryScene = ({ scene, ...props }: { scene: Project } & Partial<ViewerProps>) => (
+export const StoryScene = ({ scene, ...props }: { scene: Project } & Partial<ViewerOptions> & { source?: string }) => (
   <Viewer
     source={scene.source}
     openingCamera={scene.openingCamera}

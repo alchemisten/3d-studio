@@ -37,6 +37,8 @@ export default defineConfig({
         'react-dom',
         'react/jsx-runtime',
         'lucide-react',
+        /^mdast-util-/,
+        /^micromark-extension-/,
         'rxjs',
         '@schablone/3d-studio-ui',
         '@schablone/3d-studio-core',

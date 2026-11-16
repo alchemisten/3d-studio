@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Color, GreaterDepth, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three';
+import { Color, GreaterDepth, Matrix4, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three';
 import type { Material, Object3D } from 'three';
 import {
   defineFeature,
@@ -17,7 +17,17 @@ import { IconButton, Panel, Slot, useSlotFills } from '@schablone/3d-studio-ui';
 import './highlights.css';
 import { HoverOutline } from './hover-outline';
 import { pointerTipRadius, updatePointer } from './pointer';
-import { highlightLabel, isHighlightVisible, pickHotspot, resolveAnchor, runCommand, type AnimationSnapshot, type Highlight } from './highlight-model';
+import {
+  highlightDescription,
+  highlightLabel,
+  isHighlightVisible,
+  localizedText,
+  pickHotspot,
+  resolveAnchor,
+  runCommand,
+  type AnimationSnapshot,
+  type Highlight,
+} from './highlight-model';
 
 declare module '@schablone/3d-studio-ui' {
   interface SlotMap {
@@ -58,6 +68,8 @@ interface HighlightsState {
   focusedId: string | null;
 }
 
+const HighlightContentView = lazy(() => import('./highlight-content-view'));
+
 const FEATURE_ID = 'highlights';
 const HIT_RADIUS = 28;
 const PAUSE_RADIUS = 110;
@@ -66,6 +78,13 @@ const HIT_RADIUS_TOUCH = 40;
 // Stop the occlusion ray slightly short so anchors lying on a surface do not occlude themselves.
 const OCCLUSION_MARGIN = 0.02;
 const OCCLUSION_MARGIN_MAX = 0.05;
+// An occlusion raycast walks every triangle of the model (and every bone of a skinned one). The next one waits
+// this many times what the last one took, so occlusion never takes more than about a tenth of the frame time.
+const OCCLUSION_REST_FACTOR = 9;
+// A raycast slower than this would show as a hitch while the view moves: such models are only tested once the
+// camera has stood still for a moment, and the hotspots keep their last state meanwhile.
+const OCCLUSION_HEAVY_MS = 4;
+const OCCLUSION_STILL_MS = 250;
 
 const isShown = (object: Object3D | null): boolean => {
   for (let node = object; node; node = node.parent) {
@@ -101,7 +120,9 @@ export interface HighlightsApi {
 /** Focus state and commands, usable in the DOM tree and in the scene. */
 export const useHighlights = (): HighlightsApi => {
   const viewer = useViewer();
-  const focusedId = useViewerState((s) => (s.featureState[FEATURE_ID] as HighlightsState | undefined)?.focusedId ?? null);
+  const focusedId = useViewerState(
+    (s) => (s.featureState[FEATURE_ID] as HighlightsState | undefined)?.focusedId ?? null,
+  );
   return {
     focusedId,
     focus: (id) => viewer.emit('highlight:focus', { id }),
@@ -132,8 +153,7 @@ interface Goal extends Pose {
 
 const animationSnapshot = (viewer: ViewerStore): AnimationSnapshot | undefined => {
   const state = viewer.getState().featureState['animation'] as
-    | { time: number; status: Record<string, string>; clips: string[] }
-    | undefined;
+    { time: number; status: Record<string, string>; clips: string[] } | undefined;
   if (!state || state.clips.length === 0) {
     return undefined;
   }
@@ -156,9 +176,19 @@ const PointerLine = ({ highlight }: { highlight: Highlight }) => {
     if (line.current && dot.current) {
       const active = hotspotsOf(viewer).get(highlight.id)?.hasAttribute('data-hover');
       const perspective = camera as PerspectiveCamera;
-      const unitsPerPixel = 2 * camera.position.distanceTo(a.current) * Math.tan(perspective.fov * Math.PI / 360) / size.height;
-      updatePointer(line.current, dot.current, a.current, b.current, isHighlightVisible(highlight, animationSnapshot(viewer)), unitsPerPixel * (active ? 1.8 : 0.8));
-      const viewDepth = perspective.isPerspectiveCamera ? Math.abs(b.current.applyMatrix4(camera.matrixWorldInverse).z) : 1;
+      const unitsPerPixel =
+        (2 * camera.position.distanceTo(a.current) * Math.tan((perspective.fov * Math.PI) / 360)) / size.height;
+      updatePointer(
+        line.current,
+        dot.current,
+        a.current,
+        b.current,
+        isHighlightVisible(highlight, animationSnapshot(viewer)),
+        unitsPerPixel * (active ? 1.8 : 0.8),
+      );
+      const viewDepth = perspective.isPerspectiveCamera
+        ? Math.abs(b.current.applyMatrix4(camera.matrixWorldInverse).z)
+        : 1;
       dot.current.scale.setScalar(pointerTipRadius(viewDepth, size.height, camera.projectionMatrix.elements[5]));
     }
   });
@@ -185,6 +215,7 @@ const HighlightsScene = () => {
   const { config, viewer } = useFeature<HighlightsConfig>();
   const enabled = useFeatureEnabled();
   const gltf = useViewerState((s) => s.gltf);
+  const modelRevision = useViewerState((s) => s.modelRevision);
   const { focusedId, release } = useHighlights();
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const controls = useThree((s) => s.controls) as unknown as OrbitLike | null;
@@ -195,7 +226,16 @@ const HighlightsScene = () => {
   const pausedClips = useRef<string[]>([]);
   const nearId = useRef<string | null>(null);
   const tmp = useRef({ world: new Vector3(), target: new Vector3() });
-  const occlusion = useRef({ raycaster: new Raycaster(), direction: new Vector3(), cursor: 0, hidden: new Set<string>() });
+  const occlusion = useRef({
+    raycaster: new Raycaster(),
+    direction: new Vector3(),
+    cursor: 0,
+    restUntil: 0,
+    lastCost: 0,
+    view: new Matrix4(),
+    movedAt: 0,
+    hidden: new Set<string>(),
+  });
   const gl = useThree((s) => s.gl);
   // Hotspots slide while animations run, so native :hover would flicker; hit-test against projected positions instead.
   const pointer = useRef<{ x: number; y: number } | null>(null);
@@ -210,7 +250,11 @@ const HighlightsScene = () => {
     const canvas = gl.domElement;
     const local = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
-      const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
       const onViewer = event.target === canvas || (event.target as Element | null)?.closest?.('.ds-hotspot');
       return inside && onViewer ? { x: event.clientX - rect.left, y: event.clientY - rect.top } : null;
     };
@@ -256,7 +300,11 @@ const HighlightsScene = () => {
       origin = { x: event.clientX, y: event.clientY };
     };
     const move = (event: PointerEvent) => {
-      if (origin && latest.current.focusedId && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > DRAG_LEAVE_PX) {
+      if (
+        origin &&
+        latest.current.focusedId &&
+        Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > DRAG_LEAVE_PX
+      ) {
         origin = null;
         leftByDrag.current = true;
         release();
@@ -337,7 +385,8 @@ const HighlightsScene = () => {
       });
     });
     return () => touched.forEach((original, material) => material.emissive.copy(original));
-  }, [focused, gltf]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focused, gltf, modelRevision]);
 
   useFrame((_, delta) => {
     const root = gltf?.scene;
@@ -373,9 +422,16 @@ const HighlightsScene = () => {
       camera.updateProjectionMatrix();
       controls?.update();
       const settled = current.keepDirection
-        ? Math.abs(camera.position.distanceTo(controls?.target ?? current.target) - current.position.distanceTo(current.target)) < 0.001
+        ? Math.abs(
+            camera.position.distanceTo(controls?.target ?? current.target) -
+              current.position.distanceTo(current.target),
+          ) < 0.001
         : camera.position.distanceTo(current.position) < 0.001;
-      if (settled && (!controls || controls.target.distanceTo(current.target) < 0.001) && Math.abs(camera.fov - current.fov) < 0.01) {
+      if (
+        settled &&
+        (!controls || controls.target.distanceTo(current.target) < 0.001) &&
+        Math.abs(camera.fov - current.fov) < 0.01
+      ) {
         goal.current = null;
       }
     } else if (controls && followsNode) {
@@ -384,9 +440,17 @@ const HighlightsScene = () => {
     camera.updateWorldMatrix(true, false);
 
     const occ = occlusion.current;
-    // One raycast per frame, round-robin over the hotspots, keeps the cost flat on heavy models.
+    // At most one raycast per frame, round-robin over the hotspots, and none while the last one is paid off:
+    // that keeps the cost flat on heavy models.
     const registered = hotspotsOf(viewer);
-    const turn = registered.size ? occ.cursor++ % registered.size : 0;
+    const startedAt = performance.now();
+    if (!occ.view.equals(camera.matrixWorld)) {
+      occ.view.copy(camera.matrixWorld);
+      occ.movedAt = startedAt;
+    }
+    const isAtRest = startedAt - occ.movedAt >= OCCLUSION_STILL_MS;
+    const isDue = startedAt >= occ.restUntil && (occ.lastCost < OCCLUSION_HEAVY_MS || isAtRest);
+    const turn = registered.size && isDue ? occ.cursor++ % registered.size : -1;
     let index = -1;
     const visiblePoints: Array<{ id: string; x: number; y: number }> = [];
     hotspotsOf(viewer).forEach((element, id) => {
@@ -402,6 +466,9 @@ const HighlightsScene = () => {
         occ.raycaster.set(camera.position, occ.direction);
         occ.raycaster.far = distance - Math.min(distance * OCCLUSION_MARGIN, OCCLUSION_MARGIN_MAX);
         const blocked = occ.raycaster.intersectObject(root, true).some((hit) => isShown(hit.object));
+        const finishedAt = performance.now();
+        occ.lastCost = finishedAt - startedAt;
+        occ.restUntil = finishedAt + occ.lastCost * OCCLUSION_REST_FACTOR;
         if (blocked) {
           occ.hidden.add(id);
         } else {
@@ -424,13 +491,17 @@ const HighlightsScene = () => {
     points.current = visiblePoints;
     hovered.current = pickHotspot(visiblePoints, pointer.current, HIT_RADIUS, hovered.current);
     // Pause on approach: pausing goes through React state, so the hotspot would drift away from a precise hover.
-    const near = config.pauseOnHover ? pickHotspot(visiblePoints, pointer.current, PAUSE_RADIUS, nearId.current, 24) : null;
+    const near = config.pauseOnHover
+      ? pickHotspot(visiblePoints, pointer.current, PAUSE_RADIUS, nearId.current, 24)
+      : null;
     const wasNear = nearId.current;
     nearId.current = near;
     if (!!wasNear !== !!near) {
       // Moving hotspots are hard to hit: freeze playing animations while hovering, resume afterwards.
       if (near) {
-        const playing = Object.entries(animation?.status ?? {}).filter(([, status]) => status === 'playing').map(([clip]) => clip);
+        const playing = Object.entries(animation?.status ?? {})
+          .filter(([, status]) => status === 'playing')
+          .map(([clip]) => clip);
         pausedClips.current = playing;
         playing.forEach((clip) => viewer.emit('animation:pause', { clip }));
       } else {
@@ -442,8 +513,10 @@ const HighlightsScene = () => {
       }
     }
     const preview = previewIds.get(viewer) ?? hovered.current;
-    const nextOutline = enabled && preview && visiblePoints.some(point => point.id === preview)
-      ? config.highlights.find(highlight => highlight.id === preview && highlight.hoverOutline) : undefined;
+    const nextOutline =
+      enabled && preview && visiblePoints.some((point) => point.id === preview)
+        ? config.highlights.find((highlight) => highlight.id === preview && highlight.hoverOutline)
+        : undefined;
     if (lastOutline.current !== nextOutline) {
       lastOutline.current = nextOutline;
       setOutline(nextOutline);
@@ -456,10 +529,18 @@ const HighlightsScene = () => {
       }
     }
     gl.domElement.style.cursor = hovered.current ? 'pointer' : '';
-
   });
 
-  return enabled ? <>{outline && gltf && <HoverOutline highlight={outline} model={gltf.scene} />}{config.highlights.filter((highlight) => highlight.pointer).map((highlight) => <PointerLine key={highlight.id} highlight={highlight} />)}</> : null;
+  return enabled ? (
+    <>
+      {outline && gltf && <HoverOutline highlight={outline} model={gltf.scene} revision={modelRevision} />}
+      {config.highlights
+        .filter((highlight) => highlight.pointer)
+        .map((highlight) => (
+          <PointerLine key={highlight.id} highlight={highlight} />
+        ))}
+    </>
+  ) : null;
 };
 
 const HotspotLayer = ({ config }: { config: HighlightsConfig }) => {
@@ -518,67 +599,129 @@ const DetailPanel = ({ config }: { config: HighlightsConfig }) => {
   const fills = useSlotFills('highlights.detail');
   const panel = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
-  if (!highlight || !enabled || (!highlight.description && !actions?.length && !fills.length && !tools.length)) {
+  const openId = highlight?.id;
+  // Escape closes the card, and focus goes back to the hotspot it was opened from instead of falling to the page.
+  useEffect(() => {
+    if (openId === undefined) {
+      return;
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) {
+        release();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      const hotspot = document.querySelector<HTMLElement>(`[data-testid="ds-hotspot-${CSS.escape(openId)}"]`);
+      if (hotspot && (document.activeElement === document.body || !document.activeElement?.isConnected)) {
+        hotspot.focus();
+      }
+    };
+  }, [openId, release]);
+  const description = highlight && highlightDescription(highlight, config.locale);
+  if (!highlight || !enabled || (!description && !actions?.length && !fills.length && !tools.length)) {
     return null;
   }
   return (
     <div ref={panel} className="ds-highlight-callout">
-    <Panel
-      className="ds-highlight-detail"
-      data-testid="ds-highlight-detail"
-      title={<button type="button" className="ds-callout-handle" aria-label={`Move ${highlightLabel(highlight, config.locale)}`}
-        onKeyDown={(event) => {
-          const box = panel.current;
-          const parent = box?.offsetParent;
-          if (!box || !parent) return;
-          const directions: Record<string, [number, number]> = { ArrowLeft: [-8, 0], ArrowRight: [8, 0], ArrowUp: [0, -8], ArrowDown: [0, 8] };
-          const step = directions[event.key];
-          if (!step) return;
-          event.preventDefault();
-          box.style.left = Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, box.offsetLeft + step[0])) + 'px';
-          box.style.top = Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, box.offsetTop + step[1])) + 'px';
-        }}
-        onPointerDown={(event) => {
-          const box = panel.current;
-          if (!box) return;
-          drag.current = { x: event.clientX, y: event.clientY, left: box.offsetLeft, top: box.offsetTop };
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerUp={() => { drag.current = null; }}
-        onPointerCancel={() => { drag.current = null; }}
-        onPointerMove={(event) => {
-          const start = drag.current;
-          const box = panel.current;
-          const parent = box?.offsetParent;
-          if (!start || !box || !parent) return;
-          box.style.left = Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, start.left + event.clientX - start.x)) + 'px';
-          box.style.top = Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, start.top + event.clientY - start.y)) + 'px';
-        }}>
-          <span className="ds-callout-index">{String(config.highlights.indexOf(highlight) + 1).padStart(2, '0')} / {String(config.highlights.length).padStart(2, '0')}</span>
-          {highlightLabel(highlight, config.locale)}
-        </button>}
-      actions={<IconButton label="Close" icon={<X size={18} aria-hidden="true" />} data-testid="ds-highlight-detail-close" onClick={release} />}
-    >
-      <Slot name="highlights.detail" props={{ highlight }}>
-        {highlight.description && <p>{highlight.description}</p>}
-        <ModelToolControls tools={tools} surface="inline" />
-        {actions?.length ? (
-          <div className="ds-highlight-detail__actions" data-testid="ds-highlight-detail-actions">
-            {actions.map((action) => (
-              <button
-                key={action.id}
-                type="button"
-                className="ds-highlight-detail__action" data-navigation={typeof action.run === 'object' && 'focus' in action.run ? '' : undefined}
-                data-testid={`ds-highlight-action-${highlight.id}-${action.id}`}
-                onClick={() => (typeof action.run === 'function' ? action.run(viewer) : runCommand(viewer, action.run))}
-              >
-                {action.label}{typeof action.run === 'object' && 'focus' in action.run && <ArrowRight size={16} aria-hidden="true" />}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </Slot>
-    </Panel>
+      <Panel
+        className="ds-highlight-detail"
+        data-testid="ds-highlight-detail"
+        title={
+          <button
+            type="button"
+            className="ds-callout-handle"
+            aria-label={`${config.locale === 'de' ? 'Verschieben:' : 'Move'} ${highlightLabel(highlight, config.locale)}`}
+            onKeyDown={(event) => {
+              const box = panel.current;
+              const parent = box?.offsetParent;
+              if (!box || !parent) return;
+              const directions: Record<string, [number, number]> = {
+                ArrowLeft: [-8, 0],
+                ArrowRight: [8, 0],
+                ArrowUp: [0, -8],
+                ArrowDown: [0, 8],
+              };
+              const step = directions[event.key];
+              if (!step) return;
+              event.preventDefault();
+              box.style.left =
+                Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, box.offsetLeft + step[0])) + 'px';
+              box.style.top =
+                Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, box.offsetTop + step[1])) + 'px';
+            }}
+            onPointerDown={(event) => {
+              const box = panel.current;
+              if (!box) return;
+              drag.current = { x: event.clientX, y: event.clientY, left: box.offsetLeft, top: box.offsetTop };
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerUp={() => {
+              drag.current = null;
+            }}
+            onPointerCancel={() => {
+              drag.current = null;
+            }}
+            onPointerMove={(event) => {
+              const start = drag.current;
+              const box = panel.current;
+              const parent = box?.offsetParent;
+              if (!start || !box || !parent) return;
+              box.style.left =
+                Math.max(0, Math.min(parent.clientWidth - box.offsetWidth, start.left + event.clientX - start.x)) +
+                'px';
+              box.style.top =
+                Math.max(0, Math.min(parent.clientHeight - box.offsetHeight, start.top + event.clientY - start.y)) +
+                'px';
+            }}
+          >
+            <span className="ds-callout-index">
+              {String(config.highlights.indexOf(highlight) + 1).padStart(2, '0')} /{' '}
+              {String(config.highlights.length).padStart(2, '0')}
+            </span>
+            {highlightLabel(highlight, config.locale)}
+          </button>
+        }
+        actions={
+          <IconButton
+            label="Close"
+            icon={<X size={18} aria-hidden="true" />}
+            data-testid="ds-highlight-detail-close"
+            onClick={release}
+          />
+        }
+      >
+        <Slot name="highlights.detail" props={{ highlight }}>
+          {description && (
+            <Suspense fallback={<p>{description}</p>}>
+              <HighlightContentView markdown={description} highlight={highlight} highlights={config.highlights} />
+            </Suspense>
+          )}
+          <ModelToolControls tools={tools} surface="inline" />
+          {actions?.length ? (
+            <div className="ds-highlight-detail__actions" data-testid="ds-highlight-detail-actions">
+              {actions.map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  className="ds-highlight-detail__action"
+                  data-navigation={typeof action.run === 'object' && 'focus' in action.run ? '' : undefined}
+                  data-testid={`ds-highlight-action-${highlight.id}-${action.id}`}
+                  onClick={() =>
+                    typeof action.run === 'function' ? action.run(viewer) : runCommand(viewer, action.run)
+                  }
+                >
+                  {localizedText(action.label, config.locale)}
+                  {typeof action.run === 'object' && 'focus' in action.run && (
+                    <ArrowRight size={16} aria-hidden="true" />
+                  )}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </Slot>
+      </Panel>
     </div>
   );
 };
@@ -591,7 +734,12 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const list = config.highlights;
   const viewer = useViewer();
-  useEffect(() => () => { previewIds.delete(viewer); }, [viewer, open, enabled]);
+  useEffect(
+    () => () => {
+      previewIds.delete(viewer);
+    },
+    [viewer, open, enabled],
+  );
 
   useEffect(() => {
     if (!open) {
@@ -611,13 +759,27 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
     return null;
   }
   const index = list.findIndex((h) => h.id === focusedId);
-  const step = (delta: number) => focus(list[index < 0 ? (delta > 0 ? 0 : list.length - 1) : (index + delta + list.length) % list.length].id);
+  const step = (delta: number) =>
+    focus(list[index < 0 ? (delta > 0 ? 0 : list.length - 1) : (index + delta + list.length) % list.length].id);
   const current = list[index];
 
   return (
-    <div ref={rootRef} className="ds-highlight-select" data-open={open ? '' : undefined} data-testid="ds-highlight-select">
+    <div
+      ref={rootRef}
+      className="ds-highlight-select"
+      data-open={open ? '' : undefined}
+      data-testid="ds-highlight-select"
+    >
       {open && (
-        <div ref={(element) => { if (element) openLists.set(viewer, element); else openLists.delete(viewer); }} className="ds-highlight-select__list" role="listbox" data-testid="ds-highlight-select-list">
+        <div
+          ref={(element) => {
+            if (element) openLists.set(viewer, element);
+            else openLists.delete(viewer);
+          }}
+          className="ds-highlight-select__list"
+          role="listbox"
+          data-testid="ds-highlight-select-list"
+        >
           {list.map((highlight, number) => (
             <button
               key={highlight.id}
@@ -639,12 +801,20 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
             >
               <span className="ds-highlight-select__number">{number + 1}</span>
               <span className="ds-highlight-select__label">{highlightLabel(highlight, config.locale)}</span>
-              {highlight.id === focusedId && <Check size={16} className="ds-highlight-select__check" aria-hidden="true" />}
+              {highlight.id === focusedId && (
+                <Check size={16} className="ds-highlight-select__check" aria-hidden="true" />
+              )}
             </button>
           ))}
         </div>
       )}
-      <button type="button" aria-label="Previous highlight" className="ds-highlight-select__step ds-highlight-select__prev" data-testid="ds-highlight-prev" onClick={() => step(-1)}>
+      <button
+        type="button"
+        aria-label="Previous highlight"
+        className="ds-highlight-select__step ds-highlight-select__prev"
+        data-testid="ds-highlight-prev"
+        onClick={() => step(-1)}
+      >
         <ChevronLeft size={20} aria-hidden="true" />
       </button>
       <button
@@ -657,7 +827,13 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
       >
         {current ? `${index + 1} · ${highlightLabel(current, config.locale)}` : 'Highlights'}
       </button>
-      <button type="button" aria-label="Next highlight" className="ds-highlight-select__step ds-highlight-select__next" data-testid="ds-highlight-next" onClick={() => step(1)}>
+      <button
+        type="button"
+        aria-label="Next highlight"
+        className="ds-highlight-select__step ds-highlight-select__next"
+        data-testid="ds-highlight-next"
+        onClick={() => step(1)}
+      >
         <ChevronRight size={20} aria-hidden="true" />
       </button>
     </div>
@@ -666,7 +842,11 @@ const HighlightSelect = ({ config }: { config: HighlightsConfig }) => {
 
 /** glTF extension: `ALCM_highlights`. Hotspots are DOM buttons (`.ds-hotspot`), focus moves the camera. */
 const StandaloneSelector = ({ config }: { config: HighlightsConfig }) => {
-  const playback = useViewerState((s) => s.featureEnabled.animation && Boolean((s.featureState.animation as { clips?: string[] } | undefined)?.clips?.length));
+  const playback = useViewerState(
+    (s) =>
+      s.featureEnabled.animation &&
+      Boolean((s.featureState.animation as { clips?: string[] } | undefined)?.clips?.length),
+  );
   return playback ? null : <HighlightSelect config={config} />;
 };
 
@@ -681,8 +861,24 @@ export const highlights = defineFeature<HighlightsConfig>({
     ...(config.detail
       ? { 'overlay.bottom-left': { mode: 'append' as const, order: -10, content: <DetailPanel config={config} /> } }
       : {}),
-    ...(config.select === 'playback' ? { 'overlay.bottom-center': { mode: 'append' as const, order: 0, content: <StandaloneSelector config={config} /> } } : {}),
-    ...(config.select ? { [config.select === 'playback' ? 'animation.controls.middle' : 'overlay.bottom-center']: { mode: 'append' as const, order: 0, content: <HighlightSelect config={config} /> } } : {}),
+    ...(config.select === 'playback'
+      ? {
+          'overlay.bottom-center': {
+            mode: 'append' as const,
+            order: 0,
+            content: <StandaloneSelector config={config} />,
+          },
+        }
+      : {}),
+    ...(config.select
+      ? {
+          [config.select === 'playback' ? 'animation.controls.middle' : 'overlay.bottom-center']: {
+            mode: 'append' as const,
+            order: 0,
+            content: <HighlightSelect config={config} />,
+          },
+        }
+      : {}),
   }),
   setup: ({ viewer, config }) => {
     if (viewer.getState().featureState[FEATURE_ID] === undefined) {

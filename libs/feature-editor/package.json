@@ -1,0 +1,54 @@
+{
+  "name": "@schablone/3d-studio-feature-editor",
+  "description": "Authoring features for 3D Studio: editor shell, highlight editor, material assignment and scene settings.",
+  "keywords": [
+    "react",
+    "three",
+    "react-three-fiber",
+    "3d",
+    "viewer",
+    "gltf",
+    "editor"
+  ],
+  "author": "Alchemisten AG",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    "./style.css": "./style.css",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "peerDependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@schablone/3d-studio-core": "__root_version__",
+    "@schablone/3d-studio-feature-highlights": "__root_version__",
+    "@schablone/3d-studio-ui": "__root_version__",
+    "lucide-react": ">=0.400.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "^7.8.1",
+    "three": ">=0.162.0"
+  },
+  "dependencies": {
+    "@tiptap/extension-image": "^3.34.0",
+    "@tiptap/pm": "^3.34.0",
+    "@tiptap/react": "^3.34.0",
+    "@tiptap/starter-kit": "^3.34.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@nx/devkit": "24.0.3",
+    "@nx/vite": "24.0.3",
+    "@vitejs/plugin-react": "6.2.1",
+    "vite": "8.3.5",
+    "vite-plugin-dts": "4.5.4"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

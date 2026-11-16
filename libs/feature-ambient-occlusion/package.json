@@ -1,0 +1,41 @@
+{
+  "name": "@schablone/3d-studio-feature-ambient-occlusion",
+  "description": "Adaptive ambient occlusion that darkens only the model, for 3D Studio.",
+  "keywords": [
+    "react",
+    "three",
+    "react-three-fiber",
+    "3d",
+    "viewer",
+    "gltf"
+  ],
+  "author": "Alchemisten AG",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "peerDependencies": {
+    "@react-three/fiber": "^9.8.2",
+    "@schablone/3d-studio-core": "__root_version__",
+    "@schablone/3d-studio-ui": "__root_version__",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": ">=0.187.0"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@nx/devkit": "24.0.3",
+    "@nx/vite": "24.0.3",
+    "@vitejs/plugin-react": "6.2.1",
+    "vite": "8.3.5",
+    "vite-plugin-dts": "4.5.4"
+  }
+}

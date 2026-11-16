@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { choiceSetting, defineFeature, useFeature, useViewer, useViewerState, type ToolSurface } from '@schablone/3d-studio-core';
+import {
+  choiceSetting,
+  defineFeature,
+  useFeature,
+  useViewer,
+  useViewerState,
+  type ToolSurface,
+} from '@schablone/3d-studio-core';
 import { MenuGroup, MenuRadioItem } from '@schablone/3d-studio-ui';
 import { bindVariantMaterials, variantNames } from './variant-materials';
 
@@ -93,18 +100,25 @@ export const materialVariants = defineFeature<VariantConfig>({
     const state = viewer.getState().featureState[id] as VariantState | undefined;
     if (!state) return [];
     const fallback = config.initial && state.names.includes(config.initial) ? config.initial : null;
-    return [choiceSetting('variant', state.names, fallback,
-      () => (viewer.getState().featureState[id] as VariantState).selected,
-      selected => viewer.setFeatureState(id, { ...state, selected }), true)];
+    return [
+      choiceSetting(
+        'variant',
+        state.names,
+        fallback,
+        () => (viewer.getState().featureState[id] as VariantState).selected,
+        (selected) => viewer.setFeatureState(id, { ...state, selected }),
+        true,
+      ),
+    ];
   },
   setup: ({ viewer, config }) => {
     const gltf = viewer.getState().gltf;
     if (!gltf) return;
     const names = variantNames(gltf);
-    if (names.length)
-      viewer.setFeatureState(id, {
-        names,
-        selected: config.initial && names.includes(config.initial) ? config.initial : null,
-      });
+    if (!names.length) return;
+    const initial = config.initial && names.includes(config.initial) ? config.initial : null;
+    const previous = viewer.getState().featureState[id] as (VariantState & { initial?: string | null }) | undefined;
+    const isSameSetup = previous?.initial === initial && previous.names.join('|') === names.join('|');
+    viewer.setFeatureState(id, { names, initial, selected: isSameSetup ? previous.selected : initial });
   },
 });

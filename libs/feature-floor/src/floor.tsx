@@ -9,9 +9,16 @@ export const isFloorMode = (value: unknown): value is FloorMode =>
 const FloorScene = () => {
   const { config } = useFeature<FloorConfig>();
   const gltf = useViewerState((s) => s.gltf);
+  const revision = useViewerState((s) => s.modelRevision);
   const mode = useViewerState((s) => s.featureState.floor as FloorMode | undefined) ?? config.mode;
   return gltf && mode !== 'off' ? (
-    <FloorSurface model={gltf.scene} mode={mode} color={config.color} animated={gltf.animations.length > 0} />
+    <FloorSurface
+      model={gltf.scene}
+      revision={revision}
+      mode={mode}
+      color={config.color}
+      animated={gltf.animations.length > 0}
+    />
   ) : null;
 };
 
@@ -36,9 +43,15 @@ export const floor = defineFeature<FloorConfig>({
   id: 'floor',
   defaults: { mode: 'shadow', color: '#aaa7a2' },
   scene: FloorScene,
-  querySettings: ({ viewer, config }) => [choiceSetting('floor', Object.keys(labels), config.mode,
-    () => viewer.getState().featureState.floor as FloorMode,
-    value => viewer.setFeatureState('floor', value))],
+  querySettings: ({ viewer, config }) => [
+    choiceSetting(
+      'floor',
+      Object.keys(labels),
+      config.mode,
+      () => viewer.getState().featureState.floor as FloorMode,
+      (value) => viewer.setFeatureState('floor', value),
+    ),
+  ],
   setup: ({ viewer, config }) => {
     if (viewer.getState().featureState.floor === undefined) viewer.setFeatureState('floor', config.mode);
   },

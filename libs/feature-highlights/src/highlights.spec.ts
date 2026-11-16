@@ -1,7 +1,16 @@
 import { resolveFeatureConfig } from '@schablone/3d-studio-core';
 import { Group, Object3D, Vector3 } from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { highlightLabel, pickHotspot, runCommand, highlights, isHighlightVisible, resolveAnchor, type Highlight } from './index';
+import {
+  highlightDescription,
+  highlightLabel,
+  pickHotspot,
+  runCommand,
+  highlights,
+  isHighlightVisible,
+  resolveAnchor,
+  type Highlight,
+} from './index';
 
 const base: Highlight = { id: 'h', anchor: { position: [0, 0, 0] }, camera: { position: [1, 1, 1] } };
 
@@ -65,6 +74,13 @@ describe('highlights feature', () => {
     expect(highlightLabel(base, 'en')).toBe('h');
     expect(highlightLabel({ ...base, label: { de: 'Tür', en: 'Door' } }, 'de')).toBe('Tür');
     expect(highlightLabel({ ...base, label: { de: 'Tür' } }, 'fr')).toBe('Tür');
+  });
+
+  it('resolves descriptions from plain strings and locale maps', () => {
+    expect(highlightDescription(base, 'en')).toBeUndefined();
+    expect(highlightDescription({ ...base, description: 'Plain' }, 'de')).toBe('Plain');
+    expect(highlightDescription({ ...base, description: { de: 'Text', en: 'Copy' } }, 'en')).toBe('Copy');
+    expect(highlightDescription({ ...base, description: { de: 'Text' } }, 'fr')).toBe('Text');
   });
 
   it('fills the hotspot layer and detail region', () => {

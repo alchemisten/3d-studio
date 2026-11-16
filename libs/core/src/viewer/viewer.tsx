@@ -14,13 +14,23 @@ import {
   type SlotFillsInput,
   type Theme,
 } from '@schablone/3d-studio-ui';
-import { indexModelTools, ModelToolContext, ModelToolControls, useModelTools, FeatureReactContext, useFeatures, type FeatureInput } from '../feature';
+import {
+  indexModelTools,
+  ModelToolContext,
+  ModelToolControls,
+  useModelTools,
+  FeatureReactContext,
+  useFeatures,
+  type FeatureInput,
+} from '../feature';
 import { type ViewerQuery, ViewerContext, ViewerStore, useViewer, useViewerState } from '../store';
+import { type QualityOptions, QualityWatcher } from '../quality';
 import { ViewerErrorBoundary } from './error-boundary';
 import type { OpeningCamera } from './opening-view';
 import { FirstSceneFrame } from './first-scene-frame';
 import { SceneLoading, type SceneLoadingProps } from './scene-loading';
-import { DefaultControls, Model } from './model';
+import { DefaultControls, HostModel, Model, type ViewerModel } from './model';
+import { resolveViewerLabels, type ViewerLabels } from './viewer-labels';
 import './viewer.css';
 
 declare module '@schablone/3d-studio-ui' {
@@ -36,9 +46,22 @@ declare module '@schablone/3d-studio-ui' {
   }
 }
 
-export interface ViewerProps {
+export interface ViewerSourceProps {
   /** URL of the glTF/GLB to display. */
   source: string;
+  model?: never;
+}
+
+export interface ViewerModelProps {
+  /**
+   * A scene the host built and owns, shown instead of a loaded `source`. It is neither cloned nor disposed
+   * and there is no loading state. After changing it in place call `store.notifyModelChanged()`.
+   */
+  model: ViewerModel;
+  source?: never;
+}
+
+export interface ViewerOptions {
   loadingPreview?: SceneLoadingProps;
   openingCamera?: OpeningCamera;
   features?: FeatureInput[];
@@ -50,6 +73,8 @@ export interface ViewerProps {
   /** Bring your own store to tap into state and events from outside. */
   store?: ViewerStore;
   query?: ViewerQuery;
+  /** Thresholds of the quality monitor behind `quality.tier` of the store, a fixed `tier`, or `false` to keep it `off`. */
+  quality?: QualityOptions | false;
   /** Passed to the R3F `<Canvas>`. */
   canvas?: Omit<CanvasProps, 'children'>;
   /** Draco decoder path, `true` for drei's default, `false` to disable. */
@@ -60,6 +85,10 @@ export interface ViewerProps {
   canvasChildren?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** Locale of the viewer's own chrome (menu names, retry); `en` and `de` are shipped. */
+  locale?: string;
+  /** Overrides single texts of the viewer's chrome. */
+  labels?: Partial<ViewerLabels>;
   /** Where the shared 'View options' menu is placed (default bottom-right), or `false` to hide it. */
   modelTools?: { tools?: readonly string[]; region?: OverlayRegion; order?: number; label?: string } | false;
   outputMenu?: { region?: OverlayRegion; order?: number; label?: string } | false;
@@ -68,13 +97,15 @@ export interface ViewerProps {
   children?: ReactNode;
 }
 
-const ViewerError = ({ retry }: { retry: () => void }) => {
+export type ViewerProps = ViewerOptions & (ViewerSourceProps | ViewerModelProps);
+
+const ViewerError = ({ retry, labels }: { retry: () => void; labels: ViewerLabels }) => {
   const error = useViewerState((s) => s.error);
   return (
     <div className="ds-viewer__message ds-viewer__message--error" role="alert" data-testid="ds-viewer-error">
       <Slot name="viewer.error" props={{ error, retry }}>
-        <span>{error?.message ?? 'Something went wrong while loading the model.'}</span>
-        <Button onClick={retry}>Retry</Button>
+        <span>{error?.message ?? labels.loadError}</span>
+        <Button onClick={retry}>{labels.retry}</Button>
       </Slot>
     </div>
   );
@@ -97,15 +128,22 @@ const ToolMenu = ({ slot, region, label, tools, order = 100 }: ToolMenuProps) =>
   if (!hasItems && !available.length) return null;
   return (
     <Region id={slot} order={order}>
-      <Menu label={label} icon={isOutput ? <ImageDown size={20} /> : isSettings ? <Settings size={20} /> : <Palette size={20} />}
+      <Menu
+        label={label}
+        icon={isOutput ? <ImageDown size={20} /> : isSettings ? <Settings size={20} /> : <Palette size={20} />}
         className={isOutput ? 'ds-output' : isSettings ? 'ds-view-options' : 'ds-model-tools'}
         testId={isOutput ? 'ds-output' : isSettings ? 'ds-view-options' : 'ds-model-tools'}
-        placement={`${region.startsWith('bottom') ? 'top' : 'bottom'}-${region.endsWith('right') ? 'end' : 'start'}`}>
-        <Slot name={slot}><ModelToolControls tools={available} surface="menu" /></Slot>
+        placement={`${region.startsWith('bottom') ? 'top' : 'bottom'}-${region.endsWith('right') ? 'end' : 'start'}`}
+      >
+        <Slot name={slot}>
+          <ModelToolControls tools={available} surface="menu" />
+        </Slot>
       </Menu>
     </Region>
   );
 };
+
+const FIXED_OFF: QualityOptions = { tier: 'off' };
 
 const REGION_COMPONENTS = {
   'top-left': Overlay.TopLeft,
@@ -122,9 +160,11 @@ const REGION_COMPONENTS = {
 
 const ViewerLayout = ({
   source,
+  model: hostModel,
   query,
   features,
   featureConfig,
+  quality,
   canvas,
   draco,
   openingCamera,
@@ -136,41 +176,66 @@ const ViewerLayout = ({
   outputMenu,
   className,
   style,
+  locale,
+  labels: labelOverrides,
   children,
-}: Omit<ViewerProps, 'theme' | 'slots' | 'store'>) => {
+}: Omit<ViewerOptions, 'theme' | 'slots' | 'store'> & (ViewerSourceProps | ViewerModelProps)) => {
+  const labels = useMemo(() => resolveViewerLabels(locale, labelOverrides), [locale, labelOverrides]);
   const status = useViewerState((s) => s.status);
   const model = useViewerState((s) => s.gltf);
   const [attempt, setAttempt] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const resolved = useFeatures(features, featureConfig, query);
-  const registered = useMemo(() => model ? indexModelTools(resolved.flatMap(({ instance, context }) => instance.feature.tools?.(context) ?? [])) : null, [model, resolved]);
+  const registered = useMemo(
+    () =>
+      model
+        ? indexModelTools(resolved.flatMap(({ instance, context }) => instance.feature.tools?.(context) ?? []))
+        : null,
+    [model, resolved],
+  );
   const store = useViewer();
 
   useEffect(() => {
+    if (source === undefined) return;
     setDismissed(false);
     store.setState({ status: 'loading', error: undefined, gltf: undefined });
   }, [source, store]);
 
   const retry = () => {
-    useGLTF.clear(source);
-    store.setState({ status: 'loading', error: undefined, gltf: undefined });
+    if (source !== undefined) useGLTF.clear(source);
+    store.setState({ status: source === undefined ? 'idle' : 'loading', error: undefined, gltf: undefined });
     setDismissed(false);
-    setAttempt(previous => previous + 1);
+    setAttempt((previous) => previous + 1);
   };
 
   return (
-    <div className={['ds-viewer', className].filter(Boolean).join(' ')} style={style} data-status={status} data-testid="ds-viewer">
-      <ViewerErrorBoundary key={JSON.stringify([source, attempt])}
-        fallback={<ViewerError retry={retry} />}
+    <div
+      className={['ds-viewer', className].filter(Boolean).join(' ')}
+      style={style}
+      data-status={status}
+      data-testid="ds-viewer"
+    >
+      <ViewerErrorBoundary
+        key={JSON.stringify([source, attempt])}
+        fallback={<ViewerError retry={retry} labels={labels} />}
         onError={(error) => {
           store.setState({ status: 'error', error });
           store.emit('model:error', { error });
         }}
       >
-        <Canvas {...canvas} className={['ds-viewer__canvas', canvas?.className].filter(Boolean).join(' ')} data-testid="ds-viewer-canvas">
+        <Canvas
+          {...canvas}
+          className={['ds-viewer__canvas', canvas?.className].filter(Boolean).join(' ')}
+          data-testid="ds-viewer-canvas"
+        >
           <ViewerContext.Provider value={store}>
+            <QualityWatcher options={quality === false ? FIXED_OFF : quality} />
             <Suspense fallback={null}>
-              <Model waitForSceneFrame openingCamera={openingCamera} url={source} draco={draco} />
+              {hostModel ? (
+                <HostModel model={hostModel} openingCamera={openingCamera} />
+              ) : (
+                <Model waitForSceneFrame openingCamera={openingCamera} url={source} draco={draco} />
+              )}
               {controls && <DefaultControls />}
               {canvasChildren}
               {resolved.map(({ id, instance, context }) => {
@@ -181,7 +246,7 @@ const ViewerLayout = ({
                   </FeatureReactContext.Provider>
                 ) : null;
               })}
-              {model && <FirstSceneFrame model={model} />}
+              {model && !hostModel && <FirstSceneFrame model={model} />}
             </Suspense>
           </ViewerContext.Provider>
         </Canvas>
@@ -192,18 +257,29 @@ const ViewerLayout = ({
       <ModelToolContext.Provider value={registered}>
         <Overlay>
           {children}
-          {modelTools !== false && <ToolMenu slot="model.tools" region="middle-left" label="Customize" {...modelTools} />}
-          {outputMenu !== false && <ToolMenu slot="viewer.output" region="top-right" label="Output" {...outputMenu} />}
-          {viewOptions !== false && <ToolMenu slot="viewer.options" region="bottom-right" label="View options" {...viewOptions} />}
+          {modelTools !== false && (
+            <ToolMenu slot="model.tools" region="middle-left" label={labels.customize} {...modelTools} />
+          )}
+          {outputMenu !== false && (
+            <ToolMenu slot="viewer.output" region="top-right" label={labels.output} {...outputMenu} />
+          )}
+          {viewOptions !== false && (
+            <ToolMenu slot="viewer.options" region="bottom-right" label={labels.viewOptions} {...viewOptions} />
+          )}
         </Overlay>
       </ModelToolContext.Provider>
-      {status !== 'error' && (!dismissed || status !== 'ready') && (
-        <div className="ds-viewer__message ds-viewer__message--loading" data-testid="ds-viewer-loading"
+      {!hostModel && status !== 'error' && (!dismissed || status !== 'ready') && (
+        <div
+          className="ds-viewer__message ds-viewer__message--loading"
+          data-testid="ds-viewer-loading"
           data-leaving={status === 'ready' || undefined}
           onAnimationEnd={(event) => {
             if (status === 'ready' && event.target === event.currentTarget) setDismissed(true);
-          }}>
-          <Slot name="viewer.loading"><SceneLoading {...loadingPreview} /></Slot>
+          }}
+        >
+          <Slot name="viewer.loading">
+            <SceneLoading {...loadingPreview} />
+          </Slot>
         </div>
       )}
     </div>

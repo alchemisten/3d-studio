@@ -2,12 +2,14 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useViewerState, type ViewerStore } from '@schablone/3d-studio-core';
 import { Button, Field, SegmentedControl, Switch } from '@schablone/3d-studio-ui';
 import { Camera, Download } from 'lucide-react';
+import { presetLabel, resolveBeautyLabels } from './beauty-labels';
 import type { BeautyConfig } from './config';
 import { cameras, type Shot } from './capture-source';
 import './beauty-shot.css';
 
 export const BeautyControls = ({ viewer, config }: { viewer: ViewerStore; config: BeautyConfig }) => {
   const titleId = useId();
+  const labels = resolveBeautyLabels(config.locale, config.labels);
   const ready = useViewerState((state) => state.status === 'ready');
   const initial = config.presets.find((item) => item.id === config.initial) ?? config.presets[0];
   const [preset, setPreset] = useState(initial);
@@ -106,29 +108,29 @@ export const BeautyControls = ({ viewer, config }: { viewer: ViewerStore; config
       <header className="ds-beauty-header">
         <h2 id={titleId}>
           <Camera size={19} aria-hidden="true" />
-          Beauty shot
+          {labels.title}
         </h2>
         {image && <span>PNG</span>}
       </header>
       {!message && (
         <section className="ds-beauty-settings">
           <div className="ds-beauty-quality">
-            <span>Quality</span>
+            <span>{labels.quality}</span>
             <SegmentedControl
-              label="Quality"
+              label={labels.quality}
               value={preset.id}
-              options={config.presets.map((item) => ({ value: item.id, label: item.label }))}
+              options={config.presets.map((item) => ({ value: item.id, label: presetLabel(item, labels) }))}
               onValueChange={selectPreset}
             />
           </div>
           {config.layout === 'details' && (
             <>
-              <Field label="Denoise">
-                {(id) => <Switch id={id} label="Denoise" checked={denoise} onCheckedChange={setDenoise} />}
+              <Field label={labels.denoise}>
+                {(id) => <Switch id={id} label={labels.denoise} checked={denoise} onCheckedChange={setDenoise} />}
               </Field>
               <details>
-                <summary>More settings</summary>
-                <Field label="Samples">
+                <summary>{labels.moreSettings}</summary>
+                <Field label={labels.samples}>
                   {(id) => (
                     <input
                       id={id}
@@ -160,11 +162,11 @@ export const BeautyControls = ({ viewer, config }: { viewer: ViewerStore; config
             <span role="status">{image ? samples + ' samples' : message}</span>
             {image && originalUrl.current && (
               <SegmentedControl
-                label="Compare render"
+                label={labels.compare}
                 value={showOriginal ? 'original' : 'denoised'}
                 options={[
-                  { value: 'original', label: 'Original' },
-                  { value: 'denoised', label: 'Denoised' },
+                  { value: 'original', label: labels.original },
+                  { value: 'denoised', label: labels.denoised },
                 ]}
                 onValueChange={(value) => setShowOriginal(value === 'original')}
               />
@@ -173,7 +175,7 @@ export const BeautyControls = ({ viewer, config }: { viewer: ViewerStore; config
           </div>
           {busy && (
             <>
-              <progress aria-label="Render progress" max={1} value={progress?.fraction} />
+              <progress aria-label={labels.progress} max={1} value={progress?.fraction} />
               {progress && (
                 <small>
                   {message === 'Denoising...'
@@ -189,17 +191,17 @@ export const BeautyControls = ({ viewer, config }: { viewer: ViewerStore; config
       )}
       <footer className="ds-beauty-footer">
         <Button variant="ghost" onClick={close}>
-          {busy ? 'Cancel' : 'Back to scene'}
+          {busy ? labels.cancel : labels.back}
         </Button>
         {!message && (
           <Button disabled={!Number.isInteger(samples) || samples < 1 || samples > 2048} onClick={() => void render()}>
-            Render image
+            {labels.render}
           </Button>
         )}
         {image && (
           <a className="ds-button" href={image} download="beauty-shot.png">
             <Download size={16} />
-            Save image
+            {labels.save}
           </a>
         )}
       </footer>

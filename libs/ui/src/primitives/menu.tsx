@@ -50,7 +50,9 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
       }
       if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
       if (e.target instanceof HTMLElement && e.target.closest('input, select, textarea, [role="slider"]')) return;
-      const items = Array.from(root.querySelectorAll<HTMLElement>('[role^="menuitem"]:not(:disabled):not([aria-disabled="true"])'));
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>('[role^="menuitem"]:not(:disabled):not([aria-disabled="true"])'),
+      );
       if (!items.length) return;
       e.preventDefault();
       const index = items.indexOf(document.activeElement as HTMLElement);
@@ -66,10 +68,15 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
   }, [open]);
 
   return (
-    <div ref={rootRef} className={cx('ds-menu', className)} data-placement={placement} data-open={open ? '' : undefined}
+    <div
+      ref={rootRef}
+      className={cx('ds-menu', className)}
+      data-placement={placement}
+      data-open={open ? '' : undefined}
       onBlur={(event) => {
         if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
-      }}>
+      }}
+    >
       <IconButton
         ref={trigger}
         label={label}
@@ -83,9 +90,15 @@ export const Menu = ({ label, icon, items, children, className, testId, placemen
         onClick={() => setOpen((o) => !o)}
       />
       {open && (
-        <div id={popupId} className="ds-menu__popup" role="menu" onClick={(event) => {
-          if (event.target instanceof Element && event.target.closest('[role="menuitem"]')) setOpen(false);
-        }} data-testid={testId && `${testId}-popup`}>
+        <div
+          id={popupId}
+          className="ds-menu__popup"
+          role="menu"
+          onClick={(event) => {
+            if (event.target instanceof Element && event.target.closest('[role="menuitem"]')) setOpen(false);
+          }}
+          data-testid={testId && `${testId}-popup`}
+        >
           {items?.map((item) => (
             <button
               key={item.id}
@@ -154,6 +167,8 @@ export interface MenuRadioItemProps {
   label: string;
   checked: boolean;
   onSelect: () => void;
+  /** Shown but not selectable, e.g. a value the current choice does not allow. */
+  disabled?: boolean;
   icon?: ReactNode;
   className?: string;
   /** Rendered as `data-testid`. */
@@ -161,11 +176,12 @@ export interface MenuRadioItemProps {
 }
 
 /** A single-choice row for `<Menu>` children. Keeps the menu open when selected. */
-export const MenuRadioItem = ({ label, checked, onSelect, icon, className, testId }: MenuRadioItemProps) => (
+export const MenuRadioItem = ({ label, checked, onSelect, icon, className, testId, disabled }: MenuRadioItemProps) => (
   <button
     type="button"
     role="menuitemradio"
     aria-checked={checked}
+    disabled={disabled}
     className={cx('ds-menu__item', 'ds-menu__item--radio', className)}
     data-testid={testId}
     onClick={onSelect}

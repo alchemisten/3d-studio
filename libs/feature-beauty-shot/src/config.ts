@@ -8,6 +8,10 @@ const preset = z.object({
 });
 export const beautyConfig = z.object({
   enabled: z.boolean().default(false),
+  /** Locale of the dialog; `en` and `de` are shipped. */
+  locale: z.string().default('en'),
+  /** Overrides single texts of the dialog (see `BeautyLabels`). */
+  labels: z.record(z.string(), z.string()).default({}),
   layout: z.enum(['direct', 'quality', 'details']).default('quality'),
   initial: z.string().default('standard'),
   presets: z

@@ -1,0 +1,76 @@
+.ds-ar-dialog {
+  margin: auto;
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: min(25rem, calc(100vw - 1.5rem));
+  max-width: none;
+  max-height: calc(100dvh - 1.5rem);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid var(--ds-color-border);
+  border-radius: 1rem;
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface);
+  box-shadow: 0 1.5rem 5rem #0004;
+  font: inherit;
+}
+.ds-ar-dialog::backdrop {
+  background: #13191c78;
+  backdrop-filter: blur(5px);
+}
+.ds-ar-dialog__panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.ds-ar-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.ds-ar-dialog__header h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 1.12rem;
+  font-weight: 650;
+  text-wrap: balance;
+}
+.ds-ar-dialog__code {
+  justify-self: center;
+  width: min(17.5rem, 100%);
+  height: auto;
+  border-radius: 0.5rem;
+}
+.ds-ar-dialog__hint,
+.ds-ar-dialog__dimensions,
+.ds-ar-dialog__error {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.ds-ar-dialog__hint,
+.ds-ar-dialog__dimensions {
+  color: var(--ds-color-text-muted);
+}
+.ds-ar-dialog__dimensions {
+  font-variant-numeric: tabular-nums;
+}
+.ds-ar-dialog__error {
+  color: var(--ds-color-danger);
+}
+.ds-ar-dialog__link {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ds-color-border);
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.ds-ar-dialog .ds-button[data-variant='solid'] {
+  background: var(--ds-color-accent);
+  border-color: var(--ds-color-accent);
+  color: var(--ds-color-accent-contrast);
+}

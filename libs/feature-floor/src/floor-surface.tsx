@@ -49,16 +49,20 @@ void main() {
 
 export const FloorSurface = ({
   model,
+  revision = 0,
   mode,
   color,
   animated = false,
   onShadowReady,
 }: FloorConfig & {
   model: Object3D;
+  /** Changes when the model was changed in place: the floor is fitted and the shadow captured again. */
+  revision?: number;
   animated?: boolean;
   onShadowReady?: () => void;
 }) => {
-  const bounds = useMemo(() => floorBounds(model), [model]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const bounds = useMemo(() => floorBounds(model), [model, revision]);
   const pass = useMemo(() => {
     if (!bounds) return null;
     const { x, y, z, span, depth } = bounds;

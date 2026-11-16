@@ -32,7 +32,16 @@ const Silhouette = ({ source, color }: { source: Mesh; color: string }) => {
   );
 };
 
-export const HoverOutline = ({ highlight, model }: { highlight: Highlight; model: Object3D }) => {
+export const HoverOutline = ({
+  highlight,
+  model,
+  revision = 0,
+}: {
+  highlight: Highlight;
+  model: Object3D;
+  /** Changes when the model was changed in place: the outlined meshes are looked up again. */
+  revision?: number;
+}) => {
   const meshes = useMemo(() => {
     const target = highlight.target ?? highlight.anchor;
     const nodes = highlight.nodes?.length ? highlight.nodes : 'node' in target ? [target.node] : [];
@@ -43,7 +52,8 @@ export const HoverOutline = ({ highlight, model }: { highlight: Highlight; model
         if (mesh.isMesh) result.add(mesh);
       });
     return [...result];
-  }, [highlight, model]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlight, model, revision]);
   const color = (typeof highlight.pointer === 'object' && highlight.pointer.color) || highlight.color || '#ffffff';
   return (
     <>

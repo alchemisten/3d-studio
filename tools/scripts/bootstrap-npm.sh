@@ -24,11 +24,15 @@ PACKAGES=(
   3d-studio-feature-material-variants
   3d-studio-feature-beauty-shot
   3d-studio-feature-floor
+  3d-studio-feature-offline
   3d-studio-feature-wireframe
   3d-studio-feature-camera-rotation
   3d-studio-feature-light-scenarios
   3d-studio-feature-animation
+  3d-studio-feature-ar
   3d-studio-feature-highlights
+  3d-studio-feature-editor
+  3d-studio-feature-ambient-occlusion
 )
 dry="${1:-}"
 if [[ $# -gt 1 || ( -n "$dry" && "$dry" != "--dry-run" ) ]]; then

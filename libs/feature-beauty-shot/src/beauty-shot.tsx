@@ -2,6 +2,7 @@ import { defineFeature, useViewer, useViewerState } from '@schablone/3d-studio-c
 import { Camera } from 'lucide-react';
 import { BeautyControls } from './beauty-controls';
 import { CaptureSource } from './capture-source';
+import { resolveBeautyLabels } from './beauty-labels';
 import { beautyConfig, type BeautyConfig } from './config';
 
 declare module '@schablone/3d-studio-core' {
@@ -10,11 +11,20 @@ declare module '@schablone/3d-studio-core' {
   }
 }
 
-const BeautyAction = () => {
+const BeautyAction = ({ label }: { label: string }) => {
   const viewer = useViewer();
-  const ready = useViewerState(state => state.status === 'ready');
-  return <button disabled={!ready} type="button" role="menuitem" className="ds-menu__item"
-    onClick={() => viewer.emit('beauty-shot:open', undefined)}><Camera size={16} /> Beauty shot</button>;
+  const ready = useViewerState((state) => state.status === 'ready');
+  return (
+    <button
+      disabled={!ready}
+      type="button"
+      role="menuitem"
+      className="ds-menu__item"
+      onClick={() => viewer.emit('beauty-shot:open', undefined)}
+    >
+      <Camera size={16} /> {label}
+    </button>
+  );
 };
 
 export const beautyShot = defineFeature<BeautyConfig>({
@@ -26,7 +36,7 @@ export const beautyShot = defineFeature<BeautyConfig>({
       ? {
           'viewer.output': {
             mode: 'append',
-            content: <BeautyAction />,
+            content: <BeautyAction label={resolveBeautyLabels(config.locale, config.labels).title} />,
           },
           'viewer.layer': { mode: 'append', content: <BeautyControls viewer={viewer} config={config} /> },
         }

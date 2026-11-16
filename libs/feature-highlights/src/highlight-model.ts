@@ -15,10 +15,16 @@ export interface Highlight {
   label?: string | Record<string, string>;
   /** Where the hotspot is shown and clicked. */
   anchor: Anchor;
-  description?: string;
+  /**
+   * Markdown, as a plain string or a map of locale to text. Besides formatting, lists, links and images
+   * it may hold `::video{src="…"}` and `::action[Label]{type="…" …}` directives (see `ContentAction`).
+   */
+  description?: string | Record<string, string>;
   tools?: readonly string[];
   /** What the highlight is about. Defaults to the anchor. */
   target?: Anchor;
+  /** Surface normal at the target (or anchor) in world space; kept for authoring tools, unused by the viewer. */
+  normal?: Vec3;
   /** Draw a pointer line from the anchor to the target. */
   hoverOutline?: boolean;
   pointer?: boolean | { color?: string };
@@ -59,7 +65,8 @@ export type HighlightCommand =
 export interface HighlightAction {
   requiresFeature?: string;
   id: string;
-  label: string;
+  /** Plain string, or a map of locale to label. */
+  label: string | Record<string, string>;
   /** A declarative command, or a function for anything else (it receives the viewer store). */
   run: HighlightCommand | ((viewer: ViewerStore) => void);
 }
@@ -139,7 +146,9 @@ export const isHighlightVisible = (highlight: Highlight, animation: AnimationSna
     return false;
   }
   if (state) {
-    const current = clip ? ((animation.status[clip] as ClipState | undefined) ?? 'stopped') : overallState(animation.status);
+    const current = clip
+      ? ((animation.status[clip] as ClipState | undefined) ?? 'stopped')
+      : overallState(animation.status);
     return (Array.isArray(state) ? state : [state]).includes(current);
   }
   return true;
@@ -152,3 +161,10 @@ export const highlightLabel = (highlight: Highlight, locale: string): string => 
   }
   return typeof label === 'string' ? label : (label[locale] ?? Object.values(label)[0] ?? highlight.id);
 };
+
+/** Picks the text of a locale from a plain string or a locale map; falls back to the first entry. */
+export const localizedText = (text: string | Record<string, string> | undefined, locale: string): string | undefined =>
+  typeof text === 'object' ? (text[locale] ?? Object.values(text)[0]) : text;
+
+export const highlightDescription = (highlight: Highlight, locale: string): string | undefined =>
+  localizedText(highlight.description, locale) || undefined;
